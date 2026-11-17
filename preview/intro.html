@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#050b1a;font-family:Almarai,sans-serif}
-#scene{height:600vh;position:relative}
+#scene{height:300vh;position:relative}
 .stick{position:sticky;top:0;height:100vh;height:100lvh;overflow:hidden;contain:strict}
 .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 52% 55%,transparent 30%,rgba(3,8,20,.55) 100%);pointer-events:none}
 .glow{position:absolute;inset:0;background:linear-gradient(180deg,rgba(249,250,253,.6) 0%,#F9FAFD 55%,#F9FAFD 100%);opacity:0;pointer-events:none}
@@ -31,7 +31,17 @@
 .worlds span{padding:10px 20px;border-radius:30px;font-size:14px;color:#032E36;background:rgba(255,255,255,.7);border:1px solid rgba(3,46,54,.08)}
 @media (prefers-reduced-motion:reduce){#scene{height:100vh}.line,.hint{display:none}}
 @media (max-width:640px){.top{padding:16px 18px}.top img{height:26px}}
-.poem{top:9%;font-size:clamp(26px,3.6vw,52px);line-height:1.7;letter-spacing:.3px}
+.poem{top:8%;font-size:clamp(28px,3.8vw,56px);line-height:1.55;letter-spacing:.2px;text-shadow:none;filter:drop-shadow(0 0 22px rgba(92,225,230,.28)) drop-shadow(0 6px 24px rgba(0,0,0,.55))}
+.poem .hm{display:block}
+.poem .w{display:inline-block;padding:.18em .04em;opacity:0;filter:blur(12px);transform:translateY(14px) scale(.98);background:linear-gradient(110deg,#fff 38%,#CFF7F8 48%,#EDE9FF 54%,#fff 64%);background-size:260% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.poem.on .w{animation:wIn 1.3s cubic-bezier(.2,.7,.2,1) forwards,shine 7s linear infinite;animation-delay:calc(var(--i)*.16s),calc(1.6s + var(--i)*.12s)}
+@keyframes wIn{to{opacity:1;filter:blur(0);transform:none}}
+@keyframes shine{to{background-position:-160% 0}}
+.poem .sep{display:flex;align-items:center;justify-content:center;gap:12px;margin:.15em auto;opacity:0;transition:opacity 1s ease .8s}
+.poem .sep:before,.poem .sep:after{content:"";height:1px;width:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75));transition:width 1.4s cubic-bezier(.2,.7,.2,1) .8s}
+.poem .sep:after{background:linear-gradient(270deg,transparent,rgba(255,255,255,.75))}
+.poem .sep b{font-size:.32em;color:#BFF3F5;font-weight:400}
+.poem.on .sep{opacity:1}.poem.on .sep:before,.poem.on .sep:after{width:clamp(50px,9vw,130px)}
 </style>
 </head>
 <body>
@@ -40,7 +50,7 @@
 </header>
 <section id="scene"><div class="stick">
   <canvas id="cv" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas><div class="vig" id="vig"></div>
-  <div class="line poem">وتَحْسَبُ أنَّكَ جِرْمٌ صَغِيرٌ<br>وفِيكَ انْطَوَى العَالَمُ الأَكْبَرُ</div>
+  <div class="line poem"><span class="hm"><span class="w" style="--i:0">وتَحْسَبُ</span> <span class="w" style="--i:1">أنَّكَ</span> <span class="w" style="--i:2">جِرْمٌ</span> <span class="w" style="--i:3">صَغِيرٌ</span></span><span class="sep"><b>✦</b></span><span class="hm"><span class="w" style="--i:4">وفِيكَ</span> <span class="w" style="--i:5">انْطَوَى</span> <span class="w" style="--i:6">العَالَمُ</span> <span class="w" style="--i:7">الأَكْبَرُ</span></span></div>
   <div class="glow" id="glow"></div>
   <div class="hint" id="hint">اسحب للأسفل<i></i></div>
 </div></section>
@@ -71,10 +81,10 @@ function f(){
   vig.style.opacity=1-cl(p/.6);
   glow.style.opacity=ease(cl((p-.78)/.2));
   hint.style.opacity=1-cl(p/.05);
-  lines.forEach((l,i)=>{const[a,b]=win[i],m=(b-a)*.3;let o=p<a||p>b?0:p<a+m?(p-a)/m:p>b-m?(b-p)/m:1;l.style.opacity=o;l.style.transform='translateY('+((1-o)*16)+'px)';});
+  lines.forEach(l=>{const o=1-cl((p-.1)/.14);l.style.opacity=o;l.style.filter=o<1?'blur('+((1-o)*10)+'px)':'';l.style.transform='translateY('+(-(1-o)*30)+'px) scale('+(1+(1-o)*.06)+')';});
   hdr.classList.toggle('light',p>.62);
 }
-addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{ticking=false;f();});}},{passive:true});addEventListener('resize',size);size();f();
+addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{ticking=false;f();});}},{passive:true});addEventListener('resize',size);size();f();setTimeout(()=>lines.forEach(l=>l.classList.add('on')),350);
 document.getElementById('skip').onclick=e=>{e.preventDefault();document.getElementById('hero').scrollIntoView({behavior:'smooth'});};
 </script>
 </body>

@@ -25,14 +25,24 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .done .btn{color:#032E36;border-color:rgba(3,46,54,.2);background:rgba(255,255,255,.6)}
 .logoW,.done .logoD{display:block}.logoD,.done .logoW{display:none}
 @media (max-width:640px){.top{padding:16px 18px}.top img{height:26px}}
-.poem{top:9%;font-size:clamp(26px,3.6vw,52px);line-height:1.7;letter-spacing:.3px}
+.poem{top:8%;font-size:clamp(28px,3.8vw,56px);line-height:1.55;letter-spacing:.2px;text-shadow:none;filter:drop-shadow(0 0 22px rgba(92,225,230,.28)) drop-shadow(0 6px 24px rgba(0,0,0,.55))}
+.poem .hm{display:block}
+.poem .w{display:inline-block;padding:.18em .04em;opacity:0;filter:blur(12px);transform:translateY(14px) scale(.98);background:linear-gradient(110deg,#fff 38%,#CFF7F8 48%,#EDE9FF 54%,#fff 64%);background-size:260% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.poem.on .w{animation:wIn 1.3s cubic-bezier(.2,.7,.2,1) forwards,shine 7s linear infinite;animation-delay:calc(var(--i)*.16s),calc(1.6s + var(--i)*.12s)}
+@keyframes wIn{to{opacity:1;filter:blur(0);transform:none}}
+@keyframes shine{to{background-position:-160% 0}}
+.poem .sep{display:flex;align-items:center;justify-content:center;gap:12px;margin:.15em auto;opacity:0;transition:opacity 1s ease .8s}
+.poem .sep:before,.poem .sep:after{content:"";height:1px;width:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75));transition:width 1.4s cubic-bezier(.2,.7,.2,1) .8s}
+.poem .sep:after{background:linear-gradient(270deg,transparent,rgba(255,255,255,.75))}
+.poem .sep b{font-size:.32em;color:#BFF3F5;font-weight:400}
+.poem.on .sep{opacity:1}.poem.on .sep:before,.poem.on .sep:after{width:clamp(50px,9vw,130px)}
 </style>
 </head>
 <body>
 <section class="hdr" id="hdr">
   <video id="v" muted playsinline autoplay preload="auto" poster="v/poster.jpg"></video>
   <div class="veil"></div>
-  <div class="line poem">وتَحْسَبُ أنَّكَ جِرْمٌ صَغِيرٌ<br>وفِيكَ انْطَوَى العَالَمُ الأَكْبَرُ</div>
+  <div class="line poem"><span class="hm"><span class="w" style="--i:0">وتَحْسَبُ</span> <span class="w" style="--i:1">أنَّكَ</span> <span class="w" style="--i:2">جِرْمٌ</span> <span class="w" style="--i:3">صَغِيرٌ</span></span><span class="sep"><b>✦</b></span><span class="hm"><span class="w" style="--i:4">وفِيكَ</span> <span class="w" style="--i:5">انْطَوَى</span> <span class="w" style="--i:6">العَالَمُ</span> <span class="w" style="--i:7">الأَكْبَرُ</span></span></div>
   <div class="hero">
     <h1>اكتشف عالمك، وابدأ رحلتك</h1>
     <p>منصة تساعدك على فهم نفسك، واكتشاف شغفك، ورسم طريقك بثقة؛ خطوة بخطوة.</p>
@@ -47,7 +57,7 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 const v=document.getElementById('v'),hdr=document.getElementById('hdr'),lines=[...document.querySelectorAll('.line')],skip=document.getElementById('skip');
 const mob=matchMedia('(max-aspect-ratio:1/1)').matches;
 v.src=mob?'v/door-m.mp4':'v/door.mp4';
-const T=[[0.3,4.2]];v.playbackRate=.85;v.addEventListener('loadedmetadata',()=>v.playbackRate=.85);
+const T=[[0.2,3.2]];v.playbackRate=.85;v.addEventListener('loadedmetadata',()=>v.playbackRate=.85);
 function finish(){hdr.classList.add('done');lines.forEach(l=>l.classList.remove('on'));skip.textContent='↻ إعادة';}
 v.addEventListener('timeupdate',()=>{const t=v.currentTime;lines.forEach((l,i)=>l.classList.toggle('on',t>=T[i][0]&&t<T[i][1]&&!hdr.classList.contains('done')));if(t>=v.duration-1.2)finish();});
 v.addEventListener('ended',finish);
