@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Youverse — ادخل عالمك</title>
+<link rel="icon" href="img/1e4dffc431313b7bc68eadda79d3417c.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#03060f;font-family:Almarai,sans-serif;overscroll-behavior:none}
+#scene{height:300vh;position:relative}
+@media (max-aspect-ratio:1/1){#scene{height:240vh}}
+.stick{position:sticky;top:0;height:100vh;height:100lvh;overflow:hidden}
+#gl,#fx{position:absolute;inset:0;width:100%;height:100%;display:block}
+#fx{pointer-events:none}
+.verse{position:absolute;left:0;right:0;top:11%;text-align:center;font-family:Amiri,serif;font-weight:700;color:#fff;padding:0 20px;pointer-events:none;
+  font-size:clamp(24px,min(3vw,5.4vh),46px);line-height:1.6;opacity:0;
+  text-shadow:0 0 18px rgba(170,225,255,.45),0 0 2px rgba(255,255,255,.9)}
+.verse .row{display:inline-block;white-space:nowrap}
+.verse .dot{display:inline-block;margin:0 .7em;font-size:.45em;vertical-align:middle;color:#cfe8ff;opacity:.9}
+@media (max-aspect-ratio:1/1){.verse{top:calc(env(safe-area-inset-top,0px) + 96px);font-size:clamp(24px,7.2vw,36px)}.verse .row{display:block}.verse .dot{display:block;margin:.1em 0;font-size:.5em}}
+.hero{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 24px 60px;opacity:0;pointer-events:none}
+.hero h1{font-family:Amiri,serif;font-size:clamp(40px,6vw,84px);color:#032E36;margin:0 0 16px;line-height:1.3;text-shadow:0 2px 30px rgba(255,255,255,.7)}
+.hero p{font-size:clamp(16px,1.6vw,21px);color:#1E3A40;max-width:620px;line-height:1.9;margin:0 0 30px}
+.cta{display:inline-block;background:#127F87;color:#fff;text-decoration:none;font-weight:700;padding:17px 44px;border-radius:40px;font-size:18px;box-shadow:0 14px 34px rgba(18,127,135,.28)}
+.cta2{display:inline-block;margin-top:14px;color:#127F87;text-decoration:none;font-size:15px}
+.top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:flex-end;padding:22px 36px;z-index:5}
+.skip{color:#fff;text-decoration:none;font-size:14px;border:1px solid rgba(255,255,255,.35);padding:9px 18px;border-radius:30px;background:rgba(10,20,40,.35);transition:.4s}
+.top.light .skip{color:#032E36;border-color:rgba(3,46,54,.2);background:rgba(255,255,255,.7)}
+.hint{position:absolute;bottom:30px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:13px}
+.hint i{display:block;margin:9px auto 0;width:22px;height:36px;border:2px solid rgba(255,255,255,.55);border-radius:12px;position:relative}
+.hint i:after{content:"";position:absolute;top:6px;left:50%;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#fff;animation:d 1.6s infinite}
+@keyframes d{0%{opacity:0;transform:translateY(0)}40%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
+@media (max-width:640px){.top{padding:16px 18px}}
+</style>
+</head>
+<body>
+<header class="top" id="top"><a class="skip" href="#" id="skip">تخطَّ إلى المنصة ←</a></header>
+<section id="scene"><div class="stick">
+  <canvas id="gl"></canvas>
+  <canvas id="fx"></canvas>
+  <div class="verse" id="verse"><span class="row">وتَحْسَبُ أنَّكَ جِرْمٌ صَغِيرٌ</span><span class="dot">✦</span><span class="row">وفِيكَ انْطَوَى العَالَمُ الأَكْبَرُ</span></div>
+  <div class="hero" id="hero">
+    <h1>اكتشف عالمك، وابدأ رحلتك</h1>
+    <p>منصة تساعدك على فهم نفسك، واكتشاف شغفك، ورسم طريقك بثقة؛ خطوة بخطوة.</p>
+    <a class="cta" href="index.html#test">ابدأ الاختبار</a>
+    <a class="cta2" href="index.html#home">تصفّح المنصة</a>
+  </div>
+  <div class="hint" id="hint">اسحب للأسفل<i></i></div>
+</div></section>
+<script type="module">
+import * as THREE from './js/three.module.min.js';
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)), ease=t=>t*t*(3-2*t), lerp=(a,b,t)=>a+(b-a)*t;
+const mob=matchMedia('(max-aspect-ratio:1/1)').matches;
+const lowPower=mob||(navigator.hardwareConcurrency||8)<=4;
+
+/* ---------- renderer ---------- */
+const canvas=$('gl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+const DPR=Math.min(devicePixelRatio||1,mob?2:2);
+renderer.setPixelRatio(DPR);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+
+const camera=new THREE.PerspectiveCamera(mob?62:42,1,0.05,400);
+const night=new THREE.Scene(), day=new THREE.Scene();
+
+/* shared noise GLSL */
+const NOISE=`
+float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<6;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}`;
+
+/* ---------- NIGHT: sky dome with milky way ---------- */
+const nightSky=new THREE.Mesh(new THREE.SphereGeometry(200,48,24),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,
+ uniforms:{t:{value:0}},
+ vertexShader:`varying vec3 vd;void main(){vd=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:NOISE+`varying vec3 vd;uniform float t;
+ void main(){vec3 d=normalize(vd);float h=d.y;
+  vec3 top=vec3(.012,.022,.055), hor=vec3(.05,.08,.15);
+  vec3 c=mix(hor,top,smoothstep(-.05,.55,h));
+  vec3 n=normalize(vec3(.55,.75,.35));float band=exp(-pow(dot(d,n),2.)*28.);
+  float m=fbm(d.xz*6.+d.y*3.)*fbm(d.zy*9.);
+  c+=vec3(.42,.5,.75)*band*m*.55+vec3(.25,.3,.45)*band*.08;
+  c+=vec3(.9,.6,.35)*.06*exp(-pow(abs(h),1.)*14.)*smoothstep(-.2,.02,h);
+  gl_FragColor=vec4(c,1.);}`}));
+night.add(nightSky);
+
+/* ---------- NIGHT: twinkling stars ---------- */
+const STARS=lowPower?2600:5200;
+{
+ const g=new THREE.BufferGeometry(),pos=new Float32Array(STARS*3),sz=new Float32Array(STARS),ph=new Float32Array(STARS),col=new Float32Array(STARS*3);
+ for(let i=0;i<STARS;i++){let x,y,z;do{x=Math.random()*2-1;y=Math.random();z=Math.random()*2-1;}while(x*x+y*y+z*z>1||y<0.015);
+  const l=Math.hypot(x,y,z),r=180;pos.set([x/l*r,y/l*r*0.95,z/l*r],i*3);
+  const big=Math.random();sz[i]=big>.985?4.2:big>.9?2.8:1.4+Math.random()*.8;ph[i]=Math.random()*6.28;
+  const tint=Math.random();col.set(tint>.8?[.8,.88,1]:tint>.65?[1,.92,.8]:[1,1,1],i*3);}
+ g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('sz',new THREE.BufferAttribute(sz,1));
+ g.setAttribute('ph',new THREE.BufferAttribute(ph,1));g.setAttribute('col',new THREE.BufferAttribute(col,3));
+ window.starMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{t:{value:0},px:{value:DPR}},
+  vertexShader:`attribute float sz,ph;attribute vec3 col;uniform float t,px;varying float a;varying vec3 vc;
+   void main(){vc=col;float tw=.55+.45*sin(t*(1.2+fract(ph*7.)*2.6)+ph);a=tw;
+    gl_PointSize=sz*px*(.85+.35*tw);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying float a;varying vec3 vc;void main(){vec2 q=gl_PointCoord-.5;float d=length(q);
+   float core=smoothstep(.5,.0,d);float glow=exp(-d*d*18.);gl_FragColor=vec4(vc*(core*.9+glow*.6)*a,1.);}`});
+ night.add(new THREE.Points(g,starMat));
+}
+
+/* ---------- NIGHT: sand with door light ---------- */
+const sandMat=new THREE.ShaderMaterial({uniforms:{open:{value:0},t:{value:0}},
+ vertexShader:`varying vec3 wp;void main(){vec4 w=modelMatrix*vec4(position,1.);wp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
+ fragmentShader:NOISE+`varying vec3 wp;uniform float open;
+ void main(){vec2 p=wp.xz;
+  float rip=fbm(vec2(p.x*1.4,p.y*5.5))*.6+fbm(p*.35)*.4;
+  vec3 base=mix(vec3(.10,.11,.15),vec3(.20,.20,.24),rip);
+  float dist=length(p);base*=mix(1.,.55,smoothstep(8.,40.,dist));
+  // light spilling out of the doorway toward the viewer
+  float z=p.y;float w=.42+max(z,0.)*.30;
+  float lane=smoothstep(w,w-.25,abs(p.x+z*.06))*smoothstep(-.05,.15,z)*exp(-max(z,0.)*.22);
+  float pool=exp(-dot(p-vec2(0.,.4),p-vec2(0.,.4))*1.2);
+  float L=(lane*.95+pool*.6)*open;
+  vec3 warm=vec3(1.,.78,.5)*(.55+.45*rip);
+  vec3 c=base+warm*L*1.15;
+  // horizon haze
+  c=mix(c,vec3(.06,.08,.14),smoothstep(25.,120.,dist));
+  gl_FragColor=vec4(c,1.);}`});
+const sand=new THREE.Mesh(new THREE.PlaneGeometry(400,400,1,1),sandMat);sand.rotation.x=-Math.PI/2;night.add(sand);
+
+/* ---------- NIGHT: the door ---------- */
+const DW=1.0,DH=2.15,FT=.09,FD=.16;
+const white=new THREE.MeshStandardMaterial({color:0xf3eee6,roughness:.55,metalness:0});
+const whiteInner=new THREE.MeshStandardMaterial({color:0xfff3e0,roughness:.5,emissive:0xffd9a8,emissiveIntensity:0});
+const gold=new THREE.MeshStandardMaterial({color:0xd4a95c,roughness:.4,metalness:.35,emissive:0x3a2a10,emissiveIntensity:.4});
+const doorG=new THREE.Group();night.add(doorG);
+function box(w,h,d,m,x,y,z){const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);doorG.add(b);return b;}
+// frame: jambs + head (inner faces glow)
+box(FT,DH+FT,FD,white,-(DW/2+FT/2),(DH+FT)/2,0);
+box(FT,DH+FT,FD,white,(DW/2+FT/2),(DH+FT)/2,0);
+box(DW+FT*2,FT,FD,white,0,DH+FT/2,0);
+// casing trim (front)
+const trimM=white;
+[[-1],[1]].forEach(([s])=>box(.05,DH+FT+.05,.04,trimM,s*(DW/2+FT+.02),(DH+FT+.05)/2,FD/2+.02));
+box(DW+FT*2+.09,.06,.04,trimM,0,DH+FT+.03,FD/2+.02);
+// inner glowing reveal strips
+const revL=box(.012,DH,FD*.9,whiteInner,-DW/2+.006,DH/2,0),revR=box(.012,DH,FD*.9,whiteInner,DW/2-.006,DH/2,0),revT=box(DW,.012,FD*.9,whiteInner,0,DH-.006,0);
+// door leaf on hinge (right side), opens toward the viewer
+const hinge=new THREE.Group();hinge.position.set(DW/2,0,FD/2);doorG.add(hinge);
+const leaf=new THREE.Group();leaf.position.set(-DW/2,0,0);hinge.add(leaf);
+function lbox(w,h,d,m,x,y,z){const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);leaf.add(b);return b;}
+lbox(DW-.01,DH-.01,.05,white,0,DH/2,.025);
+// raised panels both faces
+[[.6,.42],[.6,.12]].forEach(([y0,dummy],k)=>{});
+function panel(cx,cy,w,h,z){const t=.012,m=white;
+ lbox(w,.03,t,m,cx,cy+h/2,z);lbox(w,.03,t,m,cx,cy-h/2,z);lbox(.03,h,t,m,cx-w/2,cy,z);lbox(.03,h,t,m,cx+w/2,cy,z);}
+for(const z of [.056,-.006]){panel(0,DH*.68,DW*.68,DH*.42,z);panel(0,DH*.24,DW*.68,DH*.26,z);}
+// handle
+{const h=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.13,16),gold);h.rotation.z=Math.PI/2;h.position.set(-DW/2+.13,DH*.47,.11);leaf.add(h);
+ const r=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.02,24),gold);r.rotation.x=Math.PI/2;r.position.set(-DW/2+.08,DH*.47,.06);leaf.add(r);
+ const k=new THREE.Mesh(new THREE.BoxGeometry(.03,.09,.012),gold);k.position.set(-DW/2+.08,DH*.43,.058);leaf.add(k);}
+leaf.children.forEach(m=>{m.castShadow=false;});
+
+// lights
+night.add(new THREE.HemisphereLight(0xdfe6f5,0x2a2218,1.7));
+const moon=new THREE.DirectionalLight(0xeef2ff,1.8);moon.position.set(-6,8,6);night.add(moon);const fill=new THREE.DirectionalLight(0xfff4e6,1.3);fill.position.set(1.5,3,10);night.add(fill);
+const warm=new THREE.PointLight(0xffc98a,0,7,1.6);warm.position.set(0,1.1,-.35);night.add(warm);
+const warmFront=new THREE.PointLight(0xffd7a0,0,4,2);warmFront.position.set(0,.9,.6);night.add(warmFront);
+
+/* ---------- DAY world (seen through the doorway) ---------- */
+const daySky=new THREE.Mesh(new THREE.SphereGeometry(200,64,32),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,
+ uniforms:{t:{value:0}},
+ vertexShader:`varying vec3 vd;void main(){vd=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:NOISE+`varying vec3 vd;uniform float t;
+ void main(){vec3 d=normalize(vd);float h=d.y+.22;
+  vec3 zen=vec3(.16,.44,.82), hor=vec3(.72,.85,.95), low=vec3(.93,.95,.97);
+  vec3 c=mix(hor,zen,pow(clamp(h,0.,1.),.55));
+  c=mix(low,c,smoothstep(-.12,.06,h));
+  vec3 sun=normalize(vec3(.42,.55,-1.));float sd=max(dot(d,sun),0.);
+  c+=vec3(1.,.93,.78)*pow(sd,900.)*6.+vec3(1.,.9,.72)*pow(sd,40.)*.45+vec3(1.,.95,.85)*pow(sd,6.)*.18;
+  // cumulus clouds on a plane above
+  if(h>.0){vec2 uv=d.xz/(h+.12)*1.1+vec2(t*.004,0.);
+   float n=fbm(uv*1.3);float n2=fbm(uv*3.1+4.);
+   float cov=smoothstep(.50,.78,n*.75+n2*.35);cov*=smoothstep(0.,.18,h);
+   float lit=clamp(.55+.6*dot(normalize(vec3(uv,1.)),sun)+(n2-.5)*.6,0.,1.);
+   vec3 cc=mix(vec3(.74,.79,.86),vec3(1.,.99,.97),lit);
+   c=mix(c,cc,cov*.95);}
+  // sea of clouds below horizon
+  if(h<.03){vec2 uv=d.xz/(-h+.08)*.9;float n=fbm(uv*.9+3.);float b=smoothstep(.3,.75,n);
+   vec3 cc=mix(vec3(.82,.86,.92),vec3(1.,.99,.97),b);c=mix(c,cc,smoothstep(.03,-.06,h));}
+  gl_FragColor=vec4(c,1.);}`}));
+day.add(daySky);
+
+/* portal: the doorway shows the day world rendered from the same camera */
+let rt=new THREE.WebGLRenderTarget(4,4,{colorSpace:THREE.SRGBColorSpace});
+const portalMat=new THREE.ShaderMaterial({uniforms:{map:{value:rt.texture},res:{value:new THREE.Vector2(1,1)},glow:{value:0}},
+ vertexShader:`void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:`uniform sampler2D map;uniform vec2 res;uniform float glow;void main(){vec2 uv=gl_FragCoord.xy/res;vec4 c=texture2D(map,uv);
+  gl_FragColor=vec4(c.rgb+vec3(1.,.9,.75)*glow,1.);}`});
+const portal=new THREE.Mesh(new THREE.PlaneGeometry(DW,DH),portalMat);portal.position.set(0,DH/2,-.01);doorG.add(portal);
+
+/* soft glow halo around the doorway */
+const haloMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{k:{value:0}},
+ vertexShader:`varying vec2 u;void main(){u=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:`varying vec2 u;uniform float k;void main(){vec2 q=(u-.5)*vec2(2.6,1.6);float d=length(q);
+  float g=exp(-d*d*2.2)*k*smoothstep(.5,.28,abs(u.x-.5))*smoothstep(.5,.28,abs(u.y-.5));gl_FragColor=vec4(vec3(1.,.82,.58)*g*.55,1.);}`});
+const halo=new THREE.Mesh(new THREE.PlaneGeometry(4.2,4.4),haloMat);halo.position.set(0,DH/2,.12);night.add(halo);
+
+/* ---------- sizing ---------- */
+function resize(){const w=innerWidth,h=mob?Math.max(innerHeight,screen.height*0):innerHeight;
+ renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+ const W=Math.round(w*DPR),H=Math.round(h*DPR);
+ const s=lowPower?.6:.75;rt.setSize(Math.round(W*s),Math.round(H*s));portalMat.uniforms.res.value.set(W,H);
+ sizeFx();}
+let lastW=0;addEventListener('resize',()=>{if(mob&&innerWidth===lastW)return;lastW=innerWidth;resize();needs=true;});
+
+/* ---------- verse made of stars (2D overlay) ---------- */
+const fx=$('fx'),fctx=fx.getContext('2d'),verse=$('verse');let parts=[],fxOn=true,fxStart=0;
+function sizeFx(){fx.width=Math.round(innerWidth*DPR);fx.height=Math.round(innerHeight*DPR);buildParticles();}
+function buildParticles(){
+ const r=verse.getBoundingClientRect();if(!r.width)return;
+ const off=document.createElement('canvas'),W=Math.ceil(r.width),H=Math.ceil(r.height);off.width=W;off.height=H;
+ const o=off.getContext('2d');const cs=getComputedStyle(verse);o.fillStyle='#fff';o.textAlign='center';o.direction='rtl';
+ const rows=[...verse.querySelectorAll('.row')];
+ rows.forEach(el=>{const b=el.getBoundingClientRect();o.font=`700 ${cs.fontSize} Amiri`;o.textBaseline='middle';o.fillText(el.textContent,b.left-r.left+b.width/2,b.top-r.top+b.height/2);});
+ const img=o.getImageData(0,0,W,H).data,step=mob?2:Math.max(2,Math.round(parseFloat(cs.fontSize)/18));
+ const pts=[];for(let y=0;y<H;y+=step)for(let x=0;x<W;x+=step){if(img[(y*W+x)*4+3]>140)pts.push([x+r.left,y+r.top]);}
+ const MAX=lowPower?1800:3200;while(pts.length>MAX)pts.splice((Math.random()*pts.length)|0,1);
+ parts=pts.map(([x,y])=>({tx:x,ty:y,sx:Math.random()*innerWidth,sy:Math.random()*innerHeight*.75,vx:(Math.random()-.5)*2,vy:-Math.random()*1.2-.2,
+  d:Math.random()*.9,s:.6+Math.random()*1.1,ph:Math.random()*6.28}));
+}
+function drawFx(now,disp){
+ const T=(now-fxStart)/1000;fctx.setTransform(DPR,0,0,DPR,0,0);fctx.clearRect(0,0,innerWidth,innerHeight);
+ const form=T;let txtA=cl((T-1.9)/1.1);
+ verse.style.opacity=(txtA*(1-disp)).toFixed(3);
+ verse.style.filter=disp>0?`blur(${(disp*8).toFixed(1)}px)`:'none';
+ if(disp>=1&&T>3){fctx.clearRect(0,0,innerWidth,innerHeight);return false;}
+ fctx.globalCompositeOperation='lighter';
+ for(const p of parts){const k=ease(cl((form-p.d)/1.6));
+  let x=lerp(p.sx,p.tx,k),y=lerp(p.sy,p.ty,k);
+  if(disp>0){const e=disp*disp;x+=p.vx*e*260;y+=p.vy*e*260;}
+  const tw=.6+.4*Math.sin(T*3+p.ph);
+  const a=(k<1?.35+.65*k:1-.75*txtA)*tw*(1-disp);if(a<.02)continue;
+  fctx.fillStyle=`rgba(225,240,255,${a.toFixed(3)})`;const s=p.s*(1+(1-k)*.6);fctx.fillRect(x-s/2,y-s/2,s,s);}
+ fctx.globalCompositeOperation='source-over';return true;
+}
+
+/* ---------- scroll + smooth progress ---------- */
+const scene=$('scene'),hero=$('hero'),hint=$('hint'),top=$('top');
+let tgt=0,sm=0,needs=true;
+function readScroll(){const max=scene.offsetHeight-innerHeight;tgt=cl(scrollY/max);}
+addEventListener('scroll',readScroll,{passive:true});
+$('skip').onclick=e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});};
+
+const camFar=mob?9.5:7.2;
+function place(p){
+ // p: 0..1 smoothed page progress
+ const a=ease(cl(p/.58));                  // approach
+ const th=ease(cl((p-.56)/.17));           // pass through
+ const z=p<.56?lerp(camFar,1.25,a):lerp(1.25,-1.6,th);
+ const y=lerp(1.05,1.08,a)+th*.04;
+ camera.position.set(Math.sin(p*3.1)*.04*(1-th),y,z);
+ const look=lerp(1.0,1.12,a)+ease(cl((p-.7)/.2))*.9;
+ camera.lookAt(0,look,z-6);
+ const open=lerp(.95,1.75,ease(cl((p-.04)/.45)));
+ hinge.rotation.y=open;
+ const o=cl(open/1.72);
+ sandMat.uniforms.open.value=.45+.55*o;
+ warm.intensity=10*o+2;warmFront.intensity=5*o+.5;
+ whiteInner.emissiveIntensity=.35+.65*o;
+ haloMat.uniforms.k.value=(.45+.55*o)*cl((camera.position.z-1.4)/2.5);
+ portalMat.uniforms.glow.value=ease(cl((p-.5)/.12))*.08*(1-th);
+ const dayMode=camera.position.z<-.02;
+ const hp=ease(cl((p-.78)/.15));
+ hero.style.opacity=hp.toFixed(3);hero.style.transform=`translateY(${((1-hp)*22).toFixed(1)}px)`;hero.style.pointerEvents=hp>.5?'auto':'none';
+ hint.style.opacity=(1-cl(p/.04)).toFixed(3);
+ top.classList.toggle('light',dayMode);
+ return dayMode;
+}
+
+/* ---------- loop ---------- */
+let last=0,fxAlive=true;
+function frame(now){
+ const dt=last?Math.min(64,now-last):16.7;last=now;
+ const k=1-Math.pow(1-.12,dt/16.7);sm+=Math.abs(tgt-sm)<.0002?(tgt-sm):(tgt-sm)*k;
+ const t=now/1000;starMat.uniforms.t.value=t;daySky.material.uniforms.t.value=t;
+ const dayMode=place(sm);
+ if(dayMode){renderer.setRenderTarget(null);renderer.render(day,camera);}
+ else{renderer.setRenderTarget(rt);renderer.render(day,camera);renderer.setRenderTarget(null);renderer.render(night,camera);}
+ if(fxAlive)fxAlive=drawFx(now,ease(cl((sm-.015)/.12)));
+ else if(sm<.13){fxAlive=true;}
+ requestAnimationFrame(frame);
+}
+lastW=innerWidth;
+document.fonts.load('700 40px Amiri').then(()=>document.fonts.ready).then(()=>{resize();readScroll();sm=tgt;fxStart=performance.now();requestAnimationFrame(frame);});
+</script>
+</body>
+</html>
