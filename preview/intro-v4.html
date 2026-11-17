@@ -17,6 +17,10 @@
 .hint{position:absolute;bottom:34px;left:0;right:0;text-align:center;color:rgba(255,255,255,.75);font-size:14px;letter-spacing:.5px}
 .hint i{display:block;margin:10px auto 0;width:22px;height:36px;border:2px solid rgba(255,255,255,.6);border-radius:12px;position:relative}
 .hint i:after{content:"";position:absolute;top:6px;left:50%;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#fff;animation:d 1.6s infinite}
+.hint.touch i{width:16px;height:16px;border:0;border-top:2px solid rgba(255,255,255,.8);border-left:2px solid rgba(255,255,255,.8);border-radius:2px;transform:rotate(45deg);margin-top:18px;animation:u 1.6s ease-in-out infinite}   /* phone: swipe up */
+.hint.touch i:before{content:"";position:absolute;left:5px;top:5px;width:16px;height:16px;border-top:2px solid rgba(255,255,255,.45);border-left:2px solid rgba(255,255,255,.45);border-radius:2px}
+.hint.touch i:after{display:none}
+@keyframes u{0%{opacity:0;translate:0 10px}40%{opacity:1}100%{opacity:0;translate:0 -10px}}
 @keyframes d{0%{opacity:0;transform:translateY(0)}40%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
 .load{position:absolute;bottom:52px;left:50%;width:150px;height:2px;margin-left:-75px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden;display:none;transition:opacity .5s}
 .load span{display:block;height:100%;width:0;background:linear-gradient(90deg,#5CE1E6,#D9D5F5);transition:width .2s}
@@ -114,6 +118,7 @@ const sv=$('sv'),hero=$('hero'),scrim=$('scrim'),vig=$('vig'),hint=$('hint'),sce
 const lines=[...document.querySelectorAll('.line')];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),ease=t=>t*t*(3-2*t),sstep=(a,b,x)=>ease(cl((x-a)/(b-a)));
 const mob=matchMedia('(max-aspect-ratio:1/1)').matches;
+if(mob){hint.firstChild.nodeValue='اسحب للأعلى';hint.classList.add('touch');}   /* phones: finger swipe up; laptops keep the mouse hint */
 let mode='video';            // 'img' on phones (layered photo scene), 'video' on laptops
 
 /* ---------- shared: smoothed scroll progress ---------- */
