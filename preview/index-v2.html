@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Youverse · v2</title>
+<link rel="icon" href="img/1e4dffc431313b7bc68eadda79d3417c.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#F9FAFD}img{max-width:100%}*{box-sizing:border-box}#measure{position:absolute;left:-20000px;top:0;width:1440px;visibility:hidden;display:none}</style>
+<style>
+/* v2 phone header */
+.yv-h{position:sticky!important;top:0;z-index:60;background:rgba(255,255,255,.82)!important;-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%)}
+.yv-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;position:relative}
+.yv-bar{display:flex;align-items:center;gap:8px}
+.yv-lang{font-family:'Lora','Almarai',serif;font-weight:700;font-size:14px;color:#127F87;border:1px solid #D5E6E9;border-radius:12px;padding:0 12px;height:40px;display:flex;align-items:center;background:#fff;text-decoration:none}
+.yv-burger{width:42px;height:40px;border-radius:12px;border:0;background:#032E36;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;cursor:pointer}
+.yv-burger i{display:block;width:17px;height:2px;border-radius:2px;background:#fff;transition:transform .25s,opacity .2s}
+html.yv-menu .yv-burger i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+html.yv-menu .yv-burger i:nth-child(2){opacity:0}
+html.yv-menu .yv-burger i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.yv-drawer{position:absolute;top:calc(100% + 8px);left:12px;right:12px;background:#fff;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid #E3EEF0;border-radius:22px;box-shadow:0 28px 60px -24px rgba(3,46,54,.38);padding:8px;opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .22s,transform .22s}
+html.yv-menu .yv-drawer{opacity:1;transform:none;pointer-events:auto}
+.yv-drawer nav{display:flex;flex-direction:column;gap:2px}
+.yv-drawer nav a{display:block;padding:14px 16px;border-radius:14px;font-size:17px;font-weight:700;color:#2E4A50;text-decoration:none}
+.yv-drawer nav a.on{background:#E8F7F8;color:#032E36}
+.yv-acts{display:flex;gap:8px;padding:8px 4px 4px;border-top:1px solid #EDF3F4;margin-top:6px}
+.yv-acts a{flex:1;text-align:center;padding:13px 10px;border-radius:14px;font-weight:700;font-size:15px;text-decoration:none}
+.yv-acts .yv-main{background:#127F87;color:#fff}
+.yv-acts .yv-sec{border:1px solid #CFE3E6;color:#127F87;background:#fff}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="measure" aria-hidden="true"></div>
+<script src="pages.js"></script>
+<script src="v2-patch.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

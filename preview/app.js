@@ -104,6 +104,7 @@ function adapt(w,desk,box){
      nav.querySelectorAll('button').forEach(b=>{b.style.whiteSpace='nowrap';b.style.flex='0 0 auto';});
      const kids=[...a.children];kids.slice(2).forEach(k=>k.style.display='none');
      const logo=kids[0];if(logo)logo.style.padding='0';});}
+ if(phone&&window.yvPhoneHeader)window.yvPhoneHeader(box);   /* optional phone header (test pages only) */
 }
 function route(){const h=location.hash.slice(1);if(!h||FILES[h]){if(!cur||cur.route!==(h||'home'))load(h||'home');}
  else{const t=document.getElementById(h);if(t)t.scrollIntoView({behavior:'smooth'});}}
