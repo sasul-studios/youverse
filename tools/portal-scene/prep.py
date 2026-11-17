@@ -18,7 +18,7 @@ VIEWPORTS = {
     'desktop': [(1280, 720, 1), (1366, 768, 1), (1440, 900, 2), (1512, 982, 2), (1536, 864, 1.25), (1728, 1117, 2), (1920, 1080, 1), (2560, 1440, 1)],
 }
 REF = {'phone': (428, 926, 3), 'desktop': (1440, 900, 2)}   # screen the sharpness switch points are tuned for
-TYPICAL = {'phone': [(428, 926), (390, 844), (430, 932), (393, 852), (360, 800)],             # zoom depth is sized for these (modern phones);
+TYPICAL = {'phone': [(428, 926), (390, 844), (430, 932), (393, 852), (360, 800), (428, 823), (390, 750)],  # modern phones, also with a browser bar;
            'desktop': [(1366, 768), (1440, 900), (1512, 982), (1728, 1117), (1920, 1080)]}    # other screens get the flash
 AP, C1 = .70, 1.06            # share of the scroll spent approaching the door (config 'approach'); final zoom of the world image
 
@@ -103,8 +103,14 @@ def view_bounds(Q, W, H, s):
     return (Q[0] * (1 - 1 / s), Q[1] * (1 - 1 / s), Q[0] + (W - Q[0]) / s, Q[1] + (H - Q[1]) / s)
 
 
+def frame(vw, vh, W, H, Q):
+    """Cover fit; when the picture is wider than the screen, slide it so the door sits in the middle."""
+    Kc = max(vw / W, vh / H); OX = min(0.0, max(vw - W * Kc, vw / 2 - Kc * Q[0])); OY = (vh - H * Kc) / 2
+    return Kc, OX + Kc * Q[0], OY + Kc * Q[1]
+
+
 def screen_rect(vw, vh, W, H, Q, s):
-    Kc = max(vw / W, vh / H); qx = (vw - W * Kc) / 2 + Kc * Q[0]; qy = (vh - H * Kc) / 2 + Kc * Q[1]; a = s * Kc
+    Kc, qx, qy = frame(vw, vh, W, H, Q); a = s * Kc
     return (Q[0] - qx / a, Q[1] - qy / a, Q[0] + (vw - qx) / a, Q[1] + (vh - qy) / a)
 
 
@@ -134,7 +140,7 @@ def s_cover(I, vw, vh, W, H, Q):
 
 def cosmos_need(vw, vh, W, H, Q, OPC, CC, PORT, SMAX, t):
     """Smallest world-image zoom (c) that still fills the visible part of the opening (same maths as the page)."""
-    Kc = max(vw / W, vh / H); qx = (vw - W * Kc) / 2 + Kc * Q[0]; qy = (vh - H * Kc) / 2 + Kc * Q[1]
+    Kc, qx, qy = frame(vw, vh, W, H, Q)
     s = 1 / (1 - t * (1 - 1 / SMAX)); a = s * Kc; e = qx - a * Q[0]; f = qy - a * Q[1]
     px = e + a * OPC[0]; py = f + a * OPC[1]; m = ease((t - .5) / .5); cx = px + (vw / 2 - px) * m; cy = py + (vh / 2 - py) * m
     xL = max(0, e + a * PORT[0]); xR = min(vw, e + a * (PORT[0] + PORT[2])); yT = max(0, f + a * PORT[1]); yB = min(vh, f + a * (PORT[1] + PORT[3]))
