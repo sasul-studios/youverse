@@ -44,8 +44,17 @@
 @media (min-aspect-ratio:1/1){.poem{top:max(64px,9%);display:flex;justify-content:center;align-items:center;gap:.5em;flex-wrap:nowrap;font-size:clamp(22px,min(2.9vw,5.6vh),48px)}.poem .hm{display:inline-block;white-space:nowrap}.poem .sep{margin:0}.poem.on .sep:before,.poem.on .sep:after{width:clamp(18px,2.4vw,40px)}}
 @media (max-aspect-ratio:1/1){.poem{top:calc(env(safe-area-inset-top,0px) + 78px);font-size:clamp(24px,min(7vw,4.2vh),40px)}}
 .poem.on .sep{opacity:1}.poem.on .sep:before,.poem.on .sep:after{width:clamp(50px,9vw,130px)}
-#cv,#st{position:absolute;inset:0;width:100%;height:100%;display:none}
-#st{pointer-events:none}
+/* phone scene: each layer is drawn once; while scrolling the graphics chip only moves and fades them (like video) */
+.world{position:absolute;inset:0;overflow:hidden;display:none;opacity:0;pointer-events:none;background:#04070f;transition:opacity .5s}
+.world .L{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;will-change:transform}
+.world canvas{position:absolute;display:block;opacity:0}
+#stars{position:absolute;left:0;top:0;width:0;height:0;will-change:opacity}
+#stars canvas{opacity:1;animation:tw var(--d) ease-in-out var(--dl) infinite}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:1}}
+#portal{position:absolute;overflow:hidden}
+.world .glow{mix-blend-mode:screen;mix-blend-mode:plus-lighter}
+.vig,.scrim,.hero,.hint,.bloom{will-change:opacity,transform}
+.line{will-change:opacity,transform,filter}
 .bloom{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse 80% 62% at 50% 44%,rgba(255,246,226,.97) 0%,rgba(255,216,154,.78) 36%,rgba(255,180,100,.30) 66%,rgba(255,160,80,0) 100%)}
 </style>
 </head>
@@ -55,8 +64,10 @@
 </header>
 <section id="scene"><div class="stick" id="stick">
   <video id="sv" muted playsinline preload="auto"></video>
-  <canvas id="cv"></canvas>
-  <canvas id="st"></canvas>
+  <div class="world" id="world">
+    <div class="L" id="skyL"><div id="stars"></div></div>
+    <div class="L" id="fgL"><div id="portal"><div class="L" id="cosL"></div></div></div>
+  </div>
   <div class="bloom" id="bloom"></div>
   <div class="vig" id="vig"></div>
   <div class="line poem"><span class="hm"><span class="w" style="--i:0">وتَحْسَبُ</span> <span class="w" style="--i:1">أنَّكَ</span> <span class="w" style="--i:2">جِرْمٌ</span> <span class="w" style="--i:3">صَغِيرٌ</span></span><span class="sep"><b>✦</b></span><span class="hm"><span class="w" style="--i:4">وفِيكَ</span> <span class="w" style="--i:5">انْطَوَى</span> <span class="w" style="--i:6">العَالَمُ</span> <span class="w" style="--i:7">الأَكْبَرُ</span></span></div>
@@ -129,72 +140,79 @@ function startVideo(){
  if(mob){const done=()=>{removeEventListener('touchstart',unlock);removeEventListener('touchend',unlock);};const unlock=()=>{if(!finished)return;const p=sv.play();if(p)p.then(()=>{sv.pause();kick();done();}).catch(()=>{});else{sv.pause();kick();}};addEventListener('touchstart',unlock,{passive:true});addEventListener('touchend',unlock,{passive:true});}
 }
 
-/* ---------- phone: layered photo scene drawn live at screen resolution ---------- */
-function startImages(){
+/* ---------- phone: layered photo scene. Every layer is drawn ONCE into its own canvas;
+   while scrolling only transforms/opacities change, so the GPU composites it like a video (no redraw, no re-decode) ---------- */
+function startLayers(){
  mode='img';sv.style.display='none';
- const cv=$('cv'),st=$('st'),bloom=$('bloom');cv.style.display=st.style.display='block';
- const ctx=cv.getContext('2d',{alpha:false}),sx=st.getContext('2d');
- const A='v3/',W=941,H=1672,Q=[470.5,960],OPC=[469.5,888.5],CC=[470.5,836];
+ const world=$('world'),skyL=$('skyL'),fgL=$('fgL'),cosL=$('cosL'),portal=$('portal'),starsEl=$('stars'),bloom=$('bloom');
+ world.style.display='block';
+ const A='v3/',W=941,H=1672,Q=[470.5,960],OPC=[469.5,888.5],CC=[470.5,836],PORT=[346,649.5,247,478.5];
  const NAMES=['sky','fg-lo','fg-mid','fg-hi','in-lo','in-hi','cosmos-1x','cosmos-2x','glow'];
  const EST={sky:391588,'fg-lo':345744,'fg-mid':489060,'fg-hi':399278,'in-lo':67548,'in-hi':169590,'cosmos-1x':225022,'cosmos-2x':589114,glow:30466};
- const SMAX=5,AP=.70,C0=.30,C1=1.06;
- let R,STARS,I={},CW=0,CH=0,K=1,OX=0,OY=0,DPR=1,S1=1.204,S2=1.806,ready=false;
+ const SMAX=5,AP=.70,C0=.75,C1=1.06,SKYH=1048,D=1.66;   /* C0: the view inside starts big enough to always fill the opening */
+ let R,STARS,VW=1,VH=1,Kc=1,OXc=0,OYc=0,DPR=1,S1=1.204,S2=1.806,ready=false;
+ const L={},blobs={};
  const state=p=>{const t=cl(p/AP),s=1/(1-t*(1-1/SMAX)),u=cl((p-AP)/(1-AP));
    const c=t<1?C0/(1-t*(1-C0/C1)):C1*(1+.07*ease(u));return {t,s,u,c};};
- const xf=s=>{const a=s*K,Sx=OX+K*Q[0],Sy=OY+K*Q[1];return [a,Sx-a*Q[0],Sy-a*Q[1]];};
- const arch=c=>{const xl=346,xr=593,top=649.5,bot=1128,r=(xr-xl)/2,cx=(xl+xr)/2,cy=top+r;
-   c.beginPath();c.moveTo(xl,bot);c.lineTo(xl,cy);c.arc(cx,cy,r,Math.PI,0,false);c.lineTo(xr,bot);c.closePath();};
- const inOuter=(x,y)=>{const xl=287,xr=654,top=585,r=(xr-xl)/2,cx=(xl+xr)/2,cy=top+r;
-   if(x<xl||x>xr||y<top)return false;return y>=cy||(x-cx)*(x-cx)+(y-cy)*(y-cy)<=r*r;};
- const put=(n,a,e,f)=>{const r=R[n];ctx.setTransform(a,0,0,a,e,f);ctx.drawImage(I[n],r[0],r[1],r[2],r[3]);};
+ const setT=(el,a,e,f)=>{const v='matrix('+a.toFixed(6)+',0,0,'+a.toFixed(6)+','+e.toFixed(2)+','+f.toFixed(2)+')';if(el._t!==v){el._t=v;el.style.transform=v;}};
+ const setO=(el,o)=>{const v=o<=.002?'0':o>=.998?'1':o.toFixed(3);if(el._o!==v){el._o=v;el.style.opacity=v;}};
+ const place=(el,r)=>{el.style.left=r[0]+'px';el.style.top=r[1]+'px';el.style.width=r[2]+'px';el.style.height=r[3]+'px';};
+ place(portal,PORT);   /* the opening (a plain rectangle is enough: the frame covers its corners) */
  function draw(p){
-  if(!ready)return;const {t,s,c}=state(p);
-  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-  ctx.fillStyle='#04070f';ctx.fillRect(0,0,CW,CH);
-  const [sa,se,sf]=xf(1+.04*t);ctx.setTransform(sa,0,0,sa,se,sf);ctx.drawImage(I.sky,0,0,W,H);
-  const [a,e,f]=xf(s),inA=1-sstep(1.12,1.9,s);
+  if(!ready)return;
+  const {t,s,c}=state(p),inside=s>=4.7,qx=OXc+Kc*Q[0],qy=OYc+Kc*Q[1];
+  const sa=(1+.04*t)*Kc;setT(skyL,sa,qx-sa*Q[0],qy-sa*Q[1]);setO(skyL,inside?0:1);   /* sky: almost still */
+  const a=s*Kc,e=qx-a*Q[0],f=qy-a*Q[1];setT(fgL,a,e,f);                              /* portal + ground: the camera moves in */
+  const inA=1-sstep(1.12,1.9,s);
   if(inA<1){  /* the universe seen through the opening: far away, so it grows slower than the arch */
-   const px=e+a*OPC[0],py=f+a*OPC[1],m=sstep(.5,1,t),cx=px+(CW/2-px)*m,cy=py+(CH/2-py)*m,ca=c*K;
-   ctx.save();ctx.setTransform(a,0,0,a,e,f);arch(ctx);ctx.clip();
-   ctx.setTransform(ca,0,0,ca,cx-ca*CC[0],cy-ca*CC[1]);ctx.drawImage(ca<1.05?I['cosmos-1x']:I['cosmos-2x'],0,0,W,H);
-   ctx.restore();}
-  if(s<4.7){
-   if(inA>0){ctx.globalAlpha=inA;put(s<S1?'in-lo':'in-hi',a,e,f);ctx.globalAlpha=1;}
-   ctx.globalCompositeOperation='lighter';ctx.globalAlpha=(.35+.6*sstep(1,3.2,s))*(1-sstep(3.6,4.6,s));put('glow',a,e,f);
-   ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
-   put(s<S1?'fg-lo':s<S2?'fg-mid':'fg-hi',a,e,f);}  /* sharper level as soon as the current one would be enlarged */
-  bloom.style.opacity=(sstep(.53,.64,p)*(1-sstep(.67,.77,p))*.62).toFixed(3);
+   const px=e+a*OPC[0],py=f+a*OPC[1],m=sstep(.5,1,t),cx=px+(VW/2-px)*m,cy=py+(VH/2-py)*m;
+   const xL=Math.max(0,e+a*PORT[0]),xR=Math.min(VW,e+a*(PORT[0]+PORT[2])),yT=Math.max(0,f+a*PORT[1]),yB=Math.min(VH,f+a*(PORT[1]+PORT[3]));
+   const ca=Math.max(c*Kc,1.01*Math.max((cx-xL)/CC[0],(xR-cx)/(W-CC[0]),(cy-yT)/CC[1],(yB-cy)/(H-CC[1])));  /* never smaller than the visible opening */
+   setT(cosL,ca/a,(cx-ca*CC[0]-e)/a-PORT[0],(cy-ca*CC[1]-f)/a-PORT[1]);
+   const hi=ca*DPR>=1.15;setO(L['cosmos-1x'],hi?0:1);setO(L['cosmos-2x'],hi?1:0);
+  }else{setO(L['cosmos-1x'],0);setO(L['cosmos-2x'],0);}
+  const lo=s<S1,mid=!lo&&s<S2;   /* sharper level as soon as the current one would be enlarged */
+  setO(L['in-lo'],!inside&&lo?inA:0);setO(L['in-hi'],!inside&&!lo?inA:0);
+  setO(L.glow,inside?0:(.35+.6*sstep(1,3.2,s))*(1-sstep(3.6,4.6,s)));
+  setO(L['fg-lo'],!inside&&lo?1:0);setO(L['fg-mid'],!inside&&mid?1:0);setO(L['fg-hi'],!inside&&!lo&&!mid?1:0);
+  setO(starsEl,1-sstep(2.6,4.2,s));
+  setO(bloom,sstep(.53,.64,p)*(1-sstep(.67,.77,p))*.62);
  }
- let lastS=0;
- function twinkle(now){requestAnimationFrame(twinkle);
-  if(!ready||now-lastS<30)return;lastS=now;
-  sx.setTransform(1,0,0,1,0,0);sx.clearRect(0,0,CW,CH);
-  const {t,s}=state(sm);if(s>4.6)return;
-  const [sa,se,sf]=xf(1+.04*t),[a,e,f]=xf(s),T=now/1000,fade=1-sstep(2.6,4.2,s);
-  for(const S of STARS){const px=se+sa*S[0],py=sf+sa*S[1],ux=(px-e)/a,uy=(py-f)/a;
-   if(uy>1068||inOuter(ux,uy))continue;
-   const tw=.5+.5*Math.sin(T*S[4]+S[3]),al=(.18+.82*tw)*fade,r=S[2]*DPR*(.7+.4*tw);
-   sx.globalAlpha=al;sx.fillStyle=S[5]?'#d4e6ff':'#fff';sx.beginPath();sx.arc(px,py,r,0,6.2832);sx.fill();
-   if(S[2]>1.25){sx.globalAlpha=al*.45;const L=r*3.2,w=.6*DPR;sx.fillRect(px-L,py-w/2,2*L,w);sx.fillRect(px-w/2,py-L,w,2*L);}}
-  sx.globalAlpha=1;}
- function size(){DPR=Math.min(devicePixelRatio||1,3);const w=stick.clientWidth,h=stick.clientHeight;
-  cv.width=st.width=Math.round(w*DPR);cv.height=st.height=Math.round(h*DPR);CW=cv.width;CH=cv.height;
-  K=Math.max(CW/W,CH/H);OX=(CW-W*K)/2;OY=(CH-H*K)/2;S1=Math.max(1.204,2/K);S2=Math.max(1.806,3/K);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';draw(sm);}
+ function size(){DPR=Math.min(devicePixelRatio||1,3);VW=stick.clientWidth;VH=stick.clientHeight;
+  Kc=Math.max(VW/W,VH/H);OXc=(VW-W*Kc)/2;OYc=(VH-H*Kc)/2;const KD=Kc*DPR;S1=Math.max(1.204,2/KD);S2=Math.max(1.806,3/KD);draw(sm);}
  let lastW=0;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;size();});
  step=p=>{draw(p);return false;};
+ const paint=async n=>{  /* decode once (off the main thread when possible) and draw once */
+  const c=L[n],b=blobs[n];let src,done=()=>{};
+  if(self.createImageBitmap){src=await createImageBitmap(b);done=()=>{if(src.close)src.close();};}
+  else{const u=URL.createObjectURL(b);src=new Image();src.src=u;await src.decode();done=()=>URL.revokeObjectURL(u);}
+  c.width=src.width;c.height=src.height;c.getContext('2d',{alpha:!(n==='sky'||n.startsWith('cosmos'))}).drawImage(src,0,0);done();};
+ const paintStars=()=>{const G=[...starsEl.children];
+  for(const c of G){c.width=Math.round(W*D);c.height=Math.round(SKYH*D);}
+  STARS.forEach((S,i)=>{const x=G[i%G.length].getContext('2d'),px=S[0]*D,py=S[1]*D,r=S[2]*.95*D,col=S[5]?'212,230,255':'255,255,255';
+   const g=x.createRadialGradient(px,py,0,px,py,r*2.4);g.addColorStop(0,'rgba('+col+',.32)');g.addColorStop(1,'rgba('+col+',0)');   /* faint glow */
+   x.fillStyle=g;x.beginPath();x.arc(px,py,r*2.4,0,6.2832);x.fill();
+   x.fillStyle='rgb('+col+')';x.beginPath();x.arc(px,py,r,0,6.2832);x.fill();                                                       /* crisp core */
+   if(S[2]>1.25){x.fillStyle='rgba('+col+',.45)';const Ls=r*3.4,w=1.1;x.fillRect(px-Ls,py-w/2,2*Ls,w);x.fillRect(px-w/2,py-Ls,w,2*Ls);}});};
  (async()=>{
   const meta=await (await fetch(A+'scene.json')).json();R=meta.R;STARS=meta.stars;
-  R.sky=[0,0,W,H];R['cosmos-1x']=[0,0,W,H];R['cosmos-2x']=[0,0,W,H];
+  const mk=(n,parent,before)=>{const c=document.createElement('canvas');place(c,R[n]);parent.insertBefore(c,before||null);L[n]=c;return c;};
+  mk('sky',skyL,starsEl).style.opacity='1';                       /* bottom to top */
+  for(let i=0;i<3;i++){const c=document.createElement('canvas');place(c,[0,0,W,SKYH]);   /* 3 groups, each on its own rhythm */
+   c.style.setProperty('--d',[2.6,3.7,4.9][i]+'s');c.style.setProperty('--dl',(-1.7*i)+'s');starsEl.appendChild(c);
+   c.addEventListener('contextrestored',paintStars);}
+  mk('cosmos-1x',cosL);mk('cosmos-2x',cosL);
+  for(const n of ['in-lo','in-hi','glow','fg-lo','fg-mid','fg-hi'])mk(n,fgL);L.glow.className='glow';
   const prog={},upd=()=>{let g=0,tt=0;for(const n of NAMES){const q=prog[n]||[0,0];g+=q[0];tt+=q[1]||EST[n];}bar.style.width=(g/tt*100).toFixed(1)+'%';};
-  await Promise.all(NAMES.map(async n=>{const b=await getBlob(A+n+'.webp',(g,t)=>{prog[n]=[g,t];upd();});
-   const im=new Image();im.src=URL.createObjectURL(b);await im.decode();I[n]=im;}));
+  await Promise.all(NAMES.map(async n=>{blobs[n]=await getBlob(A+n+'.webp',(g,t)=>{prog[n]=[g,t];upd();});await paint(n);}));
+  paintStars();
+  for(const n of NAMES)L[n].addEventListener('contextrestored',()=>paint(n));   /* if the system ever drops a layer, draw it again */
   ready=true;lastW=innerWidth;size();
-  ctx.setTransform(1,0,0,1,0,0);for(const n of NAMES)ctx.drawImage(I[n],0,0,4,4);draw(sm);  /* upload every layer once now, so no hitch mid-scroll */
-  requestAnimationFrame(twinkle);release();
- })().catch(err=>{console.error(err);cv.style.display=st.style.display='none';startVideo();});
+  requestAnimationFrame(()=>{world.style.opacity='1';release();});
+ })().catch(err=>{console.error(err);world.style.display='none';startVideo();});
 }
 
-if(mob)startImages();else startVideo();
+if(mob)startLayers();else startVideo();
 addEventListener('resize',f);
 $('skip').addEventListener('click',()=>lock(false));
 $('skip').addEventListener('click',e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});});
