@@ -18,16 +18,48 @@ VIEWPORTS = {
     'desktop': [(1280, 720, 1), (1366, 768, 1), (1440, 900, 2), (1512, 982, 2), (1536, 864, 1.25), (1728, 1117, 2), (1920, 1080, 1), (2560, 1440, 1)],
 }
 REF = {'phone': (428, 926, 3), 'desktop': (1440, 900, 2)}   # screen the sharpness switch points are tuned for
+TYPICAL = {'phone': [(428, 926), (390, 844), (430, 932), (393, 852), (360, 800)],             # zoom depth is sized for these (modern phones);
+           'desktop': [(1366, 768), (1440, 900), (1512, 982), (1728, 1117), (1920, 1080)]}    # other screens get the flash
 AP, C1 = .70, 1.06            # share of the scroll spent approaching the door; final zoom of the world image
 
 
-def arch(sc, d, feather, size):
+def norm_shape(d):
+    """Shapes in units: {'shape':'arch'|'rect', xl,xr,top,bot} or {'shape':'poly','pts':[[x,y],...]}."""
+    d = dict(d); d.setdefault('shape', 'poly' if 'pts' in d else 'arch')
+    if d['shape'] == 'poly':
+        xs = [q[0] for q in d['pts']]; ys = [q[1] for q in d['pts']]
+        d.update(xl=min(xs), xr=max(xs), top=min(ys), bot=max(ys))
+    return d
+
+
+def shape_mask(sc, d, feather, size):
     m = Image.new('L', size, 0); dr = ImageDraw.Draw(m)
-    xl, xr, top, bot = [v * sc for v in (d['xl'], d['xr'], d['top'], d['bot'])]
-    r = (xr - xl) / 2; cx = (xl + xr) / 2; cy = top + r
-    dr.ellipse([cx - r, top, cx + r, top + 2 * r], fill=255)
-    dr.rectangle([xl, cy, xr, bot], fill=255)
+    if d['shape'] == 'poly':
+        dr.polygon([(x * sc, y * sc) for x, y in d['pts']], fill=255)
+    else:
+        xl, xr, top, bot = [v * sc for v in (d['xl'], d['xr'], d['top'], d['bot'])]
+        if d['shape'] == 'rect': dr.rectangle([xl, top, xr, bot], fill=255)
+        else:
+            r = (xr - xl) / 2; cx = (xl + xr) / 2; cy = top + r
+            dr.ellipse([cx - r, top, cx + r, top + 2 * r], fill=255); dr.rectangle([xl, cy, xr, bot], fill=255)
     return m.filter(ImageFilter.GaussianBlur(feather * sc)) if feather else m
+
+
+def union_mask(sc, shapes, feather, size):
+    m = None
+    for d in shapes:
+        x = np.array(shape_mask(sc, d, feather, size), np.float32) / 255
+        m = x if m is None else np.maximum(m, x)
+    return m
+
+
+def bbox(shapes):
+    return dict(xl=min(d['xl'] for d in shapes), xr=max(d['xr'] for d in shapes),
+                top=min(d['top'] for d in shapes), bot=max(d['bot'] for d in shapes))
+
+
+def arch(sc, d, feather, size):   # kept for old callers
+    return shape_mask(sc, norm_shape(d), feather, size)
 
 
 def smooth(x, a, b):
@@ -77,6 +109,14 @@ def screen_rect(vw, vh, W, H, Q, s):
 
 
 def inside_arch(I, x, y):
+    """Point inside the opening (arch, rect or convex polygon)."""
+    if I['shape'] == 'rect': return I['xl'] <= x <= I['xr'] and I['top'] <= y <= I['bot']
+    if I['shape'] == 'poly':
+        P = I['pts']; inside = False; j = len(P) - 1
+        for i in range(len(P)):
+            if (P[i][1] > y) != (P[j][1] > y) and x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]: inside = not inside
+            j = i
+        return inside
     r = (I['xr'] - I['xl']) / 2; cx = (I['xl'] + I['xr']) / 2; cy = I['top'] + r
     if x < I['xl'] or x > I['xr'] or y > I['bot']: return False
     return y >= cy or (x - cx) ** 2 + (y - cy) ** 2 <= r * r
@@ -102,7 +142,7 @@ def cosmos_need(vw, vh, W, H, Q, OPC, CC, PORT, SMAX, t):
 
 
 def derive(cfg, W, H):
-    I, O = cfg['inner'], cfg['outer']; HZ0, HZ1 = cfg['horizon']; target = cfg.get('target', 'phone')
+    I = norm_shape(cfg['inner']); O = bbox(cfg['outer']); HZ0, HZ1 = cfg['horizon']; target = cfg.get('target', 'phone')
     VPS = VIEWPORTS[target]; ow, oh = I['xr'] - I['xl'], I['bot'] - I['top']
     Q = [round((I['xl'] + I['xr'])), round(2 * (I['top'] + .65 * oh))]; Q = [Q[0] / 2, Q[1] / 2]   # zoom centre
     OPC = [(I['xl'] + I['xr']) / 2, (I['top'] + I['bot']) / 2]
@@ -121,9 +161,16 @@ def derive(cfg, W, H):
     s_side = W / (O['xr'] - O['xl']); y_need = max(HZ1 + 40, Q[1] + s_side * (HZ1 + 10 - Q[1]))
     SKY_H = int(min(H, math.ceil(y_need / 16) * 16)); R['sky'] = [0, 0, W, SKY_H]
     R['cosmos-1x'] = R['cosmos-2x'] = [0, 0, W, H]
-    # zoom depth: at 94 % of it the opening must fill every screen
-    sc = max(s_cover(I, *v[:2], W, H, Q) for v in VPS); SMAX = round(max(5.0, 1.03 * sc / .94), 2)
-    if SMAX > 8: print(f'WARNING: opening is small for this image (zoom {SMAX}); the frame will look soft near the end')
+    # zoom depth: at 94 % of it the opening must fill every screen. If that needs a deep zoom (narrow door,
+    # wide screen) we stop at flash_zoom and pass through a white flash instead (FLASH = scroll point of the flash).
+    need = 1.03 * max(s_cover(I, vw_, vh_, W, H, Q) for vw_, vh_ in TYPICAL[target]) / .94
+    need_all = 1.03 * max(s_cover(I, *v[:2], W, H, Q) for v in VPS) / .94
+    FLASH, FORCE = AP, 0                     # the page flashes only on screens the opening cannot fill (it checks itself)
+    if need <= cfg.get('max_zoom', 7.0): SMAX = round(max(5.0, need), 2)
+    else:
+        SMAX = float(cfg.get('flash_zoom', 5.0)); FORCE = 1
+        print(f'NOTE: filling the screen through this door needs zoom {need:.1f}; using {SMAX} + a white flash on every screen')
+    if need_all > SMAX and not FORCE: print(f'NOTE: some screens need zoom {need_all:.1f} > {SMAX}: they get the white flash')
     # how big the world behind the door must start so it always fills the opening (2.5 % margin)
     ts = [i / 400 for i in range(401)]; C0 = None
     for c0 in [x / 100 for x in range(30, 107)]:
@@ -137,8 +184,10 @@ def derive(cfg, W, H):
             if not ok: break
         if ok: C0 = c0; break
     if C0 is None: C0 = C1; print('NOTE: world image never fills the opening by itself; the page enlarges it as needed')
-    geo = dict(W=W, H=H, Q=Q, OPC=OPC, CC=CC, PORT=PORT, SMAX=SMAX, SIN=round(.94 * SMAX, 3),
-               GF=[round(.72 * SMAX, 3), round(.92 * SMAX, 3)], SF=[round(.52 * SMAX, 3), round(.84 * SMAX, 3)],
+    IN = {k: I[k] for k in ('shape', 'xl', 'xr', 'top', 'bot', 'pts') if k in I}
+    geo = dict(W=W, H=H, Q=Q, OPC=OPC, CC=CC, PORT=PORT, SMAX=SMAX, SIN=round(.94 * SMAX, 3), FLASH=FLASH, FORCE=FORCE, IN=IN,
+               XF=cfg.get('crossfade', [1.12, 1.9]),
+               GF=cfg.get('glow_fade', [round(.72 * SMAX, 3), round(.92 * SMAX, 3)]), SF=[round(.52 * SMAX, 3), round(.84 * SMAX, 3)],
                AP=AP, C0=C0, C1=C1, S1=S1, S2=S2, D=round(min(2.0, max(1.25, KD)), 2))
     return R, geo, VPS
 
@@ -149,7 +198,7 @@ def report(R, geo, VPS):
         KD = max(vw / W, vh / H) * dpr; S1 = max(geo['S1'], 2 / KD); S2 = max(geo['S2'], 3 / KD); miss = 0
         for i in range(0, 1001):
             t = i / 1000 * .999; s = 1 / (1 - t * (1 - 1 / geo['SMAX']))
-            if s >= geo['SIN']: break
+            if s >= geo['SIN'] and not geo['FLASH']: break
             n = 'fg-lo' if s < S1 else 'fg-mid' if s < S2 else 'fg-hi'; r = R[n]
             x0, y0, x1, y1 = screen_rect(vw, vh, W, H, Q, s); need = (max(x0, 0), max(y0, r[1]), min(x1, W), min(y1, H))
             if need[1] >= need[3]: continue
@@ -165,7 +214,8 @@ def main(cfg_path):
     OUT = os.path.join(base, cfg.get('out', 'out')) + '/'; os.makedirs(OUT, exist_ok=True)
     O = Image.open(p('door')).convert('RGB'); W, H = O.size
     X4 = Image.open(p('door_x4')).convert('RGB'); assert X4.size == (W * 4, H * 4), ('door_x4 must be exactly 4x', X4.size)
-    I, OU = cfg['inner'], cfg['outer']; HZ0, HZ1 = cfg['horizon']
+    I = norm_shape(cfg['inner']); OUL = [norm_shape(d) for d in (cfg['outer'] if isinstance(cfg['outer'], list) else [cfg['outer']])]
+    OU = bbox(OUL); HZ0, HZ1 = cfg['horizon']; cfg['inner'], cfg['outer'] = I, OUL
     R, geo, VPS = derive(cfg, W, H)
     print('geometry:', json.dumps(geo)); print('layers:', json.dumps(R))
     if not report(R, geo, VPS): sys.exit('layer coverage failed - check the geometry')
@@ -173,8 +223,8 @@ def main(cfg_path):
 
     # alpha masks at 4x: frame + ground (foreground) and the opening (original interior)
     S4 = (W * 4, H * 4)
-    inner4 = np.array(arch(4, I, 1.2, S4), np.float32) / 255
-    outer4 = np.array(arch(4, OU, 1.4, S4), np.float32) / 255
+    inner4 = np.array(shape_mask(4, I, 1.2, S4), np.float32) / 255
+    outer4 = union_mask(4, OUL, 1.4, S4)
     yy = (np.arange(H * 4, dtype=np.float32) / 4)[:, None]
     fg_a4 = np.maximum(np.repeat(smooth(yy, HZ0, HZ1), W * 4, axis=1), outer4) * (1 - inner4); del outer4
     x4 = np.array(X4)
@@ -208,21 +258,26 @@ def main(cfg_path):
     gx, gy, gw, gh = R['glow']; sc = 2; S = lambda v: v * sc
     rim = Image.new('L', (gw * sc, gh * sc), 0); dr = ImageDraw.Draw(rim)
     r = (I['xr'] - I['xl']) / 2; cx = (I['xl'] + I['xr']) / 2 - gx; cy = I['top'] + r - gy
-    dr.arc([S(cx - r), S(I['top'] - gy), S(cx + r), S(I['top'] - gy + 2 * r)], 180, 360, fill=255, width=S(3))
-    dr.line([S(I['xl'] - gx), S(cy), S(I['xl'] - gx), S(I['bot'] - gy)], fill=255, width=S(3))
-    dr.line([S(I['xr'] - gx), S(cy), S(I['xr'] - gx), S(I['bot'] - gy)], fill=255, width=S(3))
+    if I['shape'] == 'arch':
+        dr.arc([S(cx - r), S(I['top'] - gy), S(cx + r), S(I['top'] - gy + 2 * r)], 180, 360, fill=255, width=S(3))
+        dr.line([S(I['xl'] - gx), S(cy), S(I['xl'] - gx), S(I['bot'] - gy)], fill=255, width=S(3))
+        dr.line([S(I['xr'] - gx), S(cy), S(I['xr'] - gx), S(I['bot'] - gy)], fill=255, width=S(3))
+    elif I['shape'] == 'rect':
+        dr.line([S(I['xl'] - gx), S(I['bot'] - gy), S(I['xl'] - gx), S(I['top'] - gy), S(I['xr'] - gx), S(I['top'] - gy), S(I['xr'] - gx), S(I['bot'] - gy)], fill=255, width=S(3), joint='curve')
+    else:
+        dr.line([(S(x - gx), S(y - gy)) for x, y in I['pts'] + I['pts'][:1]], fill=255, width=S(3), joint='curve')
     rim = np.array(rim.filter(ImageFilter.GaussianBlur(S(5))), np.float32)
     fw = .676 * (I['xr'] - I['xl']); flo = Image.new('L', (gw * sc, gh * sc), 0)
     ImageDraw.Draw(flo).ellipse([S(cx - fw), S(I['bot'] - gy - 16), S(cx + fw), S(I['bot'] - gy + 16)], fill=255)
     flo = np.array(flo.filter(ImageFilter.GaussianBlur(S(12))), np.float32)
-    a = np.clip(rim / max(rim.max(), 1) + flo / max(flo.max(), 1) * .85, 0, 1)
+    a = np.clip(rim / max(rim.max(), 1) + flo / max(flo.max(), 1) * .85, 0, 1) * cfg.get('glow_gain', 1.0)
     col = np.array(cfg.get('glow_rgb', [255, 196, 122]), np.float32)
     q('glow.webp', Image.fromarray(np.dstack([np.broadcast_to(col, a.shape + (3,)), a * 255]).astype(np.uint8), 'RGBA'), 90, True)
 
     # twinkling stars, denser where the sky is bright (Milky Way), never on or near the arch
     L = lum(np.array(O, np.float32)); ytop = HZ0 - 26
     mw = np.array(Image.fromarray(np.clip(L, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(22)), np.float32)
-    outer1 = np.array(arch(1, OU, 0, (W, H))) > 0; half = (OU['xr'] - OU['xl']) / 2 + 17
+    outer1 = union_mask(1, OUL, 0, (W, H)) > 0; half = (OU['xr'] - OU['xl']) / 2 + 17
     rng = np.random.default_rng(11); stars = []; mmax = mw[:int(ytop)].max()
     while len(stars) < cfg.get('stars', 240):
         x, y = rng.uniform(4, W - 4), rng.uniform(4, ytop)

@@ -1,0 +1,58 @@
+{
+ "target": "desktop",
+ "door": "d_door.png",
+ "door_x4": "d_door_x4.png",
+ "world": "d_world.png",
+ "world_x4": "d_world_x4.png",
+ "out": "out/v4d",
+ "inner": {
+  "shape": "rect",
+  "xl": 759,
+  "xr": 879,
+  "top": 372,
+  "bot": 670
+ },
+ "outer": [
+  {
+   "shape": "rect",
+   "xl": 736,
+   "xr": 920,
+   "top": 349,
+   "bot": 671
+  },
+  {
+   "pts": [
+    [
+     879,
+     367.5
+    ],
+    [
+     980,
+     340
+    ],
+    [
+     981,
+     679
+    ],
+    [
+     879,
+     670
+    ]
+   ]
+  }
+ ],
+ "horizon": [
+  620,
+  636
+ ],
+ "crossfade": [
+  1.3,
+  2.4
+ ],
+ "glow_gain": 0.4,
+ "flash_zoom": 5.0,
+ "glow_fade": [
+  2.6,
+  4.2
+ ]
+}

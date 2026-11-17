@@ -1,0 +1,57 @@
+{
+ "target": "phone",
+ "door": "m_door.png",
+ "door_x4": "m_door_x4.png",
+ "world": "m_world.png",
+ "world_x4": "m_world_x4.png",
+ "out": "out/v4",
+ "inner": {
+  "shape": "rect",
+  "xl": 366,
+  "xr": 506,
+  "top": 750,
+  "bot": 1117
+ },
+ "outer": [
+  {
+   "shape": "rect",
+   "xl": 336,
+   "xr": 559,
+   "top": 717.5,
+   "bot": 1119
+  },
+  {
+   "pts": [
+    [
+     506,
+     740
+    ],
+    [
+     632.5,
+     707.5
+    ],
+    [
+     633.5,
+     1130
+    ],
+    [
+     506,
+     1119
+    ]
+   ]
+  }
+ ],
+ "horizon": [
+  1064,
+  1082
+ ],
+ "crossfade": [
+  1.3,
+  2.4
+ ],
+ "glow_gain": 0.4,
+ "glow_fade": [
+  2.6,
+  4.2
+ ]
+}
