@@ -23,3 +23,13 @@ like a video: sharp (AI-upscaled 4x, three detail levels) and light (~2.7 MB ins
    `python3 shots.py http://localhost:8772/intro-v3.html /tmp/s 428x926@3 390x844@3 --perf`
    (looks, JS errors, long tasks; headless Chromium has no GPU, so fps there is only relative).
 7. Phone recordings from the client: `python3 rec_check.py rec.mp4` lists freezes frame by frame.
+
+## Config options (besides the measured geometry)
+- `inner`: the opening, `{"shape":"arch"|"rect", xl,xr,top,bot}`; `outer`: one shape or a list of shapes, where a
+  polygon `{"pts":[[x,y],...]}` covers parts in front such as an open door leaf.
+- `crossfade` [s0, s1]: zoom range where the door's own interior fades into the world image (default [1.12, 1.9]).
+- `glow_gain`, `glow_rgb`, `glow_fade` [s0, s1]: the light along the opening; `bloom`: peak of the warm glow when
+  passing the door (0 = none; Bu Sa'ad found a long white glow annoying).
+- `max_zoom` (7) / `flash_zoom` (5): if the opening cannot fill typical screens below `max_zoom`, the zoom stops at
+  `flash_zoom` and the door scene dissolves into the world image. The page also decides this per screen, so old
+  16:9 phones dissolve while modern phones walk through the door.
