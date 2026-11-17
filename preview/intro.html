@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#050b1a;font-family:Almarai,sans-serif}
-#scene{height:300vh;position:relative}
+#scene{height:220vh;position:relative}
 .stick{position:sticky;top:0;height:100vh;height:100lvh;overflow:hidden;contain:strict}
 .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 52% 55%,transparent 30%,rgba(3,8,20,.55) 100%);pointer-events:none}
 .glow{position:absolute;inset:0;background:linear-gradient(180deg,rgba(249,250,253,.2),rgba(249,250,253,.6) 65%,#F9FAFD);opacity:0;pointer-events:none}
@@ -82,7 +82,7 @@ function size(){if(mob)return;lastW=innerWidth;const d=Math.min(devicePixelRatio
 function draw(i){let k=-1;for(let d=0;d<N;d++){if(bm.has(i-d)){k=i-d;break;}if(bm.has(i+d)){k=i+d;break;}}if(k<0||k===cur)return;cur=k;const im=bm.get(k);
  const W=cv.width,H=cv.height,iw=im.width,ih=im.height,r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);}
 const sv=document.getElementById('sv');let tgt=0,sm=0,loopOn=false;
-function loop(){const d=tgt-sm;if(Math.abs(d)<.002){sm=tgt;}else sm+=d*.18;let busyV=false;
+function loop(){const d=tgt-sm;if(Math.abs(d)<.002){sm=tgt;}else sm+=d*.3;let busyV=false;
  if(mob){const T=Math.min((sv.duration||8.8)*sm,(sv.duration||8.8)-.05);if(sv.seeking)busyV=true;else if(Math.abs(sv.currentTime-T)>.03){sv.currentTime=T;busyV=true;}}
  else{draw(Math.round(sm*(N-1)));}
  if(sm!==tgt||busyV)requestAnimationFrame(loop);else loopOn=false;}
