@@ -79,26 +79,34 @@ async function ensure(i){if(i<0||i>=N||bm.has(i)||busy.has(i))return;busy.add(i)
  if(Math.abs(i-want)<3){cur=-1;draw(want);}}catch(e){}busy.delete(i);}
 let pf=null;function prefetch(){clearTimeout(pf);pf=setTimeout(async()=>{const w=want;for(let d=0;d<8;d++){await ensure(w+d);await ensure(w-d);if(want!==w)return;}},16);}
 function size(){if(mob)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
-function draw(i){let k=-1;for(let d=0;d<N;d++){if(bm.has(i-d)){k=i-d;break;}if(bm.has(i+d)){k=i+d;break;}}if(k<0||k===cur)return;cur=k;const im=bm.get(k);
- const W=cv.width,H=cv.height,iw=im.width,ih=im.height,r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);}
+function paint(im,a){const W=cv.width,H=cv.height,iw=im.width,ih=im.height,r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.globalAlpha=a;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);ctx.globalAlpha=1;}
+let lastKey='';
+function drawF(x){x=Math.max(0,Math.min(N-1,x));let i=Math.floor(x),a=x-i;
+ if(!bm.has(i)){let k=-1;for(let d=1;d<N;d++){if(bm.has(i-d)){k=i-d;break;}if(bm.has(i+d)){k=i+d;break;}}if(k<0)return;i=k;a=0;}
+ const two=a>.02&&bm.has(i+1);const key=i+':'+(two?a.toFixed(2):0);if(key===lastKey)return;lastKey=key;
+ paint(bm.get(i),1);if(two)paint(bm.get(i+1),a);}
+function draw(i){lastKey='';drawF(typeof sm==='number'?cl(sm/.74)*(N-1):i);}
 const sv=document.getElementById('sv');let tgt=0,sm=0,loopOn=false;
-function loop(){const d=tgt-sm;if(Math.abs(d)<.002){sm=tgt;}else sm+=d*.3;let busyV=false;
- if(mob){const T=Math.min((sv.duration||8.8)*sm,(sv.duration||8.8)-.05);if(sv.seeking)busyV=true;else if(Math.abs(sv.currentTime-T)>.03){sv.currentTime=T;busyV=true;}}
- else{draw(Math.round(sm*(N-1)));}
- if(sm!==tgt||busyV)requestAnimationFrame(loop);else loopOn=false;}
+let lt=0;function loop(t){const dt=lt?Math.min(64,t-lt):16.7;lt=t;const k=1-Math.pow(1-(mob?.16:.11),dt/16.7);const d=tgt-sm;if(Math.abs(d)<.0004){sm=tgt;}else sm+=d*k;let busyV=false;
+ const vp=cl(sm/.74);
+ if(mob){const D=sv.duration||10,T=Math.min(D*vp,D-.05);if(sv.seeking)busyV=true;else if(Math.abs(sv.currentTime-T)>.012){if(sv.fastSeek&&Math.abs(sv.currentTime-T)>.5)sv.fastSeek(T);else sv.currentTime=T;busyV=true;}}
+ else drawF(vp*(N-1));
+ ui(sm);
+ if(sm!==tgt||busyV)requestAnimationFrame(loop);else{loopOn=false;lt=0;}}
 function kick(){if(!loopOn){loopOn=true;requestAnimationFrame(loop);}}
 if(mob){cv.style.display='none';sv.style.display='block';sv.poster='v/poster-m.jpg';sv.src='v/scrub-m.mp4';sv.load();
  const unlock=()=>{sv.play().then(()=>{sv.pause();kick();}).catch(()=>{});removeEventListener('touchstart',unlock);};addEventListener('touchstart',unlock,{passive:true});
 }else{(async()=>{await ensure(0);draw(0);prefetch();const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
  let q=0;const worker=async()=>{while(q<order.length){try{await ensure(order[q++]);}catch(e){}}};worker();worker();worker();})();}
-function f(){
-  const max=scene.offsetHeight-innerHeight, p=cl(scrollY/max);
-  tgt=cl(p/.74);want=Math.round(tgt*(N-1));if(!mob)prefetch();kick();
+function ui(p){
   vig.style.opacity=1-cl(p/.6);
   glow.style.opacity=ease(cl((p-.7)/.18));const hp=ease(cl((p-.76)/.16));hero.style.opacity=hp;hero.style.transform='translateY('+((1-hp)*24)+'px)';hero.style.pointerEvents=hp>.5?'auto':'none';
   hint.style.opacity=1-cl(p/.05);
-  lines.forEach(l=>{const o=1-cl((p-.1)/.14);l.style.opacity=o;l.style.filter=o<1?'blur('+((1-o)*10)+'px)':'';l.style.transform='translateY('+(-(1-o)*30)+'px) scale('+(1+(1-o)*.06)+')';});
+  lines.forEach(l=>{const o=1-cl((p-.1)/.14);l.style.opacity=o;l.style.filter=o<.99?'blur('+((1-o)*10).toFixed(2)+'px)':'';l.style.transform='translateY('+(-(1-o)*30)+'px) scale('+(1+(1-o)*.06)+')';});
   hdr.classList.toggle('light',p>.6);
+}
+function f(){
+  const max=scene.offsetHeight-innerHeight;tgt=cl(scrollY/max);want=Math.round(cl(tgt/.74)*(N-1));if(!mob)prefetch();kick();
 }
 addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{ticking=false;f();});}},{passive:true});addEventListener('resize',size);size();f();setTimeout(()=>lines.forEach(l=>l.classList.add('on')),350);
 document.getElementById('skip').onclick=e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});};
