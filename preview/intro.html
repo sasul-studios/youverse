@@ -54,7 +54,7 @@
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),glow=document.getElementById('glow'),vig=document.getElementById('vig'),hint=document.getElementById('hint'),hdr=document.getElementById('top'),scene=document.getElementById('scene');
 const lines=[...document.querySelectorAll('.line')];
-const win=[[.02,.34]];
+const win=[[.01,.25]];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=t=>t*t*(3-2*t);
 const N=121,mob=matchMedia('(max-aspect-ratio:1/1)').matches,dir=mob?'fm/':'f/',bm=[];let cur=-1,want=0,ticking=false,lastW=0;
