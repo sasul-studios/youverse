@@ -1,4 +1,4 @@
-/* Test page v2: modern phone header + "the journey" section (only YouFinder and YouPartner are worlds) */
+/* Platform enhancements: modern phone header + "the journey" section (only YouFinder and YouPartner are worlds) */
 (function(){
 const P=window.DC_PAGES;
 const rep=(k,a,b)=>{if(P[k].indexOf(a)<0)console.warn('v2: not found in',k,a.slice(0,40));P[k]=P[k].split(a).join(b);};
