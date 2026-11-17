@@ -42,7 +42,7 @@
 .poem .sep:after{background:linear-gradient(270deg,transparent,rgba(255,255,255,.75))}
 .poem .sep b{font-size:.32em;color:#BFF3F5;font-weight:400}
 @media (min-aspect-ratio:1/1){.poem{top:max(64px,9%);display:flex;justify-content:center;align-items:center;gap:.5em;flex-wrap:nowrap;font-size:clamp(22px,min(2.9vw,5.6vh),48px)}.poem .hm{display:inline-block;white-space:nowrap}.poem .sep{margin:0}.poem.on .sep:before,.poem.on .sep:after{width:clamp(18px,2.4vw,40px)}}
-@media (max-aspect-ratio:1/1){.poem{top:7%;font-size:clamp(24px,min(7vw,4.2vh),40px)}}
+@media (max-aspect-ratio:1/1){.poem{top:calc(env(safe-area-inset-top,0px) + 92px);font-size:clamp(24px,min(7vw,4.2vh),40px)}}
 .poem.on .sep{opacity:1}.poem.on .sep:before,.poem.on .sep:after{width:clamp(50px,9vw,130px)}
 </style>
 </head>
@@ -51,7 +51,7 @@
   <a class="skip" href="#hero" id="skip">تخطَّ إلى المنصة ←</a>
 </header>
 <section id="scene"><div class="stick">
-  <canvas id="cv" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas><div class="vig" id="vig"></div>
+  <video id="sv" muted playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none"></video><canvas id="cv" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas><div class="vig" id="vig"></div>
   <div class="line poem"><span class="hm"><span class="w" style="--i:0">وتَحْسَبُ</span> <span class="w" style="--i:1">أنَّكَ</span> <span class="w" style="--i:2">جِرْمٌ</span> <span class="w" style="--i:3">صَغِيرٌ</span></span><span class="sep"><b>✦</b></span><span class="hm"><span class="w" style="--i:4">وفِيكَ</span> <span class="w" style="--i:5">انْطَوَى</span> <span class="w" style="--i:6">العَالَمُ</span> <span class="w" style="--i:7">الأَكْبَرُ</span></span></div>
   <div class="glow" id="glow"></div>
   <div class="hero" id="hero">
@@ -78,14 +78,22 @@ async function ensure(i){if(i<0||i>=N||bm.has(i)||busy.has(i))return;busy.add(i)
  if(bm.size>LIM){const far=[...bm.keys()].sort((x,y)=>Math.abs(y-want)-Math.abs(x-want));for(const k of far.slice(0,bm.size-LIM)){if(k===cur)continue;bm.get(k).close&&bm.get(k).close();bm.delete(k);}}
  if(Math.abs(i-want)<3){cur=-1;draw(want);}}catch(e){}busy.delete(i);}
 let pf=null;function prefetch(){clearTimeout(pf);pf=setTimeout(async()=>{const w=want;for(let d=0;d<8;d++){await ensure(w+d);await ensure(w-d);if(want!==w)return;}},16);}
-function size(){if(mob&&innerWidth===lastW&&cv.width)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
+function size(){if(mob)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
 function draw(i){let k=-1;for(let d=0;d<N;d++){if(bm.has(i-d)){k=i-d;break;}if(bm.has(i+d)){k=i+d;break;}}if(k<0||k===cur)return;cur=k;const im=bm.get(k);
  const W=cv.width,H=cv.height,iw=im.width,ih=im.height,r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);}
-(async()=>{await ensure(0);draw(0);prefetch();const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
- let q=0;const worker=async()=>{while(q<order.length){try{await getBlob(order[q++]);}catch(e){}}};worker();worker();worker();})();
+const sv=document.getElementById('sv');let tgt=0,sm=0,loopOn=false;
+function loop(){const d=tgt-sm;if(Math.abs(d)<.002){sm=tgt;}else sm+=d*.18;let busyV=false;
+ if(mob){const T=Math.min((sv.duration||8.8)*sm,(sv.duration||8.8)-.05);if(sv.seeking)busyV=true;else if(Math.abs(sv.currentTime-T)>.03){sv.currentTime=T;busyV=true;}}
+ else{draw(Math.round(sm*(N-1)));}
+ if(sm!==tgt||busyV)requestAnimationFrame(loop);else loopOn=false;}
+function kick(){if(!loopOn){loopOn=true;requestAnimationFrame(loop);}}
+if(mob){cv.style.display='none';sv.style.display='block';sv.poster='v/poster-m.jpg';sv.src='v/scrub-m.mp4';sv.load();
+ const unlock=()=>{sv.play().then(()=>{sv.pause();kick();}).catch(()=>{});removeEventListener('touchstart',unlock);};addEventListener('touchstart',unlock,{passive:true});
+}else{(async()=>{await ensure(0);draw(0);prefetch();const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
+ let q=0;const worker=async()=>{while(q<order.length){try{await getBlob(order[q++]);}catch(e){}}};worker();worker();worker();})();}
 function f(){
   const max=scene.offsetHeight-innerHeight, p=cl(scrollY/max);
-  want=Math.round(cl(p/.74)*(N-1));draw(want);prefetch();
+  tgt=cl(p/.74);want=Math.round(tgt*(N-1));if(!mob)prefetch();kick();
   vig.style.opacity=1-cl(p/.6);
   glow.style.opacity=ease(cl((p-.7)/.18));const hp=ease(cl((p-.76)/.16));hero.style.opacity=hp;hero.style.transform='translateY('+((1-hp)*24)+'px)';hero.style.pointerEvents=hp>.5?'auto':'none';
   hint.style.opacity=1-cl(p/.05);
