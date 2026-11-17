@@ -142,14 +142,15 @@ function startVideo(){
 
 /* ---------- phone: layered photo scene. Every layer is drawn ONCE into its own canvas;
    while scrolling only transforms/opacities change, so the GPU composites it like a video (no redraw, no re-decode) ---------- */
-function startLayers(){
+function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (scene.json + layers) */
  mode='img';sv.style.display='none';
  const world=$('world'),skyL=$('skyL'),fgL=$('fgL'),cosL=$('cosL'),portal=$('portal'),starsEl=$('stars'),bloom=$('bloom');
  world.style.display='block';
- const A='v3/',W=941,H=1672,Q=[470.5,960],OPC=[469.5,888.5],CC=[470.5,836],PORT=[346,649.5,247,478.5];
+ /* geometry: defaults = the first Youverse phone images; scene.json 'geo' overrides them for new images */
+ let W=941,H=1672,Q=[470.5,960],OPC=[469.5,888.5],CC=[470.5,836],PORT=[346,649.5,247,478.5];
  const NAMES=['sky','fg-lo','fg-mid','fg-hi','in-lo','in-hi','cosmos-1x','cosmos-2x','glow'];
- const EST={sky:391588,'fg-lo':345744,'fg-mid':489060,'fg-hi':399278,'in-lo':67548,'in-hi':169590,'cosmos-1x':225022,'cosmos-2x':589114,glow:30466};
- const SMAX=5,AP=.70,C0=.75,C1=1.06,SKYH=1048,D=1.66;   /* C0: the view inside starts big enough to always fill the opening */
+ let EST={sky:391588,'fg-lo':345744,'fg-mid':489060,'fg-hi':399278,'in-lo':67548,'in-hi':169590,'cosmos-1x':225022,'cosmos-2x':589114,glow:30466};
+ let SMAX=5,AP=.70,C0=.75,C1=1.06,SKYH=1048,D=1.66,SIN=4.7,GF=[3.6,4.6],SF=[2.6,4.2],S1d=1.204,S2d=1.806;   /* C0: the view inside starts big enough to always fill the opening */
  let R,STARS,VW=1,VH=1,Kc=1,OXc=0,OYc=0,DPR=1,S1=1.204,S2=1.806,ready=false;
  const L={},blobs={};
  const state=p=>{const t=cl(p/AP),s=1/(1-t*(1-1/SMAX)),u=cl((p-AP)/(1-AP));
@@ -157,10 +158,9 @@ function startLayers(){
  const setT=(el,a,e,f)=>{const v='matrix('+a.toFixed(6)+',0,0,'+a.toFixed(6)+','+e.toFixed(2)+','+f.toFixed(2)+')';if(el._t!==v){el._t=v;el.style.transform=v;}};
  const setO=(el,o)=>{const v=o<=.002?'0':o>=.998?'1':o.toFixed(3);if(el._o!==v){el._o=v;el.style.opacity=v;}};
  const place=(el,r)=>{el.style.left=r[0]+'px';el.style.top=r[1]+'px';el.style.width=r[2]+'px';el.style.height=r[3]+'px';};
- place(portal,PORT);   /* the opening (a plain rectangle is enough: the frame covers its corners) */
  function draw(p){
   if(!ready)return;
-  const {t,s,c}=state(p),inside=s>=4.7,qx=OXc+Kc*Q[0],qy=OYc+Kc*Q[1];
+  const {t,s,c}=state(p),inside=s>=SIN,qx=OXc+Kc*Q[0],qy=OYc+Kc*Q[1];
   const sa=(1+.04*t)*Kc;setT(skyL,sa,qx-sa*Q[0],qy-sa*Q[1]);setO(skyL,inside?0:1);   /* sky: almost still */
   const a=s*Kc,e=qx-a*Q[0],f=qy-a*Q[1];setT(fgL,a,e,f);                              /* portal + ground: the camera moves in */
   const inA=1-sstep(1.12,1.9,s);
@@ -173,13 +173,13 @@ function startLayers(){
   }else{setO(L['cosmos-1x'],0);setO(L['cosmos-2x'],0);}
   const lo=s<S1,mid=!lo&&s<S2;   /* sharper level as soon as the current one would be enlarged */
   setO(L['in-lo'],!inside&&lo?inA:0);setO(L['in-hi'],!inside&&!lo?inA:0);
-  setO(L.glow,inside?0:(.35+.6*sstep(1,3.2,s))*(1-sstep(3.6,4.6,s)));
+  setO(L.glow,inside?0:(.35+.6*sstep(1,3.2,s))*(1-sstep(GF[0],GF[1],s)));
   setO(L['fg-lo'],!inside&&lo?1:0);setO(L['fg-mid'],!inside&&mid?1:0);setO(L['fg-hi'],!inside&&!lo&&!mid?1:0);
-  setO(starsEl,1-sstep(2.6,4.2,s));
+  setO(starsEl,1-sstep(SF[0],SF[1],s));
   setO(bloom,sstep(.53,.64,p)*(1-sstep(.67,.77,p))*.62);
  }
  function size(){DPR=Math.min(devicePixelRatio||1,3);VW=stick.clientWidth;VH=stick.clientHeight;
-  Kc=Math.max(VW/W,VH/H);OXc=(VW-W*Kc)/2;OYc=(VH-H*Kc)/2;const KD=Kc*DPR;S1=Math.max(1.204,2/KD);S2=Math.max(1.806,3/KD);draw(sm);}
+  Kc=Math.max(VW/W,VH/H);OXc=(VW-W*Kc)/2;OYc=(VH-H*Kc)/2;const KD=Kc*DPR;S1=Math.max(S1d,2/KD);S2=Math.max(S2d,3/KD);draw(sm);}
  let lastW=0;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;size();});
  step=p=>{draw(p);return false;};
  const paint=async n=>{  /* decode once (off the main thread when possible) and draw once */
@@ -195,7 +195,9 @@ function startLayers(){
    x.fillStyle='rgb('+col+')';x.beginPath();x.arc(px,py,r,0,6.2832);x.fill();                                                       /* crisp core */
    if(S[2]>1.25){x.fillStyle='rgba('+col+',.45)';const Ls=r*3.4,w=1.1;x.fillRect(px-Ls,py-w/2,2*Ls,w);x.fillRect(px-w/2,py-Ls,w,2*Ls);}});};
  (async()=>{
-  const meta=await (await fetch(A+'scene.json')).json();R=meta.R;STARS=meta.stars;
+  const meta=await (await fetch(A+'scene.json')).json();R=meta.R;STARS=meta.stars;if(meta.bytes)EST=meta.bytes;
+  if(meta.geo)({W,H,Q,OPC,CC,PORT,SMAX,AP,C0,C1,SKYH,D,SIN,GF,SF,S1:S1d,S2:S2d}=Object.assign({W,H,Q,OPC,CC,PORT,SMAX,AP,C0,C1,SKYH,D,SIN,GF,SF,S1:S1d,S2:S2d},meta.geo));
+  place(portal,PORT);   /* the opening (a plain rectangle is enough: the frame covers its corners) */
   const mk=(n,parent,before)=>{const c=document.createElement('canvas');place(c,R[n]);parent.insertBefore(c,before||null);L[n]=c;return c;};
   mk('sky',skyL,starsEl).style.opacity='1';                       /* bottom to top */
   for(let i=0;i<3;i++){const c=document.createElement('canvas');place(c,[0,0,W,SKYH]);   /* 3 groups, each on its own rhythm */
@@ -212,7 +214,9 @@ function startLayers(){
  })().catch(err=>{console.error(err);world.style.display='none';startVideo();});
 }
 
-if(mob)startLayers();else startVideo();
+/* layer sets per screen shape; '' = use the video. Fill DESK when the landscape images are built. */
+const PHONE_SET='v3/',DESK_SET='';
+if(mob)startLayers(PHONE_SET);else if(DESK_SET)startLayers(DESK_SET);else startVideo();
 addEventListener('resize',f);
 $('skip').addEventListener('click',()=>lock(false));
 $('skip').addEventListener('click',e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});});
