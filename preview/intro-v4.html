@@ -55,6 +55,23 @@
 .world .glow{mix-blend-mode:screen;mix-blend-mode:plus-lighter}
 .vig,.scrim,.hero,.hint,.bloom{will-change:opacity,transform}
 .line{will-change:opacity,transform,filter}
+/* the verse in his calligraphy: written in from right to left, then a soft light passes over it */
+.callig{top:calc(env(safe-area-inset-top,0px) + 66px);padding:0;display:flex;justify-content:center;pointer-events:none}
+.callig .cw{position:relative;width:min(88vw,520px);aspect-ratio:1217/629}
+@media (min-aspect-ratio:1/1){.callig{top:max(46px,6vh)}.callig .cw{width:min(34vw,520px,56vh)}}
+.callig img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.callig .halo{filter:brightness(0) blur(9px);opacity:0;transition:opacity 1.2s ease 1.6s}          /* dark halo: readable over the Milky Way */
+.callig.on .halo{opacity:.55}
+.callig .ink{-webkit-mask-image:linear-gradient(to left,#000 45%,transparent 55%);mask-image:linear-gradient(to left,#000 45%,transparent 55%);
+ -webkit-mask-size:220% 100%;mask-size:220% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:0 0;mask-position:0 0}
+.callig.on .ink{animation:write 2.6s cubic-bezier(.45,.05,.25,1) .15s forwards}
+@keyframes write{to{-webkit-mask-position:100% 0;mask-position:100% 0}}
+.callig .sh{position:absolute;inset:0;overflow:hidden;opacity:0;-webkit-mask:url(img/verse-callig.webp) 0 0/100% 100% no-repeat;mask:url(img/verse-callig.webp) 0 0/100% 100% no-repeat}
+.callig.on .sh{opacity:1;transition:opacity .6s ease 2.8s}
+.callig .sh i{position:absolute;top:0;bottom:0;right:-45%;width:45%;will-change:transform;
+ background:linear-gradient(100deg,transparent 0%,rgba(255,236,200,.95) 50%,transparent 100%);animation:sweep 6.5s ease-in-out 3.2s infinite}
+@keyframes sweep{0%{transform:translateX(0)}55%,100%{transform:translateX(-330%)}}
+@media (prefers-reduced-motion:reduce){.callig .ink{-webkit-mask-image:none;mask-image:none}.callig .sh{display:none}}
 .bloom{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse 80% 62% at 50% 44%,rgba(255,246,226,.97) 0%,rgba(255,216,154,.78) 36%,rgba(255,180,100,.30) 66%,rgba(255,160,80,0) 100%)}
 .bloom.wo{background:radial-gradient(ellipse 90% 80% at 50% 48%,#fffaf2 0%,#fff1dc 55%,#ffe7cb 100%)}   /* full white-out: walking into the light */
 </style>
@@ -71,7 +88,7 @@
   </div>
   <div class="bloom" id="bloom"></div>
   <div class="vig" id="vig"></div>
-  <div class="line poem"><span class="hm"><span class="w" style="--i:0">وتَحْسَبُ</span> <span class="w" style="--i:1">أنَّكَ</span> <span class="w" style="--i:2">جِرْمٌ</span> <span class="w" style="--i:3">صَغِيرٌ</span></span><span class="sep"><b>✦</b></span><span class="hm"><span class="w" style="--i:4">وفِيكَ</span> <span class="w" style="--i:5">انْطَوَى</span> <span class="w" style="--i:6">العَالَمُ</span> <span class="w" style="--i:7">الأَكْبَرُ</span></span></div>
+  <div class="line callig" role="img" aria-label="وتَحْسَبُ أنَّكَ جِرْمٌ صَغِيرٌ، وفِيكَ انْطَوَى العَالَمُ الأَكْبَرُ"><div class="cw"><img class="halo" src="img/verse-callig.webp" alt="" width="1217" height="629"><img class="ink" src="img/verse-callig.webp" alt="" width="1217" height="629"><div class="sh"><i></i></div></div></div>
   <div class="scrim" id="scrim"></div>
   <div class="hero" id="hero">
     <h1>اكتشف عالمك، وابدأ رحلتك</h1>
