@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Youverse — اكتشف عالمك</title>
+<link rel="icon" href="img/1e4dffc431313b7bc68eadda79d3417c.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;font-family:Almarai,sans-serif;background:#F9FAFD}
+.hdr{position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:#050b1a}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(249,250,253,.15),rgba(249,250,253,.55) 70%,#F9FAFD);opacity:0;transition:opacity 1.4s ease}
+.line{position:absolute;left:0;right:0;top:20%;text-align:center;color:#fff;font-family:Amiri,serif;font-weight:700;font-size:clamp(30px,4.6vw,64px);padding:0 24px;text-shadow:0 4px 30px rgba(0,0,0,.6);opacity:0;transform:translateY(16px);transition:opacity .9s ease,transform .9s ease}
+.line.on{opacity:1;transform:none}
+.hero{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px;opacity:0;transform:translateY(20px);transition:opacity 1.2s ease .3s,transform 1.2s ease .3s;pointer-events:none}
+.done .hero{opacity:1;transform:none;pointer-events:auto}.done .veil{opacity:1}
+.hero h1{font-family:Amiri,serif;font-size:clamp(40px,6vw,84px);color:#032E36;margin:0 0 16px;line-height:1.3}
+.hero p{font-size:clamp(16px,1.6vw,21px);color:#1E3A40;max-width:620px;line-height:1.9;margin:0 0 30px}
+.cta{display:inline-block;background:#127F87;color:#fff;text-decoration:none;font-weight:700;padding:17px 44px;border-radius:40px;font-size:18px;box-shadow:0 14px 34px rgba(18,127,135,.28)}
+.cta2{display:inline-block;margin-top:14px;color:#127F87;text-decoration:none;font-size:15px}
+.top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 36px;z-index:5}
+.top img{height:34px}
+.btn{color:#fff;font:inherit;font-size:14px;border:1px solid rgba(255,255,255,.4);padding:9px 18px;border-radius:30px;backdrop-filter:blur(8px);background:rgba(255,255,255,.08);cursor:pointer;text-decoration:none}
+.done .btn{color:#032E36;border-color:rgba(3,46,54,.2);background:rgba(255,255,255,.6)}
+.logoW,.done .logoD{display:block}.logoD,.done .logoW{display:none}
+@media (max-width:640px){.top{padding:16px 18px}.top img{height:26px}}
+</style>
+</head>
+<body>
+<section class="hdr" id="hdr">
+  <video id="v" muted playsinline autoplay preload="auto" poster="v/poster.jpg"></video>
+  <div class="veil"></div>
+  <div class="line">كل رحلة تبدأ بسؤال…</div>
+  <div class="line">من أنت؟ وإلى أين تريد أن تصل؟</div>
+  <div class="line">خلف هذا الباب، عالم صُمّم لك</div>
+  <div class="hero">
+    <h1>اكتشف عالمك، وابدأ رحلتك</h1>
+    <p>منصة تساعدك على فهم نفسك، واكتشاف شغفك، ورسم طريقك بثقة؛ خطوة بخطوة.</p>
+    <a class="cta" href="index.html#test">ابدأ الاختبار</a>
+    <a class="cta2" href="index.html#home">تصفّح المنصة</a>
+  </div>
+  <header class="top">
+    <a href="index.html#home"><img class="logoW" src="img/e71bb002c61cd7d156a7ad3ffea2d570.png" alt="Youverse"><img class="logoD" src="img/1e4dffc431313b7bc68eadda79d3417c.png" alt="Youverse"></a>
+    <button class="btn" id="skip">تخطَّ ←</button>
+  </header>
+</section>
+<script>
+const v=document.getElementById('v'),hdr=document.getElementById('hdr'),lines=[...document.querySelectorAll('.line')],skip=document.getElementById('skip');
+const mob=matchMedia('(max-aspect-ratio:1/1)').matches;
+v.src=mob?'v/door-m.mp4':'v/door.mp4';
+const T=[[0.8,2.9],[3.3,5.3],[5.7,7.2]];
+function finish(){hdr.classList.add('done');lines.forEach(l=>l.classList.remove('on'));skip.textContent='↻ إعادة';}
+v.addEventListener('timeupdate',()=>{const t=v.currentTime;lines.forEach((l,i)=>l.classList.toggle('on',t>=T[i][0]&&t<T[i][1]&&!hdr.classList.contains('done')));if(t>=v.duration-1.2)finish();});
+v.addEventListener('ended',finish);
+skip.onclick=()=>{if(hdr.classList.contains('done')){hdr.classList.remove('done');skip.textContent='تخطَّ ←';v.currentTime=0;v.play();}else{v.pause();v.currentTime=Math.max(0,v.duration-0.05);finish();}};
+if(matchMedia('(prefers-reduced-motion:reduce)').matches){v.removeAttribute('autoplay');v.poster='v/end.jpg';finish();}
+else v.play().catch(()=>{v.poster='v/end.jpg';finish();});
+</script>
+</body>
+</html>
