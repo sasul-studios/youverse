@@ -25,12 +25,14 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .done .btn{color:#032E36;border-color:rgba(3,46,54,.2);background:rgba(255,255,255,.6)}
 .logoW,.done .logoD{display:block}.logoD,.done .logoW{display:none}
 @media (max-width:640px){.top{padding:16px 18px}.top img{height:26px}}
+.poem{top:9%;font-size:clamp(26px,3.6vw,52px);line-height:1.7;letter-spacing:.3px}
 </style>
 </head>
 <body>
 <section class="hdr" id="hdr">
   <video id="v" muted playsinline autoplay preload="auto" poster="v/poster.jpg"></video>
   <div class="veil"></div>
+  <div class="line poem">وتَحْسَبُ أنَّكَ جِرْمٌ صَغِيرٌ<br>وفِيكَ انْطَوَى العَالَمُ الأَكْبَرُ</div>
   <div class="line">كل رحلة تبدأ بسؤال…</div>
   <div class="line">من أنت؟ وإلى أين تريد أن تصل؟</div>
   <div class="line">خلف هذا الباب، عالم صُمّم لك</div>
@@ -49,7 +51,7 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 const v=document.getElementById('v'),hdr=document.getElementById('hdr'),lines=[...document.querySelectorAll('.line')],skip=document.getElementById('skip');
 const mob=matchMedia('(max-aspect-ratio:1/1)').matches;
 v.src=mob?'v/door-m.mp4':'v/door.mp4';
-const T=[[0.8,2.9],[3.3,5.3],[5.7,7.2]];
+const T=[[0.3,3.0],[3.3,4.7],[5.0,6.3],[6.6,7.7]];v.playbackRate=.85;v.addEventListener('loadedmetadata',()=>v.playbackRate=.85);
 function finish(){hdr.classList.add('done');lines.forEach(l=>l.classList.remove('on'));skip.textContent='↻ إعادة';}
 v.addEventListener('timeupdate',()=>{const t=v.currentTime;lines.forEach((l,i)=>l.classList.toggle('on',t>=T[i][0]&&t<T[i][1]&&!hdr.classList.contains('done')));if(t>=v.duration-1.2)finish();});
 v.addEventListener('ended',finish);
