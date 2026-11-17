@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Youverse — ادخل عالمك</title>
+<link rel="icon" href="img/1e4dffc431313b7bc68eadda79d3417c.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#050b1a;font-family:Almarai,sans-serif}
+#scene{height:500vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;height:100lvh;overflow:hidden;contain:strict}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at 52% 55%,transparent 30%,rgba(3,8,20,.55) 100%);pointer-events:none}
+.glow{position:absolute;inset:0;background:linear-gradient(180deg,rgba(249,250,253,.6) 0%,#F9FAFD 55%,#F9FAFD 100%);opacity:0;pointer-events:none}
+.line{position:absolute;left:0;right:0;top:20%;text-align:center;color:#fff;font-family:Amiri,serif;font-size:clamp(30px,4.6vw,64px);font-weight:700;opacity:0;padding:0 24px;text-shadow:0 4px 30px rgba(0,0,0,.6);will-change:opacity,transform}
+.hint{position:absolute;bottom:34px;left:0;right:0;text-align:center;color:rgba(255,255,255,.75);font-size:14px;letter-spacing:.5px}
+.hint i{display:block;margin:10px auto 0;width:22px;height:36px;border:2px solid rgba(255,255,255,.6);border-radius:12px;position:relative}
+.hint i:after{content:"";position:absolute;top:6px;left:50%;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#fff;animation:d 1.6s infinite}
+@keyframes d{0%{opacity:0;transform:translateY(0)}40%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
+.top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px 36px;z-index:5;transition:.4s}
+.top img{height:34px}
+.skip{color:#fff;text-decoration:none;font-size:14px;border:1px solid rgba(255,255,255,.4);padding:9px 18px;border-radius:30px;backdrop-filter:blur(8px);background:rgba(255,255,255,.08)}
+.top.light .skip{color:#032E36;border-color:rgba(3,46,54,.2);background:rgba(255,255,255,.6)}
+.logoW,.top.light .logoD{display:block}.logoD,.top.light .logoW{display:none}
+.hero{min-height:100vh;background:linear-gradient(180deg,#F9FAFD 0%,#EEF9FA 40%,#F3F0FC 75%,#FBEFF4 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;margin-top:-1px}
+.hero h1{font-family:Amiri,serif;font-size:clamp(40px,6vw,84px);color:#032E36;margin:0 0 18px;line-height:1.3}
+.hero p{font-size:clamp(16px,1.6vw,21px);color:#1E3A40;max-width:620px;line-height:1.9;margin:0 0 34px}
+.cta{display:inline-block;background:#127F87;color:#fff;text-decoration:none;font-weight:700;padding:17px 44px;border-radius:40px;font-size:18px;box-shadow:0 14px 34px rgba(18,127,135,.28)}
+.cta2{display:inline-block;margin-top:16px;color:#127F87;text-decoration:none;font-size:15px}
+.worlds{display:flex;gap:14px;margin-top:46px;flex-wrap:wrap;justify-content:center}
+.worlds span{padding:10px 20px;border-radius:30px;font-size:14px;color:#032E36;background:rgba(255,255,255,.7);border:1px solid rgba(3,46,54,.08)}
+@media (prefers-reduced-motion:reduce){#scene{height:100vh}.line,.hint{display:none}}
+@media (max-width:640px){.top{padding:16px 18px}.top img{height:26px}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <a href="index.html#home"><img class="logoW" src="img/e71bb002c61cd7d156a7ad3ffea2d570.png" alt="Youverse"><img class="logoD" src="img/1e4dffc431313b7bc68eadda79d3417c.png" alt="Youverse"></a>
+  <a class="skip" href="#hero" id="skip">تخطَّ إلى المنصة ←</a>
+</header>
+<section id="scene"><div class="stick">
+  <canvas id="cv" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas><div class="vig" id="vig"></div>
+  <div class="line">كل رحلة تبدأ بسؤال…</div>
+  <div class="line">من أنت؟ وإلى أين تريد أن تصل؟</div>
+  <div class="line">خلف هذا الباب، عالم صُمّم لك</div>
+  <div class="glow" id="glow"></div>
+  <div class="hint" id="hint">اسحب للأسفل<i></i></div>
+</div></section>
+<section class="hero" id="hero">
+  <h1>اكتشف عالمك، وابدأ رحلتك</h1>
+  <p>منصة تساعدك على فهم نفسك، واكتشاف شغفك، ورسم طريقك بثقة؛ خطوة بخطوة.</p>
+  <a class="cta" href="index.html#test">ابدأ الاختبار</a>
+  <a class="cta2" href="index.html#home">تصفّح المنصة</a>
+  <div class="worlds"><span>اختبار الشخصية</span><span>YouFinder</span><span>YouPartner</span><span>You</span></div>
+</section>
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),glow=document.getElementById('glow'),vig=document.getElementById('vig'),hint=document.getElementById('hint'),hdr=document.getElementById('top'),scene=document.getElementById('scene');
+const lines=[...document.querySelectorAll('.line')];
+const win=[[.03,.18],[.22,.38],[.42,.56]];
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=t=>t*t*(3-2*t);
+const N=121,mob=matchMedia('(max-aspect-ratio:1/1)').matches,dir=mob?'fm/':'f/',bm=[];let cur=-1,want=0,ticking=false,lastW=0;
+const url=i=>dir+String(i+1).padStart(3,'0')+'.jpg';
+async function load(i){if(bm[i]!==undefined)return;bm[i]=null;try{const r=await fetch(url(i));const bl=await r.blob();bm[i]=await createImageBitmap(bl);}catch(e){const im=new Image();im.src=url(i);await im.decode();bm[i]=im;}if(Math.abs(i-want)<4){cur=-1;draw(want);}}
+function size(){if(mob&&innerWidth===lastW&&cv.width)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,mob?2:2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
+function draw(i){let k=i;while(k>0&&!bm[k])k--;const im=bm[k];if(!im||k===cur)return;cur=k;
+ const W=cv.width,H=cv.height,iw=im.width,ih=im.height,r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);}
+(async()=>{await load(0);draw(0);const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
+ let q=0;const worker=async()=>{while(q<order.length){await load(order[q++]);}};worker();worker();worker();})();
+function f(){
+  const max=scene.offsetHeight-innerHeight, p=cl(scrollY/max);
+  want=Math.round(cl(p/.86)*(N-1));draw(want);
+  vig.style.opacity=1-cl(p/.6);
+  glow.style.opacity=ease(cl((p-.78)/.2));
+  hint.style.opacity=1-cl(p/.05);
+  lines.forEach((l,i)=>{const[a,b]=win[i],m=(b-a)*.3;let o=p<a||p>b?0:p<a+m?(p-a)/m:p>b-m?(b-p)/m:1;l.style.opacity=o;l.style.transform='translateY('+((1-o)*16)+'px)';});
+  hdr.classList.toggle('light',p>.62);
+}
+addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{ticking=false;f();});}},{passive:true});addEventListener('resize',size);size();f();
+document.getElementById('skip').onclick=e=>{e.preventDefault();document.getElementById('hero').scrollIntoView({behavior:'smooth'});};
+</script>
+</body>
+</html>
