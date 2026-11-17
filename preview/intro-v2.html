@@ -82,6 +82,7 @@ function vt(p){const D=sv.duration||12.04;return p<JP?(p/JP)*JT:JT+((p-JP)/(1-JP
 let tgt=0,sm=0,loopOn=false,ticking=false,lt=0;
 function loop(t){const dt=lt?Math.min(64,t-lt):16.7;lt=t;const k=1-Math.pow(1-.16,dt/16.7);
  const d=tgt-sm;if(Math.abs(d)<.0004)sm=tgt;else sm+=d*k;let busyV=false;
+ if(!sv.paused)sv.pause();
  if(sv.readyState>=1){const D=sv.duration||12.04,T=Math.min(vt(sm),D-.06);
   if(sv.seeking)busyV=true;else if(Math.abs(sv.currentTime-T)>.012){if(sv.fastSeek&&Math.abs(sv.currentTime-T)>.5)sv.fastSeek(T);else sv.currentTime=T;busyV=true;}}
  ui(sm);
@@ -109,7 +110,7 @@ let finished=false,released=false;
 const release=()=>{if(released)return;released=true;load.style.opacity=0;setTimeout(()=>load.style.display='none',500);hint.style.visibility='visible';lock(false);f();kick();};
 const finish=src=>{if(finished)return;finished=true;sv.src=src;sv.load();
  sv.addEventListener('loadeddata',release,{once:true});sv.addEventListener('canplay',release,{once:true});setTimeout(release,4000);
- if(mob)sv.play().then(()=>{sv.pause();kick();}).catch(()=>{});};
+};
 lock(true);load.style.display='block';hint.style.visibility='hidden';
 const fallback=setTimeout(()=>finish(SRC),15000);
 (async()=>{try{
@@ -118,7 +119,10 @@ const fallback=setTimeout(()=>finish(SRC),15000);
   for(;;){const {done,value}=await reader.read();if(done)break;parts.push(value);got+=value.length;if(total)bar.style.width=(got/total*100).toFixed(1)+'%';}
   clearTimeout(fallback);finish(URL.createObjectURL(new Blob(parts,{type:'video/mp4'})));
  }catch(e){clearTimeout(fallback);finish(SRC);}})();
-if(mob){const unlock=()=>{if(!finished)return;sv.play().then(()=>{sv.pause();kick();removeEventListener('touchstart',unlock);}).catch(()=>{});};addEventListener('touchstart',unlock,{passive:true});}
+/* the video must never play by itself: it only moves with the scroll */
+sv.addEventListener('playing',()=>{sv.pause();kick();});
+sv.addEventListener('timeupdate',()=>{if(!sv.paused){sv.pause();kick();}});
+if(mob){const done=()=>{removeEventListener('touchstart',unlock);removeEventListener('touchend',unlock);};const unlock=()=>{if(!finished)return;const p=sv.play();if(p)p.then(()=>{sv.pause();kick();done();}).catch(()=>{});else{sv.pause();kick();}};addEventListener('touchstart',unlock,{passive:true});addEventListener('touchend',unlock,{passive:true});}
 $('skip').addEventListener('click',()=>lock(false));
 $('skip').addEventListener('click',e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});});
 f();setTimeout(()=>lines.forEach(l=>l.classList.add('on')),350);
