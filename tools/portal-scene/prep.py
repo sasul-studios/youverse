@@ -20,7 +20,7 @@ VIEWPORTS = {
 REF = {'phone': (428, 926, 3), 'desktop': (1440, 900, 2)}   # screen the sharpness switch points are tuned for
 TYPICAL = {'phone': [(428, 926), (390, 844), (430, 932), (393, 852), (360, 800)],             # zoom depth is sized for these (modern phones);
            'desktop': [(1366, 768), (1440, 900), (1512, 982), (1728, 1117), (1920, 1080)]}    # other screens get the flash
-AP, C1 = .70, 1.06            # share of the scroll spent approaching the door; final zoom of the world image
+AP, C1 = .70, 1.06            # share of the scroll spent approaching the door (config 'approach'); final zoom of the world image
 
 
 def norm_shape(d):
@@ -143,6 +143,7 @@ def cosmos_need(vw, vh, W, H, Q, OPC, CC, PORT, SMAX, t):
 
 def derive(cfg, W, H):
     I = norm_shape(cfg['inner']); O = bbox(cfg['outer']); HZ0, HZ1 = cfg['horizon']; target = cfg.get('target', 'phone')
+    AP = cfg.get('approach', globals()['AP'])
     VPS = VIEWPORTS[target]; ow, oh = I['xr'] - I['xl'], I['bot'] - I['top']
     Q = [round((I['xl'] + I['xr'])), round(2 * (I['top'] + .65 * oh))]; Q = [Q[0] / 2, Q[1] / 2]   # zoom centre
     OPC = [(I['xl'] + I['xr']) / 2, (I['top'] + I['bot']) / 2]
