@@ -101,28 +101,25 @@ addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame((
 addEventListener('resize',f);
 sv.addEventListener('loadedmetadata',kick);
 
-if(mob){
- /* phone: same approach that was approved */
- sv.src=SRC;sv.load();
- const unlock=()=>{sv.play().then(()=>{sv.pause();kick();}).catch(()=>{});removeEventListener('touchstart',unlock);};
- addEventListener('touchstart',unlock,{passive:true});
-}else{
- /* laptop: download the whole video first, then scrub it from memory */
- const de=document.documentElement;
- const lock=on=>{de.style.overflow=on?'hidden':'';document.body.style.overflow=on?'hidden':'';};
- let finished=false;
- const finish=src=>{if(finished)return;finished=true;sv.src=src;sv.load();
-  sv.addEventListener('loadeddata',()=>{load.style.opacity=0;setTimeout(()=>load.style.display='none',500);hint.style.visibility='visible';lock(false);f();kick();},{once:true});};
- lock(true);load.style.display='block';hint.style.visibility='hidden';
- const fallback=setTimeout(()=>finish(SRC),15000);
- (async()=>{try{
-   const r=await fetch(SRC);if(!r.ok||!r.body)throw 0;
-   const total=+r.headers.get('content-length')||0,reader=r.body.getReader(),parts=[];let got=0;
-   for(;;){const {done,value}=await reader.read();if(done)break;parts.push(value);got+=value.length;if(total)bar.style.width=(got/total*100).toFixed(1)+'%';}
-   clearTimeout(fallback);finish(URL.createObjectURL(new Blob(parts,{type:'video/mp4'})));
-  }catch(e){clearTimeout(fallback);finish(SRC);}})();
- $('skip').addEventListener('click',()=>lock(false));
-}
+/* both devices: download the whole video first, then scrub it from memory */
+const de=document.documentElement,noTouch=e=>e.preventDefault();
+const lock=on=>{de.style.overflow=on?'hidden':'';document.body.style.overflow=on?'hidden':'';
+ if(on)addEventListener('touchmove',noTouch,{passive:false});else removeEventListener('touchmove',noTouch);};
+let finished=false,released=false;
+const release=()=>{if(released)return;released=true;load.style.opacity=0;setTimeout(()=>load.style.display='none',500);hint.style.visibility='visible';lock(false);f();kick();};
+const finish=src=>{if(finished)return;finished=true;sv.src=src;sv.load();
+ sv.addEventListener('loadeddata',release,{once:true});sv.addEventListener('canplay',release,{once:true});setTimeout(release,4000);
+ if(mob)sv.play().then(()=>{sv.pause();kick();}).catch(()=>{});};
+lock(true);load.style.display='block';hint.style.visibility='hidden';
+const fallback=setTimeout(()=>finish(SRC),15000);
+(async()=>{try{
+  const r=await fetch(SRC);if(!r.ok||!r.body)throw 0;
+  const total=+r.headers.get('content-length')||0,reader=r.body.getReader(),parts=[];let got=0;
+  for(;;){const {done,value}=await reader.read();if(done)break;parts.push(value);got+=value.length;if(total)bar.style.width=(got/total*100).toFixed(1)+'%';}
+  clearTimeout(fallback);finish(URL.createObjectURL(new Blob(parts,{type:'video/mp4'})));
+ }catch(e){clearTimeout(fallback);finish(SRC);}})();
+if(mob){const unlock=()=>{if(!finished)return;sv.play().then(()=>{sv.pause();kick();removeEventListener('touchstart',unlock);}).catch(()=>{});};addEventListener('touchstart',unlock,{passive:true});}
+$('skip').addEventListener('click',()=>lock(false));
 $('skip').addEventListener('click',e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});});
 f();setTimeout(()=>lines.forEach(l=>l.classList.add('on')),350);
 </script>
