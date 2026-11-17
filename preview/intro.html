@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#050b1a;font-family:Almarai,sans-serif}
-#scene{height:220vh;position:relative}
+#scene{height:300vh;position:relative}@media (max-aspect-ratio:1/1){#scene{height:220vh}}
 .stick{position:sticky;top:0;height:100vh;height:100lvh;overflow:hidden;contain:strict}
 .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 52% 55%,transparent 30%,rgba(3,8,20,.55) 100%);pointer-events:none}
 .glow{position:absolute;inset:0;background:linear-gradient(180deg,rgba(249,250,253,.2),rgba(249,250,253,.6) 65%,#F9FAFD);opacity:0;pointer-events:none}
@@ -70,7 +70,7 @@ const lines=[...document.querySelectorAll('.line')];
 const win=[[.01,.25]];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=t=>t*t*(3-2*t);
-const mob=matchMedia('(max-aspect-ratio:1/1)').matches,N=mob?106:121,dir=mob?'fm/':'f/',LIM=mob?18:20;
+const mob=matchMedia('(max-aspect-ratio:1/1)').matches,N=mob?106:121,dir=mob?'fm/':'f/',LIM=mob?18:999;
 const blobs=[],bm=new Map(),busy=new Set();let cur=-1,want=0,ticking=false,lastW=0;
 const url=i=>dir+String(i+1).padStart(3,'0')+'.webp';
 async function getBlob(i){if(blobs[i])return blobs[i];const r=await fetch(url(i));return blobs[i]=await r.blob();}
@@ -90,7 +90,7 @@ function kick(){if(!loopOn){loopOn=true;requestAnimationFrame(loop);}}
 if(mob){cv.style.display='none';sv.style.display='block';sv.poster='v/poster-m.jpg';sv.src='v/scrub-m.mp4';sv.load();
  const unlock=()=>{sv.play().then(()=>{sv.pause();kick();}).catch(()=>{});removeEventListener('touchstart',unlock);};addEventListener('touchstart',unlock,{passive:true});
 }else{(async()=>{await ensure(0);draw(0);prefetch();const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
- let q=0;const worker=async()=>{while(q<order.length){try{await getBlob(order[q++]);}catch(e){}}};worker();worker();worker();})();}
+ let q=0;const worker=async()=>{while(q<order.length){try{await ensure(order[q++]);}catch(e){}}};worker();worker();worker();})();}
 function f(){
   const max=scene.offsetHeight-innerHeight, p=cl(scrollY/max);
   tgt=cl(p/.74);want=Math.round(tgt*(N-1));if(!mob)prefetch();kick();
