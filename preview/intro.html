@@ -70,17 +70,22 @@ const lines=[...document.querySelectorAll('.line')];
 const win=[[.01,.25]];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=t=>t*t*(3-2*t);
-const N=121,mob=matchMedia('(max-aspect-ratio:1/1)').matches,dir=mob?'fm/':'f/',bm=[];let cur=-1,want=0,ticking=false,lastW=0;
+const mob=matchMedia('(max-aspect-ratio:1/1)').matches,N=mob?106:121,dir=mob?'fm/':'f/',LIM=mob?18:20;
+const blobs=[],bm=new Map(),busy=new Set();let cur=-1,want=0,ticking=false,lastW=0;
 const url=i=>dir+String(i+1).padStart(3,'0')+'.webp';
-async function load(i){if(bm[i]!==undefined)return;bm[i]=null;try{const r=await fetch(url(i));const bl=await r.blob();bm[i]=await createImageBitmap(bl);}catch(e){const im=new Image();im.src=url(i);await im.decode();bm[i]=im;}if(Math.abs(i-want)<4){cur=-1;draw(want);}}
-function size(){if(mob&&innerWidth===lastW&&cv.width)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,mob?2:2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
-function draw(i){let k=i;while(k>0&&!bm[k])k--;const im=bm[k];if(!im||k===cur)return;cur=k;
+async function getBlob(i){if(blobs[i])return blobs[i];const r=await fetch(url(i));return blobs[i]=await r.blob();}
+async function ensure(i){if(i<0||i>=N||bm.has(i)||busy.has(i))return;busy.add(i);try{const b=await getBlob(i);const im=await createImageBitmap(b);bm.set(i,im);
+ if(bm.size>LIM){const far=[...bm.keys()].sort((x,y)=>Math.abs(y-want)-Math.abs(x-want));for(const k of far.slice(0,bm.size-LIM)){if(k===cur)continue;bm.get(k).close&&bm.get(k).close();bm.delete(k);}}
+ if(Math.abs(i-want)<3){cur=-1;draw(want);}}catch(e){}busy.delete(i);}
+let pf=null;function prefetch(){clearTimeout(pf);pf=setTimeout(async()=>{const w=want;for(let d=0;d<8;d++){await ensure(w+d);await ensure(w-d);if(want!==w)return;}},16);}
+function size(){if(mob&&innerWidth===lastW&&cv.width)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
+function draw(i){let k=-1;for(let d=0;d<N;d++){if(bm.has(i-d)){k=i-d;break;}if(bm.has(i+d)){k=i+d;break;}}if(k<0||k===cur)return;cur=k;const im=bm.get(k);
  const W=cv.width,H=cv.height,iw=im.width,ih=im.height,r=Math.max(W/iw,H/ih),w=iw*r,h=ih*r;ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);}
-(async()=>{await load(0);draw(0);const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
- let q=0;const worker=async()=>{while(q<order.length){await load(order[q++]);}};worker();worker();worker();})();
+(async()=>{await ensure(0);draw(0);prefetch();const order=[];for(let s=8;s>=1;s=s>>1)for(let i=0;i<N;i+=s)if(!order.includes(i))order.push(i);
+ let q=0;const worker=async()=>{while(q<order.length){try{await getBlob(order[q++]);}catch(e){}}};worker();worker();worker();})();
 function f(){
   const max=scene.offsetHeight-innerHeight, p=cl(scrollY/max);
-  want=Math.round(cl(p/.74)*(N-1));draw(want);
+  want=Math.round(cl(p/.74)*(N-1));draw(want);prefetch();
   vig.style.opacity=1-cl(p/.6);
   glow.style.opacity=ease(cl((p-.7)/.18));const hp=ease(cl((p-.76)/.16));hero.style.opacity=hp;hero.style.transform='translateY('+((1-hp)*24)+'px)';hero.style.pointerEvents=hp>.5?'auto':'none';
   hint.style.opacity=1-cl(p/.05);
