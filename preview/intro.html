@@ -61,7 +61,7 @@ const win=[[.02,.16],[.18,.3],[.32,.44],[.46,.57]];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=t=>t*t*(3-2*t);
 const N=121,mob=matchMedia('(max-aspect-ratio:1/1)').matches,dir=mob?'fm/':'f/',bm=[];let cur=-1,want=0,ticking=false,lastW=0;
-const url=i=>dir+String(i+1).padStart(3,'0')+'.jpg';
+const url=i=>dir+String(i+1).padStart(3,'0')+'.webp';
 async function load(i){if(bm[i]!==undefined)return;bm[i]=null;try{const r=await fetch(url(i));const bl=await r.blob();bm[i]=await createImageBitmap(bl);}catch(e){const im=new Image();im.src=url(i);await im.decode();bm[i]=im;}if(Math.abs(i-want)<4){cur=-1;draw(want);}}
 function size(){if(mob&&innerWidth===lastW&&cv.width)return;lastW=innerWidth;const d=Math.min(devicePixelRatio||1,mob?2:2);const h=mob?screen.height:innerHeight;cv.width=Math.round(innerWidth*d);cv.height=Math.round(Math.max(innerHeight,h)*d);ctx.imageSmoothingQuality='high';cur=-1;draw(want);}
 function draw(i){let k=i;while(k>0&&!bm[k])k--;const im=bm[k];if(!im||k===cur)return;cur=k;
