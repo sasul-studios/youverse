@@ -41,9 +41,6 @@
 <section id="scene"><div class="stick">
   <canvas id="cv" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas><div class="vig" id="vig"></div>
   <div class="line poem">وتَحْسَبُ أنَّكَ جِرْمٌ صَغِيرٌ<br>وفِيكَ انْطَوَى العَالَمُ الأَكْبَرُ</div>
-  <div class="line">كل رحلة تبدأ بسؤال…</div>
-  <div class="line">من أنت؟ وإلى أين تريد أن تصل؟</div>
-  <div class="line">خلف هذا الباب، عالم صُمّم لك</div>
   <div class="glow" id="glow"></div>
   <div class="hint" id="hint">اسحب للأسفل<i></i></div>
 </div></section>
@@ -57,7 +54,7 @@
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),glow=document.getElementById('glow'),vig=document.getElementById('vig'),hint=document.getElementById('hint'),hdr=document.getElementById('top'),scene=document.getElementById('scene');
 const lines=[...document.querySelectorAll('.line')];
-const win=[[.02,.16],[.18,.3],[.32,.44],[.46,.57]];
+const win=[[.02,.34]];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const ease=t=>t*t*(3-2*t);
 const N=121,mob=matchMedia('(max-aspect-ratio:1/1)').matches,dir=mob?'fm/':'f/',bm=[];let cur=-1,want=0,ticking=false,lastW=0;
