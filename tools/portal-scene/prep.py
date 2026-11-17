@@ -169,8 +169,8 @@ def derive(cfg, W, H):
     if need <= cfg.get('max_zoom', 7.0): SMAX = round(max(5.0, need), 2)
     else:
         SMAX = float(cfg.get('flash_zoom', 5.0)); FORCE = 1
-        print(f'NOTE: filling the screen through this door needs zoom {need:.1f}; using {SMAX} + a white flash on every screen')
-    if need_all > SMAX and not FORCE: print(f'NOTE: some screens need zoom {need_all:.1f} > {SMAX}: they get the white flash')
+        print(f'NOTE: filling the screen through this door needs zoom {need:.1f}; using {SMAX} + a dissolve into the world on every screen')
+    if need_all > SMAX and not FORCE: print(f'NOTE: some screens need zoom {need_all:.1f} > {SMAX}: they dissolve into the world instead')
     # how big the world behind the door must start so it always fills the opening (2.5 % margin)
     ts = [i / 400 for i in range(401)]; C0 = None
     for c0 in [x / 100 for x in range(30, 107)]:
@@ -186,7 +186,7 @@ def derive(cfg, W, H):
     if C0 is None: C0 = C1; print('NOTE: world image never fills the opening by itself; the page enlarges it as needed')
     IN = {k: I[k] for k in ('shape', 'xl', 'xr', 'top', 'bot', 'pts') if k in I}
     geo = dict(W=W, H=H, Q=Q, OPC=OPC, CC=CC, PORT=PORT, SMAX=SMAX, SIN=round(.94 * SMAX, 3), FLASH=FLASH, FORCE=FORCE, IN=IN,
-               XF=cfg.get('crossfade', [1.12, 1.9]),
+               XF=cfg.get('crossfade', [1.12, 1.9]), BLOOM=cfg.get('bloom', .62),
                GF=cfg.get('glow_fade', [round(.72 * SMAX, 3), round(.92 * SMAX, 3)]), SF=[round(.52 * SMAX, 3), round(.84 * SMAX, 3)],
                AP=AP, C0=C0, C1=C1, S1=S1, S2=S2, D=round(min(2.0, max(1.25, KD)), 2))
     return R, geo, VPS
