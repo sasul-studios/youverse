@@ -74,28 +74,31 @@ float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<6;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}`;
 
 /* ---------- NIGHT: sky dome with milky way ---------- */
+const BN=new THREE.Vector3().crossVectors(new THREE.Vector3(-.04,.24,-1).normalize(),new THREE.Vector3(.34,.03,-1).normalize()).normalize();
 const nightSky=new THREE.Mesh(new THREE.SphereGeometry(200,48,24),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,
- uniforms:{t:{value:0}},
+ uniforms:{t:{value:0},bn:{value:BN}},
  vertexShader:`varying vec3 vd;void main(){vd=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
- fragmentShader:NOISE+`varying vec3 vd;uniform float t;
+ fragmentShader:NOISE+`varying vec3 vd;uniform float t;uniform vec3 bn;
  void main(){vec3 d=normalize(vd);float h=d.y;
-  vec3 top=vec3(.012,.022,.055), hor=vec3(.05,.08,.15);
-  vec3 c=mix(hor,top,smoothstep(-.05,.55,h));
-  vec3 n=normalize(vec3(.55,.75,.35));float band=exp(-pow(dot(d,n),2.)*28.);
-  float m=fbm(d.xz*6.+d.y*3.)*fbm(d.zy*9.);
-  c+=vec3(.42,.5,.75)*band*m*.55+vec3(.25,.3,.45)*band*.08;
-  c+=vec3(.9,.6,.35)*.06*exp(-pow(abs(h),1.)*14.)*smoothstep(-.2,.02,h);
+  vec3 top=vec3(.010,.020,.060), hor=vec3(.045,.075,.15);
+  vec3 c=mix(hor,top,smoothstep(-.02,.5,h));
+  float bd=dot(d,bn);float band=exp(-bd*bd*420.)*.85;
+  float m=fbm(d.xy*30.+d.z*9.);float m2=fbm(d.xy*70.+3.);
+  float dust=smoothstep(.35,.75,m)*band;
+  c+=vec3(.25,.33,.6)*band*.16+vec3(.8,.86,1.)*band*pow(m2,3.)*.7+vec3(.5,.6,.9)*dust*.22;
+  c-=vec3(.04,.04,.05)*band*smoothstep(.55,.8,fbm(d.xy*48.+7.));
+  c+=vec3(.25,.3,.42)*.18*exp(-max(h,0.)*10.)*smoothstep(-.1,.0,h);
   gl_FragColor=vec4(c,1.);}`}));
 night.add(nightSky);
 
 /* ---------- NIGHT: twinkling stars ---------- */
-const STARS=lowPower?2600:5200;
+const STARS=lowPower?4200:8000;
 {
  const g=new THREE.BufferGeometry(),pos=new Float32Array(STARS*3),sz=new Float32Array(STARS),ph=new Float32Array(STARS),col=new Float32Array(STARS*3);
- for(let i=0;i<STARS;i++){let x,y,z;do{x=Math.random()*2-1;y=Math.random();z=Math.random()*2-1;}while(x*x+y*y+z*z>1||y<0.015);
+ for(let i=0;i<STARS;i++){let x,y,z;if(i<STARS*.8){do{x=(Math.random()*2-1)*.75;y=Math.random()*.55+.004;z=-1;const L=Math.hypot(x,y,z);const bd=(x*BN.x+y*BN.y+z*BN.z)/L;if(Math.random()>.45+.55*Math.exp(-bd*bd*400)){y=-1;}}while(y<.004);}else{do{x=Math.random()*2-1;y=Math.random();z=Math.random()*2-1;}while(x*x+y*y+z*z>1||y<0.015);}
   const l=Math.hypot(x,y,z),r=180;pos.set([x/l*r,y/l*r*0.95,z/l*r],i*3);
   const big=Math.random();sz[i]=big>.985?4.2:big>.9?2.8:1.4+Math.random()*.8;ph[i]=Math.random()*6.28;
-  const tint=Math.random();col.set(tint>.8?[.8,.88,1]:tint>.65?[1,.92,.8]:[1,1,1],i*3);}
+  const tint=Math.random();col.set(tint>.55?[.72,.84,1]:tint>.4?[1,.95,.86]:[.92,.95,1],i*3);}
  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('sz',new THREE.BufferAttribute(sz,1));
  g.setAttribute('ph',new THREE.BufferAttribute(ph,1));g.setAttribute('col',new THREE.BufferAttribute(col,3));
  window.starMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
@@ -113,18 +116,19 @@ const sandMat=new THREE.ShaderMaterial({uniforms:{open:{value:0},t:{value:0}},
  vertexShader:`varying vec3 wp;void main(){vec4 w=modelMatrix*vec4(position,1.);wp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
  fragmentShader:NOISE+`varying vec3 wp;uniform float open;
  void main(){vec2 p=wp.xz;
-  float rip=fbm(vec2(p.x*1.4,p.y*5.5))*.6+fbm(p*.35)*.4;
-  vec3 base=mix(vec3(.10,.11,.15),vec3(.20,.20,.24),rip);
-  float dist=length(p);base*=mix(1.,.55,smoothstep(8.,40.,dist));
-  // light spilling out of the doorway toward the viewer
-  float z=p.y;float w=.42+max(z,0.)*.30;
-  float lane=smoothstep(w,w-.25,abs(p.x+z*.06))*smoothstep(-.05,.15,z)*exp(-max(z,0.)*.22);
-  float pool=exp(-dot(p-vec2(0.,.4),p-vec2(0.,.4))*1.2);
-  float L=(lane*.95+pool*.6)*open;
-  vec3 warm=vec3(1.,.78,.5)*(.55+.45*rip);
-  vec3 c=base+warm*L*1.15;
-  // horizon haze
-  c=mix(c,vec3(.06,.08,.14),smoothstep(25.,120.,dist));
+  float rip=fbm(vec2(p.x*.9+p.y*.3,p.y*6.5))*.55+fbm(p*.4)*.45;
+  float fine=fbm(p*14.);rip=smoothstep(.28,.72,rip);
+  vec3 base=mix(vec3(.30,.30,.33),vec3(.50,.49,.50),rip)*(.92+.16*fine);
+  float dist=length(p);
+  base=mix(base,vec3(.16,.18,.25),smoothstep(6.,60.,dist));
+  float z=p.y;float cx=-max(z,0.)*.38;float w=.40+max(z,0.)*.22;
+  float lane=smoothstep(w,w-.35,abs(p.x-cx))*smoothstep(-.02,.2,z)*exp(-max(z,0.)*.16);
+  float pool=exp(-dot(p-vec2(-.05,.35),p-vec2(-.05,.35))*1.6);
+  float shadow=smoothstep(.0,.5,z)*smoothstep(.15,.55,p.x-cx-w*.6)*exp(-max(z,0.)*.25)*.45*open;
+  float L=(lane*.95+pool*.55)*open;
+  vec3 warm=vec3(1.,.72,.42)*(.65+.5*rip);
+  vec3 c=base*(1.-shadow)+warm*L*1.25;
+  c=mix(c,vec3(.10,.13,.22),smoothstep(40.,140.,dist));
   gl_FragColor=vec4(c,1.);}`});
 const sand=new THREE.Mesh(new THREE.PlaneGeometry(400,400,1,1),sandMat);sand.rotation.x=-Math.PI/2;night.add(sand);
 
@@ -252,23 +256,23 @@ function readScroll(){const max=scene.offsetHeight-innerHeight;tgt=cl(scrollY/ma
 addEventListener('scroll',readScroll,{passive:true});
 $('skip').onclick=e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});};
 
-const camFar=mob?9.5:7.2;
+const camFar=mob?12:14;const FOV0=mob?40:24,FOV1=mob?66:52;
 function place(p){
  // p: 0..1 smoothed page progress
  const a=ease(cl(p/.58));                  // approach
  const th=ease(cl((p-.56)/.17));           // pass through
  const z=p<.56?lerp(camFar,1.25,a):lerp(1.25,-1.6,th);
- const y=lerp(1.05,1.08,a)+th*.04;
+ const y=lerp(.62,1.05,a*a)+th*.04;camera.fov=lerp(FOV0,FOV1,Math.pow(a,1.6));camera.updateProjectionMatrix();
  camera.position.set(Math.sin(p*3.1)*.04*(1-th),y,z);
- const look=lerp(1.0,1.12,a)+ease(cl((p-.7)/.2))*.9;
+ const look=lerp(mob?1.25:1.0,1.15,a)+ease(cl((p-.7)/.2))*.9;
  camera.lookAt(0,look,z-6);
- const open=lerp(.95,1.75,ease(cl((p-.04)/.45)));
+ const open=lerp(1.2,1.8,ease(cl((p-.04)/.45)));
  hinge.rotation.y=open;
  const o=cl(open/1.72);
  sandMat.uniforms.open.value=.45+.55*o;
  warm.intensity=10*o+2;warmFront.intensity=5*o+.5;
  whiteInner.emissiveIntensity=.35+.65*o;
- haloMat.uniforms.k.value=(.45+.55*o)*cl((camera.position.z-1.4)/2.5);
+ haloMat.uniforms.k.value=(.2+.45*o)*cl((camera.position.z-1.4)/2.5);
  portalMat.uniforms.glow.value=ease(cl((p-.5)/.12))*.08*(1-th);
  const dayMode=camera.position.z<-.02;
  const hp=ease(cl((p-.78)/.15));
