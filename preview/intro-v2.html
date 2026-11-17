@@ -72,7 +72,7 @@ const sv=$('sv'),hero=$('hero'),scrim=$('scrim'),vig=$('vig'),hint=$('hint'),sce
 const lines=[...document.querySelectorAll('.line')];
 const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),ease=t=>t*t*(3-2*t);
 const mob=matchMedia('(max-aspect-ratio:1/1)').matches;
-const SRC=mob?'v2/scrub-m.mp4':'v2/scrub-d.mp4';
+const SRC=mob?'v2/scrub-m-hd.mp4':'v2/scrub-d.mp4';
 sv.poster=mob?'v2/poster-m.jpg':'v2/poster-d.jpg';
 
 /* timeline: the journey to the universe takes most of the scroll, the slow drift the rest */
