@@ -131,7 +131,11 @@ function ui(p){
  hint.style.opacity=1-cl(p/.05);
  lines.forEach(l=>{const o=1-cl((p-.1)/.14);l.style.opacity=o;l.style.filter=o<.99?'blur('+((1-o)*10).toFixed(2)+'px)':'';l.style.transform='translateY('+(-(1-o)*30)+'px) scale('+(1+(1-o)*.06)+')';});
 }
-function f(){const max=scene.offsetHeight-innerHeight;tgt=max>0?cl(scrollY/max):0;kick();}
+let WARP=null;   /* extra scroll that only stretches the verse moment in space; everything before and after keeps its old scroll distance */
+function f(){const max=scene.offsetHeight-innerHeight;if(max<=0){tgt=0;kick();return;}
+ if(!WARP){tgt=cl(scrollY/max);kick();return;}
+ const X=max*WARP.ex/(WARP.base+WARP.ex-100),T0=max-X,x=cl(scrollY,0,max),A=WARP.ap*T0,V=WARP.w*T0;
+ tgt=x<A?x/T0:x<A+V+X?WARP.ap+(x-A)/(V+X)*WARP.w:WARP.ap+WARP.w+(x-A-V-X)/T0;tgt=cl(tgt);kick();}
 addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(()=>{ticking=false;f();});}},{passive:true});
 
 /* scroll stays locked until the scene is fully loaded */
@@ -240,7 +244,8 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
   const meta=await (await fetch(A+'scene.json')).json();R=meta.R;STARS=meta.stars;if(meta.bytes)EST=meta.bytes;
   if(meta.geo)({W,H,Q,OPC,CC,PORT,SMAX,AP,C0,C1,SKYH,D,SIN,GF,SF,XF,FLASH,FORCE,IN,BLOOM,S1:S1d,S2:S2d}=Object.assign({W,H,Q,OPC,CC,PORT,SMAX,AP,C0,C1,SKYH,D,SIN,GF,SF,XF,FLASH,FORCE,IN,BLOOM,S1:S1d,S2:S2d},meta.geo));
   place(portal,PORT);   /* the opening (a plain rectangle is enough: the frame covers its corners) */
-  HERO0=AP+.18;   /* title after the verse has had its moment in space */
+  HERO0=AP+.18;
+  WARP={ap:AP,w:.2,base:mob?240:320,ex:mob?80:110};scene.style.height=(WARP.base+WARP.ex)+'vh';f();   /* the verse now stays on screen much longer */   /* title after the verse has had its moment in space */
   const mk=(n,parent,before)=>{const c=document.createElement('canvas');place(c,R[n]);parent.insertBefore(c,before||null);L[n]=c;return c;};
   mk('sky',skyL,starsEl).style.opacity='1';                       /* bottom to top */
   for(let i=0;i<3;i++){const c=document.createElement('canvas');place(c,[0,0,W,SKYH]);   /* 3 groups, each on its own rhythm */
