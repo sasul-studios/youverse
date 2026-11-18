@@ -62,6 +62,12 @@ html.yv-menu .yv-drawer{opacity:1;transform:none;pointer-events:auto}
 .yvd-main:hover{transform:scale(1.06);filter:brightness(1.08)}
 .yvd nav a:hover svg{transform:scale(1.15);transition:transform .2s}
 }
+/* phone: masterclass detail chips keep their compact size (two neat rows) */
+@media (max-width:699px){
+#root div[style*="max-width: 470px"]{font-size:15px!important;gap:10px!important}
+#root span[style*="padding: 12px 18px; border-radius: 16px"]{padding:9px 14px!important;border-radius:14px!important}
+#root span[style*="padding: 12px 18px; border-radius: 16px"]>span{font-size:17px!important}
+}
 </style>
 </head>
 <body>
