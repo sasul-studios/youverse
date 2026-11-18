@@ -36,6 +36,19 @@
 .hero p{font-size:clamp(15px,1.4vw,19px);color:rgba(236,243,250,.82);max-width:560px;line-height:1.9;margin:30px 0 0;text-shadow:0 2px 16px rgba(0,0,0,.55)}
 .cta{display:inline-block;background:#5CE1E6;color:#032E36;text-decoration:none;font-weight:800;padding:17px 44px;border-radius:40px;font-size:18px;box-shadow:0 14px 40px rgba(92,225,230,.35)}
 .cta2{display:inline-block;margin-top:16px;color:#BFF3F5;text-decoration:none;font-size:15px}
+/* laptop hover: the main button lifts, glows and a light sweeps across it; the second link lights up with an underline */
+.cta{position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,background .35s}
+.cta:before{content:"";position:absolute;top:0;bottom:0;width:45%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);pointer-events:none}
+.cta2{position:relative;transition:color .3s,text-shadow .3s,transform .3s}
+.cta2:after{content:"";position:absolute;left:50%;right:50%;bottom:-4px;height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,#5CE1E6,transparent);transition:left .35s,right .35s}
+@media (hover:hover) and (pointer:fine){
+ .cta:hover{transform:translateY(-4px) scale(1.08);background:#7AEAEE;box-shadow:0 0 0 6px rgba(92,225,230,.16),0 0 46px rgba(92,225,230,.75),0 18px 44px rgba(92,225,230,.38)}
+ .cta:hover:before{animation:ctaShine 1.1s ease forwards}
+ .cta:active{transform:translateY(-1px) scale(1.02)}
+ .cta2:hover{color:#fff;text-shadow:0 0 18px rgba(92,225,230,.9);transform:translateY(-2px)}
+ .cta2:hover:after{left:-8px;right:-8px}
+}
+@keyframes ctaShine{to{left:120%}}
 .worlds{display:flex;gap:14px;margin-top:46px;flex-wrap:wrap;justify-content:center}
 .worlds span{padding:10px 20px;border-radius:30px;font-size:14px;color:#F2FAFC;background:linear-gradient(180deg,rgba(150,170,200,.20),rgba(90,110,145,.16));-webkit-backdrop-filter:blur(26px) saturate(140%) brightness(1.05);backdrop-filter:blur(26px) saturate(140%) brightness(1.05);border:1px solid rgba(150,180,240,.30);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 14px rgba(0,0,0,.22);text-shadow:0 1px 6px rgba(0,0,0,.35)}   /* liquid glass pills */
 @media (prefers-reduced-motion:reduce){#scene{height:100vh}.line,.hint{display:none}}
