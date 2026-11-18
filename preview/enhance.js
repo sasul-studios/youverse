@@ -59,7 +59,7 @@ window.yvHeader=function(box,phone){
   el.innerHTML='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#127F87" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>'+
    d.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</span>';});
  box.querySelectorAll('header').forEach(h=>{
-  if(h.dataset.yvd)return;h.dataset.yvd='1';h.classList.add('yvd');h.removeAttribute('style');
+  if(h.dataset.yvd||!h.querySelector('nav'))return;h.dataset.yvd='1';   /* only the main headers; test and lesson pages keep their own */h.classList.add('yvd');h.removeAttribute('style');
   const img=h.querySelector('img');if(img){img.src='img/logo-light.png';img.style.height=phone?'30px':'32px';}
   h.querySelectorAll('nav a').forEach(a=>{const t=a.textContent.trim(),k=KEY[t];
    if((a.getAttribute('style')||'').includes('#032E36'))a.classList.add('on');a.removeAttribute('style');
