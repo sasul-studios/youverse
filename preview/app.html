@@ -53,6 +53,15 @@ html.yv-menu .yv-drawer{opacity:1;transform:none;pointer-events:auto}
 .yvd .yv-drawer nav a{justify-content:flex-start;display:flex;align-items:center;gap:10px;color:#2E4A50;font-size:17px;padding:14px 16px;border-radius:14px}
 .yvd .yv-drawer nav a svg{width:18px;height:18px;color:#127F87}
 .yvd .yv-drawer nav a.on{background:#E8F7F8;color:#032E36}
+/* laptop hover: buttons and pills lift and grow a little so visitors notice them */
+@media (hover:hover) and (pointer:fine){
+#root a[style*="padding"],#root button{transition:transform .22s cubic-bezier(.2,.7,.2,1),box-shadow .22s,filter .22s}
+#root a[style*="padding"]:hover,#root button:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 14px 28px -12px rgba(3,46,54,.35);filter:brightness(1.04)}
+#root a[style*="padding"]:active,#root button:active{transform:translateY(0) scale(.98)}
+.yvd-main,.yvd-lang,.yvd-sec{transition:transform .2s,filter .2s}
+.yvd-main:hover{transform:scale(1.06);filter:brightness(1.08)}
+.yvd nav a:hover svg{transform:scale(1.15);transition:transform .2s}
+}
 </style>
 </head>
 <body>
