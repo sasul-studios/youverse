@@ -55,6 +55,9 @@ const ICO={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0
 const svg=k=>'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICO[k]+'</svg>';
 const KEY={'الرئيسية':'home','Home':'home','الاختبار':'test','The Test':'test','YouFinder':'finder','YouPartner':'partner','You':'you'};
 window.yvHeader=function(box,phone){
+ box.querySelectorAll('.yv-today').forEach(el=>{const en=el.dataset.lang==='en',d=new Date();   /* today's day and date */
+  el.innerHTML='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#127F87" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>'+
+   d.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</span>';});
  box.querySelectorAll('header').forEach(h=>{
   if(h.dataset.yvd)return;h.dataset.yvd='1';h.classList.add('yvd');h.removeAttribute('style');
   const img=h.querySelector('img');if(img){img.src='img/logo-light.png';img.style.height=phone?'30px':'32px';}
