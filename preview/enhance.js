@@ -44,6 +44,33 @@ window.yvPhoneHeader=function(box){
   const img=logo.querySelector('img');if(img)img.style.height='34px';
   row.appendChild(logo);row.appendChild(bar);row.appendChild(drawer);});
 };
+
+/* dark slim header with icons (all screen sizes) */
+const ICO={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+ test:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="m9 12 2 2 4-4M9 7h6"/>',
+ finder:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+ partner:'<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M10.5 20a5.5 5.5 0 0 1 11 0"/>',
+ you:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'};
+const svg=k=>'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICO[k]+'</svg>';
+const KEY={'الرئيسية':'home','Home':'home','الاختبار':'test','The Test':'test','YouFinder':'finder','YouPartner':'partner','You':'you'};
+window.yvHeader=function(box,phone){
+ box.querySelectorAll('header').forEach(h=>{
+  if(h.dataset.yvd)return;h.dataset.yvd='1';h.classList.add('yvd');h.removeAttribute('style');
+  const img=h.querySelector('img');if(img){img.src='img/logo-light.png';img.style.height=phone?'30px':'32px';}
+  h.querySelectorAll('nav a').forEach(a=>{const t=a.textContent.trim(),k=KEY[t];
+   if((a.getAttribute('style')||'').includes('#032E36'))a.classList.add('on');a.removeAttribute('style');
+   if(k&&!a.querySelector('svg'))a.innerHTML=svg(k)+'<span>'+t+'</span>';});
+  if(phone)return;
+  const row=h.firstElementChild;row.removeAttribute('style');row.className='yvd-row';
+  const nav=row.querySelector(':scope > nav');if(nav)nav.removeAttribute('style');
+  [...row.children].forEach(k=>{if(k.tagName==='DIV'){k.removeAttribute('style');k.className='yvd-acts';
+     [...k.children].forEach(a=>{const t=a.textContent.trim(),st=a.getAttribute('style')||'';a.removeAttribute('style');
+      if(t==='EN'||t==='عربي'){a.className='yvd-lang';a.innerHTML=svg('globe')+'<span>'+t+'</span>';}
+      else a.className=st.includes('#127F87')?'yvd-main':'yvd-sec';});}
+   else if(k.tagName==='A'&&k!==row.firstElementChild){k.removeAttribute('style');k.className='yvd-main';}
+   else if(k.tagName==='SPAN'){k.style.width='34px';k.style.height='34px';k.style.fontSize='14px';}});});
+};
 const html=document.documentElement;
 document.addEventListener('click',e=>{
  if(e.target.closest('.yv-burger')){html.classList.toggle('yv-menu');return;}

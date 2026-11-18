@@ -63,6 +63,7 @@ function rerender(){
  if(w<1000){desk=document.getElementById('measure');desk.style.display='block';build(desk);}
  const stage=ensureStage();stage.style.display='block';build(stage);
  if(w<1000)adapt(w,desk,stage);
+ if(window.yvHeader)window.yvHeader(stage,w<700);   /* dark header (enhance.js) */
  if(desk){desk.innerHTML='';desk.style.display='none';}
  if(fresh||!root.firstChild){root.innerHTML='';while(stage.firstChild)root.appendChild(stage.firstChild);bindAll(root);fresh=false;}
  else{const oc=[...root.childNodes],nc=[...stage.childNodes];
