@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-header="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,6 +71,19 @@ html.yv-menu .yv-drawer{opacity:1;transform:none;pointer-events:auto}
 #root span[style*="padding: 12px 18px; border-radius: 16px"]{padding:9px 14px!important;border-radius:14px!important}
 #root span[style*="padding: 12px 18px; border-radius: 16px"]>span{font-size:17px!important}
 }
+/* TEST: light frosted-glass header (compare with app.html) */
+html[data-header=light] .yvd{background:rgba(255,255,255,.62)!important;-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(3,46,54,.08)!important;box-shadow:0 8px 30px -18px rgba(3,46,54,.25)}
+html[data-header=light] .yvd nav a{color:#4E6A70}
+html[data-header=light] .yvd nav a:hover,html[data-header=light] .yvd nav a.on{color:#032E36!important;background:rgba(92,225,230,.18)}
+html[data-header=light] .yvd nav a.on svg{color:#127F87}
+html[data-header=light] .yvd .yvd-sec{color:#2E4A50}
+html[data-header=light] .yvd .yvd-sec:hover,html[data-header=light] .yvd .yvd-lang:hover{color:#032E36!important;background:rgba(3,46,54,.05)}
+html[data-header=light] .yvd .yvd-lang{color:#4E6A70}
+html[data-header=light] .yvd .yvd-main{background:#127F87;color:#fff!important}
+html[data-header=light] .yvd .yvd-main:hover{color:#fff!important}
+html[data-header=light] .yvd.yv-h{background:rgba(255,255,255,.7)!important}
+html[data-header=light] .yvd .yv-lang{color:#127F87;border-color:#D5E6E9;background:rgba(255,255,255,.7)}
+html[data-header=light] .yvd .yv-burger{background:#032E36;border:0}
 </style>
 </head>
 <body>
