@@ -43,7 +43,10 @@ html.yv-menu .yv-drawer{opacity:1;transform:none;pointer-events:auto}
 .yvd-acts a{text-decoration:none;font-size:14px;font-weight:700}
 .yvd-lang{display:flex;align-items:center;gap:6px;color:rgba(232,244,246,.75);padding:7px 10px;border-radius:10px;font-family:'Lora','Almarai',serif}
 .yvd-lang:hover{background:rgba(255,255,255,.06);color:#fff}
-.yvd-sec{color:rgba(232,244,246,.85);padding:8px 12px}
+.yvd-sec{color:rgba(232,244,246,.85);padding:8px 12px;border-radius:10px;transition:background .15s,color .15s}
+.yvd .yvd-sec:hover,.yvd .yvd-lang:hover,.yvd nav a:hover,.yvd nav a.on{color:#fff!important}   /* the site-wide link hover is dark: keep header links light */
+.yvd .yvd-sec:hover{background:rgba(255,255,255,.08)}
+.yvd .yvd-main:hover{color:#032E36!important}
 .yvd-main{background:#5CE1E6;color:#032E36!important;padding:9px 18px;border-radius:12px;text-decoration:none;font-weight:800;font-size:14px}
 /* phone header on dark */
 .yvd.yv-h{background:rgba(10,27,34,.92)!important}
