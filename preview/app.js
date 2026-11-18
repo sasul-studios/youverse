@@ -34,7 +34,7 @@ function load(route){
  const file=FILES[route]||FILES.home;const txt=window.DC_PAGES[file];
  const doc=new DOMParser().parseFromString(txt,'text/html');
  document.documentElement.lang=doc.documentElement.lang||'ar';document.documentElement.dir=doc.documentElement.dir||'rtl';
- document.title=(doc.querySelector('title')||{}).textContent||document.title;
+ document.title=/(^|-)en$/.test(route)?'Youverse - Discover Your Universe!':'Youverse - اكتشف عالمك!';   /* tab title */
  const xdc=doc.querySelector('x-dc');const h=xdc.querySelector('helmet');
  styleEl.textContent=h?[...h.querySelectorAll('style')].map(s=>s.textContent).join('\n'):'';
  const code=doc.querySelector('script[data-dc-script]').textContent;
