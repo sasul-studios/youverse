@@ -60,7 +60,7 @@ window.yvHeader=function(box,phone){
    d.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'</span>';});
  box.querySelectorAll('header').forEach(h=>{
   if(h.dataset.yvd||!h.querySelector('nav'))return;h.dataset.yvd='1';   /* only the main headers; test and lesson pages keep their own */h.classList.add('yvd');h.removeAttribute('style');
-  const img=h.querySelector('img');if(img){img.src='img/logo-light.png';img.style.height=phone?'30px':'32px';}
+  const img=h.querySelector('img');if(img){if(document.documentElement.dataset.header!=='light')img.src='img/logo-light.png';img.style.height=phone?'30px':'32px';}
   h.querySelectorAll('nav a').forEach(a=>{const t=a.textContent.trim(),k=KEY[t];
    if((a.getAttribute('style')||'').includes('#032E36'))a.classList.add('on');a.removeAttribute('style');
    if(k&&!a.querySelector('svg'))a.innerHTML=svg(k)+'<span>'+t+'</span>';});
