@@ -1,7 +1,7 @@
 # portal-scene: sharp, smooth scroll header from two stills
 
 Two images in (a door/portal scene + the world behind the door, same size), a scroll-driven
-"walk through the door" header out. Built for Youverse (`preview/intro-v3.html`, phone set in `preview/v3/`).
+"walk through the door" header out. Built for Youverse (the intro at `preview/index.html`; phone set in `preview/v5/`, laptop set in `preview/v5d/`).
 
 Why not a video: a phone shows only part of a 16:9 clip, magnified, so it looks soft; and redrawing big
 images on a canvas every frame stutters on iPhone (WebKit re-decodes them). Here every layer is drawn
@@ -17,13 +17,13 @@ like a video: sharp (AI-upscaled 4x, three detail levels) and light (~2.7 MB ins
    and adjust `inner` / `outer` / `horizon` until the lines sit on the edges in `check.png`.
 4. `python3 prep.py config.json` - writes the layers + `scene.json` (geometry, layer crops, zoom depth,
    start size of the world image) and checks layer coverage on 8 screen sizes.
-5. Copy the output folder next to the page (e.g. `preview/v4/`) and set `PHONE_SET` / `DESK_SET` at the
+5. Copy the output folder next to the page (a new folder, e.g. `preview/v6/`, on a new test page first) and set `PHONE_SET` / `DESK_SET` at the
    bottom of the page script. The page reads all geometry from `scene.json`.
 5b. Deep-zoom detail (recommended): `python3 xhi.py config.json preview/v5` (~3 min phone, ~7 min laptop).
    Near the end of the walk the 4x frame is enlarged 2-3x on phones and retina laptops; this adds an 8x
    copy of only the frame + floor the screen can still see (second Real-ESRGAN pass over the halved 4x crop),
    as `fg-x-*.webp` pieces that cross-fade where they meet (scaled canvases that only touch leave a hairline).
-   The page (`intro-v5.html` and later) loads them after the start, and only on screens that need them.
+   The page (`index.html`, approved from the intro-v5 test page) loads them after the start, and only on screens that need them.
 6. Check: `python3 -m RangeHTTPServer 8772` in the site folder, then
    `python3 shots.py http://localhost:8772/index.html /tmp/s 428x926@3 390x844@3 --perf`
    (looks, JS errors, long tasks; headless Chromium has no GPU, so fps there is only relative).
@@ -39,7 +39,7 @@ like a video: sharp (AI-upscaled 4x, three detail levels) and light (~2.7 MB ins
   `flash_zoom` and the door scene dissolves into the world image. The page also decides this per screen, so old
   16:9 phones dissolve while modern phones walk through the door.
 
-## Page notes (intro-v5 and later)
+## Page notes (current intro, approved as intro-v5)
 - Phones: the browser bar sliding away makes the screen taller without changing its width. The page keeps
   the framing, but covers the tallest height seen (`VHC`) and only hides the frame once that whole height is
   inside the opening (`SINs`); otherwise a dark band showed at the bottom while passing the door.
