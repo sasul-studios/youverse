@@ -19,8 +19,13 @@ like a video: sharp (AI-upscaled 4x, three detail levels) and light (~2.7 MB ins
    start size of the world image) and checks layer coverage on 8 screen sizes.
 5. Copy the output folder next to the page (e.g. `preview/v4/`) and set `PHONE_SET` / `DESK_SET` at the
    bottom of the page script. The page reads all geometry from `scene.json`.
+5b. Deep-zoom detail (recommended): `python3 xhi.py config.json preview/v5` (~3 min phone, ~7 min laptop).
+   Near the end of the walk the 4x frame is enlarged 2-3x on phones and retina laptops; this adds an 8x
+   copy of only the frame + floor the screen can still see (second Real-ESRGAN pass over the halved 4x crop),
+   as `fg-x-*.webp` pieces that cross-fade where they meet (scaled canvases that only touch leave a hairline).
+   The page (`intro-v5.html` and later) loads them after the start, and only on screens that need them.
 6. Check: `python3 -m RangeHTTPServer 8772` in the site folder, then
-   `python3 shots.py http://localhost:8772/intro-v3.html /tmp/s 428x926@3 390x844@3 --perf`
+   `python3 shots.py http://localhost:8772/index.html /tmp/s 428x926@3 390x844@3 --perf`
    (looks, JS errors, long tasks; headless Chromium has no GPU, so fps there is only relative).
 7. Phone recordings from the client: `python3 rec_check.py rec.mp4` lists freezes frame by frame.
 
@@ -33,3 +38,11 @@ like a video: sharp (AI-upscaled 4x, three detail levels) and light (~2.7 MB ins
 - `max_zoom` (7) / `flash_zoom` (5): if the opening cannot fill typical screens below `max_zoom`, the zoom stops at
   `flash_zoom` and the door scene dissolves into the world image. The page also decides this per screen, so old
   16:9 phones dissolve while modern phones walk through the door.
+
+## Page notes (intro-v5 and later)
+- Phones: the browser bar sliding away makes the screen taller without changing its width. The page keeps
+  the framing, but covers the tallest height seen (`VHC`) and only hides the frame once that whole height is
+  inside the opening (`SINs`); otherwise a dark band showed at the bottom while passing the door.
+- The scroll range is measured in px from the first viewport, so the bar sliding in/out no longer nudges the scene.
+- Every hidden layer is shown at 0.4% opacity for a few frames after loading (and the 8x pieces after they
+  arrive), so the graphics chip already holds them when the zoom switches level.
