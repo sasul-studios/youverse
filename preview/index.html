@@ -142,6 +142,7 @@ let mode='video';            // 'img' on phones (layered photo scene), 'video' o
 
 /* ---------- shared: smoothed scroll progress ---------- */
 let tgt=0,sm=0,loopOn=false,ticking=false,lt=0,step=()=>false,HERO0=.74;
+let VH0=0;const TOUCH=matchMedia('(pointer:coarse)').matches;   /* VH0: viewport height the scroll range is measured with */
 function loop(t){const dt=lt?Math.min(64,t-lt):16.7;lt=t;const k=1-Math.pow(1-.16,dt/16.7);
  const d=tgt-sm;if(Math.abs(d)<.0004)sm=tgt;else sm+=d*k;
  const busy=step(sm);ui(sm);
@@ -157,7 +158,8 @@ function ui(p){
  lines.forEach(l=>{const o=1-cl((p-.1)/.14);l.style.opacity=o;l.style.filter=o<.99?'blur('+((1-o)*10).toFixed(2)+'px)':'';l.style.transform='translateY('+(-(1-o)*30)+'px) scale('+(1+(1-o)*.06)+')';});
 }
 let WARP=null;   /* extra scroll that only stretches the verse moment in space; everything before and after keeps its old scroll distance */
-function f(){const max=scene.offsetHeight-innerHeight;if(max<=0){tgt=0;kick();return;}
+const setSceneH=()=>{VH0=innerHeight;if(WARP)scene.style.height=Math.round((WARP.base+WARP.ex+WARP.tail)*VH0/100)+'px';};
+function f(){const max=scene.offsetHeight-(VH0||innerHeight);if(max<=0){tgt=0;kick();return;}
  if(!WARP){tgt=cl(scrollY/max);kick();return;}
  const X2=WARP.tail?max*WARP.tail/(WARP.base+WARP.ex+WARP.tail-100):0,M=max-X2;
  if(X2)$('dim').style.opacity=(.5*cl((scrollY-M)/X2)).toFixed(3);
@@ -207,7 +209,7 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
  const NAMES=['sky','fg-lo','fg-mid','fg-hi','in-lo','in-hi','cosmos-1x','cosmos-2x','glow'];
  let EST={sky:391588,'fg-lo':345744,'fg-mid':489060,'fg-hi':399278,'in-lo':67548,'in-hi':169590,'cosmos-1x':225022,'cosmos-2x':589114,glow:30466};
  let SMAX=5,AP=.70,C0=.75,C1=1.06,SKYH=1048,D=1.66,SIN=4.7,GF=[3.6,4.6],SF=[2.6,4.2],S1d=1.204,S2d=1.806,XF=[1.12,1.9],FLASH=0,FORCE=0,IN=null,FL=0,BLOOM=.62,topL=null;   /* C0: the view inside starts big enough to always fill the opening */
- let R,STARS,VW=1,VH=1,Kc=1,OXc=0,OYc=0,DPR=1,S1=1.204,S2=1.806,ready=false;
+ let R,STARS,VW=1,VH=1,VHC=1,Kc=1,OXc=0,OYc=0,DPR=1,S1=1.204,S2=1.806,S3=99,SINs=4.7,OPEN=false,XL=null,XB=null,ready=false;   /* VHC: tallest the screen has been; SINs: zoom where this screen is fully inside the opening */
  const L={},blobs={};
  const state=p=>{const t=cl(p/AP),s=1/(1-t*(1-1/SMAX)),u=cl((p-AP)/(1-AP));
    const c=t<1?C0/(1-t*(1-C0/C1)):C1*(1+.07*ease(u));return {t,s,u,c};};
@@ -218,13 +220,15 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
   if(!ready)return;
   const {t,s,c,u}=state(p),qx=OXc+Kc*Q[0],qy=OYc+Kc*Q[1];
   /* screens the opening cannot fill (old 16:9 phones, laptops): the door scene dissolves into the world instead */
-  const ds=FL?sstep(FL-.10,FL,p):0,inside=FL?p>=FL:s>=SIN;
+  const ds=FL?sstep(FL-.10,FL,p):0,inside=FL?p>=FL:s>=SINs;
   const sa=(1+.04*t)*Kc;setT(skyL,sa,qx-sa*Q[0],qy-sa*Q[1]);setO(skyL,inside?0:1);   /* sky: almost still */
   const a=s*Kc,e=qx-a*Q[0],f=qy-a*Q[1];setT(fgL,a,e,f);                              /* portal + ground: the camera moves in */
   const inA=1-sstep(XF[0],XF[1],s);
   if(inA<1||ds>0){  /* the universe seen through the opening: far away, so it grows slower than the arch */
    const px=e+a*OPC[0],py=f+a*OPC[1],m=sstep(.5,1,t),cx=px+(VW/2-px)*m,cy=py+(VH/2-py)*m;
-   const xL=ds>0?0:Math.max(0,e+a*PORT[0]),xR=ds>0?VW:Math.min(VW,e+a*(PORT[0]+PORT[2])),yT=ds>0?0:Math.max(0,f+a*PORT[1]),yB=ds>0?VH:Math.min(VH,f+a*(PORT[1]+PORT[3]));
+   const full=ds>0||(inside&&OPEN);   /* OPEN: the screen grew taller than the opening - once inside, let the world fill it */
+   if(OPEN||portal._ov){const ov=full?'visible':'';if(portal._ov!==ov){portal._ov=ov;portal.style.overflow=ov;}}
+   const xL=full?0:Math.max(0,e+a*PORT[0]),xR=full?VW:Math.min(VW,e+a*(PORT[0]+PORT[2])),yT=full?0:Math.max(0,f+a*PORT[1]),yB=full?VHC:Math.min(VHC,f+a*(PORT[1]+PORT[3]));
    const ca=Math.max(c*Kc,1.01*Math.max((cx-xL)/CC[0],(xR-cx)/(W-CC[0]),(cy-yT)/CC[1],(yB-cy)/(H-CC[1])));  /* never smaller than the visible opening */
    setT(cosL,ca/a,(cx-ca*CC[0]-e)/a-PORT[0],(cy-ca*CC[1]-f)/a-PORT[1]);
    const hi=ca*DPR>=1.15;setO(L['cosmos-1x'],hi?0:1);setO(L['cosmos-2x'],hi?1:0);
@@ -236,7 +240,8 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
   const lo=s<S1,mid=!lo&&s<S2;   /* sharper level as soon as the current one would be enlarged */
   setO(L['in-lo'],!inside&&lo?inA:0);setO(L['in-hi'],!inside&&!lo?inA:0);
   setO(L.glow,inside?0:(.35+.6*sstep(1,3.2,s))*(1-sstep(GF[0],GF[1],s)));
-  setO(L['fg-lo'],!inside&&lo?1:0);setO(L['fg-mid'],!inside&&mid?1:0);setO(L['fg-hi'],!inside&&!lo&&!mid?1:0);
+  const hiL=!lo&&!mid,x3=!!XL&&hiL&&s>=S3;   /* 8x frame once the 4x one would be enlarged */
+  setO(L['fg-lo'],!inside&&lo?1:0);setO(L['fg-mid'],!inside&&mid?1:0);setO(L['fg-hi'],!inside&&hiL&&!x3?1:0);if(XL)XL.forEach(c=>setO(c,!inside&&x3?1:0));
   setO(starsEl,1-sstep(SF[0],SF[1],s));
   setO(bloom,FL?0:BLOOM*sstep(.53,.64,p)*(1-sstep(.67,.77,p)));   /* BLOOM 0 = no white glow when passing the door */
  }
@@ -247,17 +252,33 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
  const load3=async()=>{try{const r=await fetch(A+'cosmos-3x.webp');if(!r.ok)return;const bm=await createImageBitmap(await r.blob());   /* laptops: sharper space (3x) */
   const c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d',{alpha:false}).drawImage(bm,0,0);if(bm.close)bm.close();
   place(c,R['cosmos-2x']);c.style.opacity='1';C3=c;if(topL)topL.replaceChild(c,topL.firstChild);}catch(e){}};   /* a copy of the world above the door scene */
+ const warm=els=>{   /* show every hidden layer at 0.4% for a few frames, so the graphics chip already holds it when it is needed */
+  els.forEach(c=>{const v=c.style.opacity;if(v==='0'||v===''){c._o='w';c.style.opacity='0.004';}});
+  let n=0;const tick=()=>{if(++n<4)requestAnimationFrame(tick);else{els.forEach(c=>{if(c._o==='w')c._o=null;});draw(sm);}};requestAnimationFrame(tick);};
+ const loadX=async()=>{   /* 8x frame for the deep part of the zoom - only where the 4x one would look soft */
+  const KD=Kc*DPR,end=FL?state(FL-.05).s:SINs;if(!(4.4/KD<end))return;
+  try{const rs=R['fg-x'];
+   const cs=await Promise.all(rs.map(async(r,i)=>{const bm=await createImageBitmap(await (await fetch(A+'fg-x-'+i+'.webp')).blob());
+    const c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d').drawImage(bm,0,0);if(bm.close)bm.close();place(c,r);return c;}));
+   const nx=L['fg-hi'].nextSibling;cs.forEach(c=>{c.style.opacity='0';fgL.insertBefore(c,nx);});   /* each piece is its own layer, like the other levels */
+   XB=[Math.min(...rs.map(r=>r[0])),Math.min(...rs.map(r=>r[1])),Math.max(...rs.map(r=>r[0]+r[2])),Math.max(...rs.map(r=>r[1]+r[3]))];
+   XL=cs;cover();warm(cs);}catch(e){}};
  const inShape=(d,x,y)=>{if(!d)return true;if(d.shape==='rect')return x>=d.xl&&x<=d.xr&&y>=d.top&&y<=d.bot;
   if(d.shape==='poly'){let n=false;const P=d.pts;for(let i=0,j=P.length-1;i<P.length;j=i++)if((P[i][1]>y)!==(P[j][1]>y)&&x<(P[j][0]-P[i][0])*(y-P[i][1])/(P[j][1]-P[i][1])+P[i][0])n=!n;return n;}
   const r=(d.xr-d.xl)/2,cx=(d.xl+d.xr)/2,cy=d.top+r;if(x<d.xl||x>d.xr||y>d.bot)return false;return y>=cy||(x-cx)**2+(y-cy)**2<=r*r;};
- const sCover=()=>{let lo=1,hi=80;const qx=OXc+Kc*Q[0],qy=OYc+Kc*Q[1];   /* zoom at which this screen sits inside the opening */
-  for(let i=0;i<50;i++){const s=(lo+hi)/2,a=s*Kc,x0=Q[0]-qx/a,y0=Q[1]-qy/a,x1=Q[0]+(VW-qx)/a,y1=Q[1]+(VH-qy)/a;
-   if([[x0,y0],[x1,y0],[x0,y1],[x1,y1]].every(([x,y])=>inShape(IN,x,y)))hi=s;else lo=s;}return hi;};
+ const sFit=(h,test)=>{let lo=1,hi=80;const qx=OXc+Kc*Q[0],qy=OYc+Kc*Q[1];   /* smallest zoom at which the screen (h tall) passes test */
+  for(let i=0;i<50;i++){const s=(lo+hi)/2,a=s*Kc,x0=Q[0]-qx/a,y0=Q[1]-qy/a,x1=Q[0]+(VW-qx)/a,y1=Q[1]+(h-qy)/a;
+   if(test(x0,y0,x1,y1))hi=s;else lo=s;}return hi;};
+ const sCover=h=>sFit(h,(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x0,y1],[x1,y1]].every(([x,y])=>inShape(IN,x,y)));   /* zoom at which this screen sits inside the opening */
+ const cover=()=>{VHC=Math.max(VHC,VH,stick.clientHeight,innerHeight);if(FL||!IN){SINs=SIN;OPEN=false;}else{const n=1.03*sCover(VHC);OPEN=n>SMAX*.995;SINs=OPEN?SMAX*.995:Math.max(SIN,n);}
+  if(XB)S3=Math.max(sFit(VHC,(x0,y0,x1,y1)=>x0>=XB[0]&&y0>=XB[1]&&x1<=XB[2]&&y1<=XB[3]),4.4/(Kc*DPR));};
  function size(){DPR=Math.min(devicePixelRatio||1,3);VW=stick.clientWidth;VH=stick.clientHeight;
   Kc=Math.max(VW/W,VH/H);OXc=Math.min(0,Math.max(VW-W*Kc,VW/2-Kc*Q[0]));OYc=(VH-H*Kc)/2;   /* door centred when the picture is wider than the screen */const KD=Kc*DPR;S1=Math.max(S1d,2/KD);S2=Math.max(S2d,3/KD);
-  FL=FLASH&&(FORCE||(IN&&1.03*sCover()>SIN))?FLASH:0;if(FL)makeTop();   /* door too narrow for this screen: dissolve into the world */
+  VHC=Math.max(VH,innerHeight);FL=FLASH&&(FORCE||(IN&&1.03*sCover(VHC)>SIN))?FLASH:0;if(FL)makeTop();cover();   /* door too narrow for this screen: dissolve into the world */
   draw(sm);}
- let lastW=0;addEventListener('resize',()=>{if(innerWidth===lastW)return;lastW=innerWidth;size();});
+ let lastW=0,lastH=0;addEventListener('resize',()=>{   /* phones: the browser bar only changes the height - keep the framing, cover the taller screen */
+  if(innerWidth!==lastW||(!TOUCH&&innerHeight!==lastH)){lastW=innerWidth;lastH=innerHeight;VHC=0;setSceneH();size();f();return;}
+  if(ready){cover();draw(sm);}});
  step=p=>{draw(p);return false;};
  const paint=async n=>{  /* decode once (off the main thread when possible) and draw once */
   const c=L[n],b=blobs[n];let src,done=()=>{};
@@ -276,7 +297,7 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
   if(meta.geo)({W,H,Q,OPC,CC,PORT,SMAX,AP,C0,C1,SKYH,D,SIN,GF,SF,XF,FLASH,FORCE,IN,BLOOM,S1:S1d,S2:S2d}=Object.assign({W,H,Q,OPC,CC,PORT,SMAX,AP,C0,C1,SKYH,D,SIN,GF,SF,XF,FLASH,FORCE,IN,BLOOM,S1:S1d,S2:S2d},meta.geo));
   place(portal,PORT);   /* the opening (a plain rectangle is enough: the frame covers its corners) */
   HERO0=AP+.18;
-  WARP={ap:AP,w:.2,base:mob?240:320,ex:mob?80:110,tail:mob?0:70};scene.style.height=(WARP.base+WARP.ex+WARP.tail)+'vh';f();   /* the verse now stays on screen much longer */   /* title after the verse has had its moment in space */
+  WARP={ap:AP,w:.2,base:mob?240:320,ex:mob?80:110,tail:mob?0:70};setSceneH();f();   /* the verse now stays on screen much longer */   /* title after the verse has had its moment in space */
   const mk=(n,parent,before)=>{const c=document.createElement('canvas');place(c,R[n]);parent.insertBefore(c,before||null);L[n]=c;return c;};
   mk('sky',skyL,starsEl).style.opacity='1';                       /* bottom to top */
   for(let i=0;i<3;i++){const c=document.createElement('canvas');place(c,[0,0,W,SKYH]);   /* 3 groups, each on its own rhythm */
@@ -288,13 +309,14 @@ function startLayers(A){   /* A = folder made by tools/portal-scene/prep.py (sce
   await Promise.all(NAMES.map(async n=>{blobs[n]=await getBlob(A+n+'.webp',(g,t)=>{prog[n]=[g,t];upd();});await paint(n);}));
   paintStars();
   for(const n of NAMES)L[n].addEventListener('contextrestored',()=>paint(n));   /* if the system ever drops a layer, draw it again */
-  ready=true;lastW=innerWidth;size();
-  requestAnimationFrame(()=>{world.style.opacity='1';release();if(!mob&&FL)setTimeout(load3,400);});
+  await Promise.all([HV1,HV2].map(h=>{const i=h.querySelector('img');return i&&i.decode?i.decode().catch(()=>{}):0;}));   /* the verse is decoded before it is needed */
+  ready=true;lastW=innerWidth;lastH=innerHeight;size();
+  requestAnimationFrame(()=>{world.style.opacity='1';release();warm(Object.values(L));if(!mob&&FL)setTimeout(load3,400);if(R['fg-x'])setTimeout(loadX,250);});
  })().catch(err=>{console.error(err);world.style.display='none';startVideo();});
 }
 
 /* layer sets per screen shape; '' = use the video. Fill DESK when the landscape images are built. */
-const PHONE_SET='v4/',DESK_SET='v4d/';
+const PHONE_SET='v5/',DESK_SET='v5d/';
 if(mob)startLayers(PHONE_SET);else if(DESK_SET)startLayers(DESK_SET);else startVideo();
 addEventListener('resize',f);
 $('skip').addEventListener('click',()=>lock(false));
