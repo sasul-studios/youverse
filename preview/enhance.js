@@ -74,6 +74,10 @@ window.yvHeader=function(box,phone){
    else if(k.tagName==='A'&&k!==row.firstElementChild){k.removeAttribute('style');k.className='yvd-main';}
    else if(k.tagName==='SPAN'){k.style.width='34px';k.style.height='34px';k.style.fontSize='14px';}});});
 };
+
+/* the test now lives on its own page (test.html) */
+const toTest=()=>{const h=location.hash;if(h==='#test'||h==='#test-en')location.replace('test.html'+(h==='#test-en'?'?lang=en':''));};
+toTest();addEventListener('hashchange',toTest);
 const html=document.documentElement;
 document.addEventListener('click',e=>{
  if(e.target.closest('.yv-burger')){html.classList.toggle('yv-menu');return;}
