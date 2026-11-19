@@ -86,6 +86,10 @@ html[data-header=light] .yvd .yv-lang{color:#127F87;border-color:#D5E6E9;backgro
 html[data-header=light] .yvd .yv-burger{background:#032E36;border:0}
 /* pages were drawn at a fixed artboard height: let them end at their footer (no empty band under it) */
 #root > div{min-height:100vh!important;height:auto!important}
+/* home: the Light test card breathes like the orb on the test page */
+.yv-orb{animation:yvBreathe 3.2s ease-in-out infinite}
+@keyframes yvBreathe{0%,100%{transform:scale(1);opacity:.88;box-shadow:0 0 40px #5CE1E6,0 0 90px rgba(92,225,230,.18)}50%{transform:scale(1.12);opacity:1;box-shadow:0 0 70px #5CE1E6,0 0 150px rgba(92,225,230,.4)}}
+@media (hover:hover) and (pointer:fine){#root a.yv-lightcard:hover{transform:translateY(-4px) scale(1.015)!important;box-shadow:0 40px 70px -30px rgba(3,20,40,.7)!important}}
 </style>
 </head>
 <body>
