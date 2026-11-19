@@ -98,11 +98,38 @@ h2{font-size:clamp(26px,4.4vw,36px);line-height:1.5;margin:0 0 22px;color:#fff;f
 .btn2:hover{background:rgba(255,255,255,.16);transform:translateY(-2px)}
 .btn2.main{background:var(--c);color:#032E36;border-color:transparent}
 .sample{margin-top:26px;font-size:12px;color:rgba(234,244,246,.45);text-align:center}
+/* v2: the five Lights orbit the orb */
+.halo{position:relative;width:230px;height:230px;margin:0 auto 20px;--p:0}
+.halo .ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.055);animation:orbit linear infinite}
+.halo .ring i{position:absolute;top:-4px;left:50%;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c),0 0 24px var(--c);opacity:calc(.45 + .55*var(--p));transition:top 1s cubic-bezier(.6,0,.4,1),opacity .4s}
+.halo .r1{inset:0;animation-duration:18s}
+.halo .r2{inset:17px;animation-duration:13s;animation-direction:reverse;animation-delay:-4s}
+.halo .r3{inset:34px;animation-duration:10s;animation-delay:-7s}
+.halo .r4{inset:8px;animation-duration:23s;animation-direction:reverse;animation-delay:-11s}
+.halo .r5{inset:26px;animation-duration:15s;animation-delay:-2s}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.halo .coreW{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;transform:scale(calc(.8 + .34*var(--p)));filter:brightness(calc(.78 + .5*var(--p)));transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s}
+.halo .coreW .orb{margin:0;width:100%;height:100%}
+.halo .coreW.tick{animation:tick .28s ease}
+@keyframes tick{50%{transform:scale(calc(.9 + .34*var(--p)))}}
+.halo.fast .r1{animation-duration:2.6s}.halo.fast .r2{animation-duration:2s}.halo.fast .r3{animation-duration:1.6s}.halo.fast .r4{animation-duration:3s}.halo.fast .r5{animation-duration:2.2s}
+.halo.fast .ring i{opacity:1}
+.halo.merge .ring i{top:calc(50% - 4px)}
+.halo.merge .coreW{transform:scale(1.4);filter:brightness(1.7)}
+.burst{position:fixed;z-index:50;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0%,#D6FBFC 28%,rgba(92,225,230,.65) 52%,rgba(92,225,230,0) 72%);animation:burst .95s cubic-bezier(.5,0,.2,1) forwards}
+@keyframes burst{0%{transform:scale(.3);opacity:1}58%{transform:scale(24);opacity:1}100%{transform:scale(28);opacity:0}}
+.spot{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle 280px at var(--x,50%) var(--y,40%),rgba(150,200,255,.11),transparent 70%);mix-blend-mode:screen;opacity:0;transition:opacity .6s}
+@media (hover:hover) and (pointer:fine){body.dark .spot{opacity:1}}
+.st{animation:in .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+.under.st{animation:glowIn 1.5s ease both;animation-delay:var(--d,0s)}
+@keyframes glowIn{0%{opacity:0;filter:blur(10px);text-shadow:none}60%{opacity:1;filter:blur(0);text-shadow:0 0 40px rgba(92,225,230,1)}100%{opacity:1;filter:none;text-shadow:0 0 24px rgba(92,225,230,.5)}}
+.still .st{animation:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body class="dark">
 <div class="bg"></div>
+<div class="spot" id="spot"></div>
 <header class="top">
   <a href="app.html#home" aria-label="Youverse"><img src="img/logo-light.png" alt="Youverse"></a>
   <div class="r"><button class="chip" id="lang" type="button">EN</button><a class="chip" id="exit" href="app.html#home"></a></div>
@@ -114,6 +141,7 @@ const D=window.YV_TEST,$=s=>document.querySelector(s),app=$('#app');
 const KEYS={ar:['أ','ب','ج','د'],en:['A','B','C','D']};
 let lang=new URLSearchParams(location.search).get('lang')==='en'?'en':'ar';
 const S={screen:'welcome',q:0,ans:Array(10).fill(null),name:'',email:'',light:null,worldOpen:false};
+const HALO=cls=>`<div class="halo ${cls}" id="halo">${['#7FB2FF','#F2A93B','#5CE1E6','#F08BB4','#A99BFF'].map((c,i)=>`<div class="ring r${i+1}"><i style="--c:${c}"></i></div>`).join('')}<div class="coreW"><div class="orb"></div></div></div>`;
 const T=()=>D[lang],esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function setLang(l){lang=l;const t=T();document.documentElement.lang=l;document.documentElement.dir=t.dir;
  document.title=l==='en'?'Youverse - Discover Your Universe!':'Youverse - اكتشف عالمك!‏';
@@ -129,10 +157,10 @@ function score(){const n={H:0,F:0,O:0,S:0,C:0};let last=null;
  return tied[0];}
 function render(anim){const t=T();let h='';document.body.className=S.screen==='result'?'lit':'dark';
  if(S.screen==='welcome'){
-  h=`<section class="screen c"><div class="orb"></div><h1 class="serif">${esc(t.headline)}</h1><p class="under">${esc(t.underline)}</p>
-  <p class="lead">${esc(t.intro)}</p>
-  <input class="field" id="name" maxlength="30" autocomplete="given-name" placeholder="${esc(t.nameField)}" value="${esc(S.name)}">
-  <div><button class="btn" id="start" type="button">${esc(t.start)}</button></div><p class="note">${esc(t.startNote)}</p></section>`;}
+  h=`<section class="screen c">${HALO('')}<h1 class="serif st" style="--d:.1s">${esc(t.headline)}</h1><p class="under st" style="--d:.6s">${esc(t.underline)}</p>
+  <p class="lead st" style="--d:.95s">${esc(t.intro)}</p>
+  <input class="field st" style="--d:1.1s" id="name" maxlength="30" autocomplete="given-name" placeholder="${esc(t.nameField)}" value="${esc(S.name)}">
+  <div class="st" style="--d:1.25s"><button class="btn" id="start" type="button">${esc(t.start)}</button></div><p class="note st" style="--d:1.4s">${esc(t.startNote)}</p></section>`;}
  else if(S.screen==='q'){const i=S.q,[qt,opts]=t.questions[i],r=i<3?0:i<6?1:2;
   h=`<section class="screen"><div class="meta"><span class="round">${esc(t.rounds[r])}</span><span>${esc(t.qOf(i+1))}</span></div>
   <div class="bar"><i style="width:${(i+1)*10}%"></i></div><h2 class="serif">${esc(qt)}</h2>
@@ -141,7 +169,7 @@ function render(anim){const t=T();let h='';document.body.className=S.screen==='r
   <button class="btn" id="next" type="button" ${S.ans[i]==null?'disabled':''}>${esc(t.cont)}</button></div></section>`;}
  else if(S.screen==='note'){h=`<section class="screen c"><div class="orb" style="--c:#A99BFF;width:70px;height:70px"></div>
   <p class="quote serif">${esc(t.notes[S.q])}</p><button class="btn" id="next" type="button" style="margin-top:34px">${esc(t.cont)}</button></section>`;}
- else if(S.screen==='loading'){h=`<section class="screen c"><div class="orb"></div><h2 class="serif" style="margin:0">${esc(t.loadingTitle)}</h2><div class="msgs" id="msgs"></div></section>`;}
+ else if(S.screen==='loading'){h=`<section class="screen c">${HALO('fast')}<h2 class="serif" style="margin:0">${esc(t.loadingTitle)}</h2><div class="msgs" id="msgs"></div></section>`;}
  else if(S.screen==='email'){const L=t.lights[S.light],c=D.COLORS[S.light];
   h=`<section class="screen c" style="--c:${c}"><div class="orb" style="--c:${c}">${L.emoji}</div><h1 class="serif">${esc(t.lightTitle(L.name))}</h1>
   <p class="tag serif" style="color:${c}">${esc(L.tagline)}</p><p class="lead">${esc(t.emailText)}</p>
@@ -163,17 +191,20 @@ function render(anim){const t=T();let h='';document.body.className=S.screen==='r
    <div class="row"><button class="btn2 main" id="copy" type="button">${esc(t.copy)}</button><button class="btn2" id="share" type="button">${esc(t.share)}</button></div></div>
   <div class="c"><button class="link" id="retake" type="button" style="margin-top:18px">↻ ${esc(t.retake)}</button></div>
   <p class="sample">${esc(t.sampleNote)}</p></section>`;}
- app.innerHTML=h;if(!anim)app.querySelectorAll('.screen').forEach(e=>e.style.animation='none');
+ app.innerHTML=h;app.classList.toggle('still',!anim);if(!anim)app.querySelectorAll('.screen').forEach(e=>e.style.animation='none');
  if(anim)scrollTo({top:0,behavior:'instant'});bind();}
 function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
- if(S.screen==='welcome'){const n=$('#name');n.oninput=()=>S.name=n.value;n.onkeydown=e=>{if(e.key==='Enter')$('#start').click();};on('#start',()=>go('q',{q:0}));}
+ if(S.screen==='welcome'){const n=$('#name'),hal=$('#halo'),cw=hal.querySelector('.coreW'),setP=()=>hal.style.setProperty('--p',Math.min(n.value.trim().length/5,1));setP();
+  n.oninput=()=>{S.name=n.value;setP();cw.classList.remove('tick');void cw.offsetWidth;cw.classList.add('tick');};
+  n.onkeydown=e=>{if(e.key==='Enter')$('#start').click();};
+  on('#start',()=>burst(()=>go('q',{q:0})));}
  if(S.screen==='q'){app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S.ans[S.q]=+b.dataset.k;app.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));$('#next').disabled=false;});
   on('#back',()=>{if(S.q===0)return;go('q',{q:S.q-1});});
   on('#next',()=>{if(S.ans[S.q]==null)return;const n=S.q+1;if(n===10){S.light=score();go('loading');return;}
    if(t.notes[n])go('note',{q:n});else go('q',{q:n});});}
  if(S.screen==='note')on('#next',()=>go('q',{q:S.q}));
  if(S.screen==='loading'){const box=$('#msgs');let k=0;const tick=()=>{if(S.screen!=='loading')return;
-   if(k<t.loading.length){box.innerHTML=`<span>${esc(T().loading[k])}</span>`;k++;setTimeout(tick,1100);}else go('email');};tick();}
+   if(k<t.loading.length){box.innerHTML=`<span>${esc(T().loading[k])}</span>`;k++;setTimeout(tick,1050);}else{$('#halo').classList.add('merge');setTimeout(()=>{if(S.screen==='loading')go('email');},1000);}};tick();}
  if(S.screen==='email'){const e=$('#email'),err=$('#err');e.oninput=()=>{S.email=e.value;e.classList.remove('bad');err.textContent='';};
   e.onkeydown=ev=>{if(ev.key==='Enter')$('#reveal').click();};
   on('#reveal',()=>{const v=e.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){e.classList.add('bad');err.textContent=t.emailError;e.focus();return;}S.email=v;go('result');});}
@@ -183,6 +214,10 @@ function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
   on('#copy',async()=>{const b=$('#copy');try{await navigator.clipboard.writeText(txt);b.textContent=T().copied;}catch(e){b.textContent=T().copyFailed;}setTimeout(()=>{if($('#copy'))$('#copy').textContent=T().copy;},1800);});
   on('#share',async()=>{if(navigator.share){try{await navigator.share({text:txt});}catch(e){}}else $('#copy').click();});
   on('#retake',()=>{Object.assign(S,{ans:Array(10).fill(null),light:null,worldOpen:false});go('welcome');});}}
+function burst(cb){const h=$('#halo');if(!h||matchMedia('(prefers-reduced-motion:reduce)').matches)return cb();
+ const r=h.getBoundingClientRect(),b=document.createElement('div');b.className='burst';b.style.left=(r.left+r.width/2)+'px';b.style.top=(r.top+r.height/2)+'px';
+ document.body.appendChild(b);setTimeout(cb,520);setTimeout(()=>b.remove(),1000);}
+{const sp=$('#spot');let q=0;addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||q)return;q=requestAnimationFrame(()=>{q=0;sp.style.setProperty('--x',e.clientX+'px');sp.style.setProperty('--y',e.clientY+'px');});},{passive:true});}
 setLang(lang);
 </script>
 </body>
