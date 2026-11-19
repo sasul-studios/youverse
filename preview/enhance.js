@@ -4,18 +4,18 @@ const P=window.DC_PAGES;
 const rep=(k,a,b)=>{if(P[k].indexOf(a)<0)console.warn('v2: not found in',k,a.slice(0,40));P[k]=P[k].split(a).join(b);};
 const tagHTML='<span style="align-self: flex-start; font-size: 13px; font-weight: 800; color: {{w.dot}}; background: #FFFFFF; padding: 5px 12px; border-radius: 30px">{{w.tag}}</span>\n<h3 ';
 /* Arabic */
-rep('Main.dc.html','أربعة عوالم، رحلة واحدة','رحلة واحدة، وعالمان');
-rep('Main.dc.html','كل عالم له لون، لتعرف دائماً أين أنت في رحلتك.','تبدأ بالاختبار، ثم تنطلق في عالمَين: YouFinder و YouPartner، وتتابع كل شيء في مساحتك You.');
+rep('Main.dc.html','أربعة عوالم، رحلة واحدة','اكتشف ضوءك، وادخل عالمك');
+rep('Main.dc.html','كل عالم له لون، لتعرف دائماً أين أنت في رحلتك.','اكتشف ضوءك ← ادخل عالمك في YouFinder ← تابع رحلتك في You');
 rep('Main.dc.html',"title:'الاختبار',","title:'الاختبار',tag:'نقطة البداية',");
-rep('Main.dc.html',"title:'YouFinder',","title:'YouFinder',tag:'عالم',");
-rep('Main.dc.html',"title:'YouPartner',","title:'YouPartner',tag:'عالم',");
+rep('Main.dc.html',"title:'YouFinder',","title:'YouFinder',tag:'خمسة عوالم',");
+rep('Main.dc.html',"title:'YouPartner',","title:'YouPartner',tag:'الشركاء والفرص',");
 rep('Main.dc.html',"title:'You',","title:'You',tag:'مساحتك',");
 /* English */
-rep('Main-EN.dc.html','Four worlds, one journey','One journey, two worlds');
-rep('Main-EN.dc.html','Each world has its own colour, so you always know where you are.','Start with the test, explore the YouFinder and YouPartner worlds, and follow everything in your own space, You.');
+rep('Main-EN.dc.html','Four worlds, one journey','Find your Light, enter your World');
+rep('Main-EN.dc.html','Each world has its own colour, so you always know where you are.','Find your Light → Enter your World in YouFinder → Follow your journey in You');
 rep('Main-EN.dc.html',"title:'The Test',","title:'The Test',tag:'Starting point',");
-rep('Main-EN.dc.html',"title:'YouFinder',","title:'YouFinder',tag:'World',");
-rep('Main-EN.dc.html',"title:'YouPartner',","title:'YouPartner',tag:'World',");
+rep('Main-EN.dc.html',"title:'YouFinder',","title:'YouFinder',tag:'Five Worlds',");
+rep('Main-EN.dc.html',"title:'YouPartner',","title:'YouPartner',tag:'Partners',");
 rep('Main-EN.dc.html',"title:'You',","title:'You',tag:'Your space',");
 for(const k of ['Main.dc.html','Main-EN.dc.html'])P[k]=P[k].replace(/(<sc-for list="\{\{worlds\}\}"[\s\S]*?)<h3 /,(m,a)=>a+tagHTML);
 

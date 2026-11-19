@@ -154,7 +154,7 @@ function render(anim){const t=T();let h='';document.body.className=S.screen==='r
   <div class="grid2"><div class="card"><h3>⚡ ${esc(t.sections.superpower)}</h3><p>${esc(L.superpower)}</p></div>
   <div class="card"><h3>🌑 ${esc(t.sections.shadow)}</h3><p>${esc(L.shadow)}</p></div></div>
   <div class="card world sec"><h3>🌍 ${esc(t.sections.world)}</h3><div class="wn serif">${esc(L.world)}</div><p style="color:rgba(234,244,246,.85)">${esc(L.worldDesc)}</p>
-   <button class="btn" id="enter" type="button">${esc(t.enterWorld(L.world))}</button>${S.worldOpen?`<div class="soon">${esc(t.worldSoon)}</div>`:''}</div>
+   <button class="btn" id="enter" type="button">${esc(t.enterWorld(L.world))}</button>${S.worldOpen?`<div class="soon">${esc(t.worldSoon)}<br><a href="#" id="peek" style="color:var(--c);font-weight:800">${lang==='ar'?'معاينة: شاهد عالمك في YouFinder ←':'Preview: see your World in YouFinder →'}</a></div>`:''}</div>
   <div class="card sec"><h3>🎓 ${esc(t.sections.matches)}</h3><div class="mlist">${L.matches.map(m=>`<div class="mi"><i>▶</i><span>${esc(m)}</span></div>`).join('')}</div></div>
   <div class="card sec"><h3 style="justify-content:space-between"><span>🗓️ ${esc(t.sections.days)}</span><span class="draft">${lang==='ar'?'مسودة':'Draft'}</span></h3>
    <div class="days">${L.days.map((d,k)=>`<div class="day"><small>${esc(t.dayLabel(k+1))}</small><span>${esc(d)}</span></div>`).join('')}</div></div>
@@ -179,6 +179,7 @@ function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
   on('#reveal',()=>{const v=e.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){e.classList.add('bad');err.textContent=t.emailError;e.focus();return;}S.email=v;go('result');});}
  if(S.screen==='result'){const txt=$('#stext').textContent;
   on('#enter',()=>{S.worldOpen=true;render(false);});
+  on('#peek',e=>{e.preventDefault();try{sessionStorage.setItem('yvWorld',S.light);}catch(x){}location.href='app.html#youfinder'+(lang==='en'?'-en':'');});
   on('#copy',async()=>{const b=$('#copy');try{await navigator.clipboard.writeText(txt);b.textContent=T().copied;}catch(e){b.textContent=T().copyFailed;}setTimeout(()=>{if($('#copy'))$('#copy').textContent=T().copy;},1800);});
   on('#share',async()=>{if(navigator.share){try{await navigator.share({text:txt});}catch(e){}}else $('#copy').click();});
   on('#retake',()=>{Object.assign(S,{ans:Array(10).fill(null),light:null,worldOpen:false});go('welcome');});}}

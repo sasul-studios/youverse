@@ -1,5 +1,5 @@
 (function(){
-const ROUTES={"Main.dc.html": "home", "Main-EN.dc.html": "en", "Test.dc.html": "test", "Test-EN.dc.html": "test-en", "Register.dc.html": "register", "Register-EN.dc.html": "register-en", "Masterclass.dc.html": "masterclass", "Masterclass-EN.dc.html": "masterclass-en", "Lesson.dc.html": "lesson", "Lesson-EN.dc.html": "lesson-en", "You.dc.html": "you", "You-EN.dc.html": "you-en", "Admin.dc.html": "admin", "Admin-EN.dc.html": "admin-en"};
+const ROUTES={"Main.dc.html": "home", "Main-EN.dc.html": "en", "Test.dc.html": "test", "Test-EN.dc.html": "test-en", "Register.dc.html": "register", "Register-EN.dc.html": "register-en", "Masterclass.dc.html": "masterclass", "Masterclass-EN.dc.html": "masterclass-en", "Lesson.dc.html": "lesson", "Lesson-EN.dc.html": "lesson-en", "You.dc.html": "you", "You-EN.dc.html": "you-en", "Admin.dc.html": "admin", "Admin-EN.dc.html": "admin-en", "YouFinder.dc.html": "youfinder", "YouFinder-EN.dc.html": "youfinder-en"};
 const FILES={};for(const k in ROUTES)FILES[ROUTES[k]]=k;
 class DCLogic{constructor(p){this.props=p||{};this.state={};}
  setState(p){const n=typeof p==='function'?p(this.state):p;this.state=Object.assign({},this.state,n);rerender();}
