@@ -309,7 +309,7 @@ V.test=()=>{const done=USERS.filter(u=>u.lt);return `<div class="grid kpis">
  <div class="card" style="margin-top:18px"><div class="tools"><h3 style="margin-inline-end:auto">آخر النتائج</h3><button class="btn ghost" id="tcsv">تصدير CSV</button></div>
  <div class="tw"><table><thead><tr><th>المستخدم</th><th>الضوء</th><th>العالم</th><th>خطة 7 أيام</th><th>التاريخ</th></tr></thead><tbody>
  ${done.slice(0,15).map((u,i)=>`<tr data-u="${u.id}"><td><div class="u">${avatar(u.n,u.lt)}<b>${esc(u.n)}</b></div></td><td>${lightTag(u.lt)}</td><td>${LIGHTS[u.lt].w}</td><td>${i%4?'<span class="st ok">أُرسلت</span>':'<span class="st mute">لم يطلبها</span>'}</td><td>${date(u.joined)}</td></tr>`).join('')}</tbody></table></div>
- <div class="hint" style="margin:14px 0 0">طريقة حساب النتيجة مؤقتة لين يرسل العميل الجدول النهائي.</div></div>`;};
+ <div class="hint" style="margin:14px 0 0">النتيجة تُحسب بجدول العميل: نقطة لكل إجابة، والأعلى يفوز، وعند التعادل الترتيب: الأفق، الصانع، المدار، الشرارة، البوصلة.</div></div>`;};
 
 V.mc=()=>`<div class="tools"><button class="btn" id="mcAdd">+ ماستركلاس جديد</button><span class="chip">${MC.filter(m=>m.st==='pub').length} منشور · ${MC.filter(m=>m.st!=='pub').length} مسودة</span></div>
  <div class="grid mcs">${MC.map(m=>`<div class="card mc"><div class="cv" style="background:linear-gradient(135deg,${LIGHTS[m.w].c},#032E36)">${m.st==='pub'?'<span class="st ok">منشور</span>':'<span class="st warn">مسودة</span>'}<h4>${esc(m.t)}</h4></div>

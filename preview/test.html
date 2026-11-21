@@ -149,12 +149,10 @@ function setLang(l){lang=l;const t=T();document.documentElement.lang=l;document.
  history.replaceState(null,'',l==='en'?'?lang=en':location.pathname);render(false);}
 $('#lang').onclick=()=>setLang(lang==='en'?'ar':'en');
 function go(screen,extra){Object.assign(S,{screen},extra||{});render(true);}
-function score(){const n={H:0,F:0,O:0,S:0,C:0};let last=null;
- S.ans.forEach((a,i)=>{if(a==null)return;const l=D.SCORE[i][a];n[l]++;last=l;});
- const top=Math.max(...Object.values(n)),tied=Object.keys(n).filter(k=>n[k]===top);
- if(tied.length===1)return tied[0];
- for(let i=9;i>=0;i--){const l=S.ans[i]!=null&&D.SCORE[i][S.ans[i]];if(tied.includes(l))return l;}   /* temporary tie-break: the latest answer wins */
- return tied[0];}
+function score(){const n={H:0,F:0,O:0,S:0,C:0};   /* client's table: one point per answer, most points wins */
+ S.ans.forEach((a,i)=>{if(a==null)return;n[D.SCORE[i][a]]++;});
+ const top=Math.max(...Object.values(n));
+ return ['H','F','O','S','C'].find(k=>n[k]===top);}   /* tie: first in this order wins - Horizon, Forge, Orbit, Spark, Compass */
 function render(anim){const t=T();let h='';document.body.className=S.screen==='result'?'lit':'dark';
  if(S.screen==='welcome'){
   h=`<section class="screen c">${HALO('')}<h1 class="serif st" style="--d:.1s">${esc(t.headline)}</h1><p class="under st" style="--d:.6s">${esc(t.underline)}</p>
@@ -189,8 +187,7 @@ function render(anim){const t=T();let h='';document.body.className=S.screen==='r
   <div class="card sec sent"><span style="font-size:22px">✉️</span><span>${esc(t.planSent(S.email))}</span></div>
   <div class="card sec"><h3>✨ ${esc(t.shareTitle)}</h3><div class="sharebox" id="stext">${esc(share)}</div>
    <div class="row"><button class="btn2 main" id="copy" type="button">${esc(t.copy)}</button><button class="btn2" id="share" type="button">${esc(t.share)}</button></div></div>
-  <div class="c"><button class="link" id="retake" type="button" style="margin-top:18px">↻ ${esc(t.retake)}</button></div>
-  <p class="sample">${esc(t.sampleNote)}</p></section>`;}
+  <div class="c"><button class="link" id="retake" type="button" style="margin-top:18px">↻ ${esc(t.retake)}</button></div></section>`;}
  app.innerHTML=h;app.classList.toggle('still',!anim);if(!anim)app.querySelectorAll('.screen').forEach(e=>e.style.animation='none');
  if(anim)scrollTo({top:0,behavior:'instant'});bind();}
 function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};

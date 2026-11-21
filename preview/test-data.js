@@ -2,7 +2,7 @@
    The 7-day plans are the client's draft: he is still working on them.
    SCORE is TEMPORARY until the client sends the real scoring table. */
 window.YV_TEST = {
-  /* temporary scoring: for each question, the Light each option counts for (H Horizon, F Forge, O Orbit, S Spark, C Compass) */
+  /* scoring from the client's table (Nov 2026): for each question, the Light each option counts for (H Horizon, F Forge, O Orbit, S Spark, C Compass) */
   SCORE: [
     ['H','F','O','S'], ['H','F','O','C'], ['H','F','S','C'], ['H','O','S','C'], ['F','O','S','C'],
     ['H','F','O','S'], ['H','F','O','C'], ['H','F','S','C'], ['H','O','S','C'], ['F','O','S','C']
@@ -43,7 +43,6 @@ window.YV_TEST = {
     shareTitle: 'Share your Light',
     shareText: (light, tagline) => 'I’m a ' + light + ' Light in the Youverse. ' + tagline + ' Find yours at youverse.qa',
     copy: 'Copy', share: 'Share', copied: 'Copied', copyFailed: 'Copy failed', retake: 'Retake the test',
-    sampleNote: 'Preview: the scoring is temporary until the client sends the scoring table.',
     lights: {
       H: { name: 'Horizon', emoji: '🔭', tagline: 'You see what the world hasn’t built yet.',
         desc: 'You think in futures. While most people see what is, you see what could be, and you connect ideas before anyone has asked the question. You don’t need a perfect plan to begin. You need a direction, and one thing you actually finish.',
@@ -111,7 +110,6 @@ window.YV_TEST = {
     shareTitle: 'شارك ضوءك',
     shareText: (light, tagline) => 'أنا ضوء ' + light + ' في اليوفيرس. ' + tagline + ' اكتشف ضوءك على youverse.qa',
     copy: 'انسخ', share: 'شارك', copied: 'تم النسخ', copyFailed: 'تعذّر النسخ', retake: 'أعد الاختبار',
-    sampleNote: 'معاينة: طريقة حساب النتيجة مؤقتة حتى يرسل العميل جدول الحساب.',
     lights: {
       H: { name: 'الأفق', emoji: '🔭', tagline: 'أنت ترى ما لم يبنه العالم بعد.',
         desc: 'تفكر بمنطق المستقبل. بينما يرى أغلب الناس ما هو موجود، ترى أنت ما يمكن أن يكون، وتربط الأفكار قبل أن يسأل أحد السؤال. لا تحتاج إلى خطة مثالية لتبدأ. تحتاج إلى اتجاه، وإلى شيء واحد تنهيه فعلاً.',
