@@ -26,6 +26,9 @@ h1,h2,h3{font-family:Amiri,serif;margin:0;line-height:1.3}
 .lg input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(92,225,230,.2)}
 .lg button{width:100%;height:50px;margin-top:22px;border:0;border-radius:14px;background:var(--cyan);color:var(--ink);font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 12px 30px -10px rgba(92,225,230,.6)}
 .lg .note{margin-top:16px;font-size:12px;color:rgba(255,255,255,.55);text-align:center;line-height:1.7}
+.lg .fg{display:block;text-align:start;margin-top:10px;font-size:13px;color:var(--cyan);cursor:pointer;background:none;border:0;width:auto;height:auto;padding:0;box-shadow:none;font-weight:700}
+.lg .ok{color:#9BF0C9;font-size:13.5px;text-align:center;line-height:1.8;margin-top:12px}
+.lg .back{display:block;margin:14px auto 0;background:none;border:0;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;width:auto;height:auto;box-shadow:none;padding:0}
 .lg .err{color:#FF9BAA;font-size:13px;margin-top:10px;text-align:center;min-height:18px}
 
 /* shell */
@@ -151,9 +154,20 @@ html[dir=rtl] .dr{transform:translateX(-105%)}.dr.on{transform:none!important}
   <p>الدخول لحساب المدير فقط</p>
   <label>البريد الإلكتروني</label><input id="le" type="email" placeholder="admin@youverse.qa" required>
   <label>كلمة المرور</label><input id="lp" type="password" placeholder="••••••••" required>
+  <button type="button" class="fg" id="fgo">نسيت كلمة المرور؟</button>
   <div class="err" id="lerr"></div>
   <button type="submit">دخول</button>
   <div class="note">نسخة معاينة ببيانات تجريبية: اكتب أي بريد وكلمة مرور.<br>بعد الربط بـ Supabase يصير الدخول لحساب المدير فقط.</div>
+ </form>
+ <form class="lg hide" id="rsf" autocomplete="off">
+  <img src="img/e71bb002c61cd7d156a7ad3ffea2d570.png" alt="Youverse">
+  <h1>استعادة كلمة المرور</h1>
+  <p>اكتب بريد حساب المدير، ونرسل لك رابطاً لتعيين كلمة مرور جديدة</p>
+  <label>البريد الإلكتروني</label><input id="re" type="email" placeholder="admin@youverse.qa" required>
+  <button type="submit">إرسال رابط الاستعادة</button>
+  <div class="ok hide" id="rok"></div>
+  <button type="button" class="back" id="rback">→ العودة لتسجيل الدخول</button>
+  <div class="note">نسخة معاينة: الرابط يوصل فعلياً بعد الربط بـ Supabase.</div>
  </form>
 </section>
 
@@ -328,9 +342,16 @@ V.pay=()=>{const paid=PAYS.filter(p=>p.st==='paid'),r=PAYS.filter(p=>!pf||p.st==
 
 V.set=()=>`<div class="grid set">
  <div class="card"><h3>حساب المدير</h3><div class="hint">حساب واحد فقط يدخل اللوحة</div><form class="fm">
-  <label class="w">الاسم<input value="مدير المنصة"></label><label class="w">البريد<input value="${esc($('#meMail').textContent)}" dir="ltr"></label>
-  <label class="w">كلمة المرور<input type="password" value="12345678"></label></form>
-  <div class="act" style="margin-top:16px"><button class="btn" data-t="تم الحفظ (معاينة)">حفظ</button></div></div>
+  <label class="w">الاسم<input value="مدير المنصة"></label><label class="w">البريد<input value="${esc($('#meMail').textContent)}" dir="ltr"></label></form>
+  <div class="act" style="margin-top:16px"><button class="btn ghost" data-t="تم الحفظ (معاينة)">حفظ</button></div>
+  <div class="sec" style="margin-top:26px">تغيير كلمة المرور</div><form class="fm" id="pwf">
+  <label class="w">كلمة المرور الحالية<input type="password" name="o" required></label>
+  <label>كلمة المرور الجديدة<input type="password" name="n" minlength="8" required></label>
+  <label>تأكيد كلمة المرور<input type="password" name="c" required></label>
+  <div class="w" style="font-size:12.5px;color:var(--mut)">8 أحرف على الأقل، ويُفضّل خلط حروف وأرقام.</div>
+  <div class="w" id="pwerr" style="color:var(--bad);font-size:13px;min-height:16px"></div></form>
+  <div class="act" style="margin-top:6px"><button class="btn" id="pwSave">تغيير كلمة المرور</button></div>
+  <div class="sw" style="margin-top:14px;border-top:1px solid #F0F5F6"><div><b>التحقق بخطوتين</b><small>كود من تطبيق مثل Google Authenticator عند كل دخول</small></div><button class="tg"></button></div></div>
  <div class="card"><h3>إعدادات المنصة</h3><div class="hint">تتحكم في تجربة الزوار</div>
   ${[['التسجيل مفتوح','الزوار يقدرون يسوون حسابات جديدة',1],['موافقة ولي الأمر لمن هم تحت 18','لازم موافقة قبل الاشتراك أو الدفع',1],['إرسال خطة الأيام السبعة بالبريد','بعد ما يكتب المستخدم بريده في النتيجة',1],['وضع الصيانة','يقفل الموقع للزوار مؤقتاً',0]].map(s=>`<div class="sw"><div><b>${s[0]}</b><small>${s[1]}</small></div><button class="tg ${s[2]?'on':''}"></button></div>`).join('')}</div>
  <div class="card"><h3>الدفع</h3><div class="hint">SkipCash</div>
@@ -370,6 +391,12 @@ $('#today').textContent=new Date().toLocaleDateString('ar-QA',{weekday:'long',da
 /* login (preview: any email/password; real: Supabase auth, admin role only) */
 const enter=mail=>{$('#meMail').textContent=mail;$('#login').classList.add('hide');$('#app').classList.remove('hide');const h=location.hash.slice(1);go(PAGES.some(p=>p.k===h)?h:'home');};
 $('#lgf').onsubmit=e=>{e.preventDefault();const m=$('#le').value.trim();if($('#lp').value.length<4){$('#lerr').textContent='كلمة المرور قصيرة';return;}try{sessionStorage.setItem('yvAdmin',m)}catch(_){}enter(m);};
+$('#fgo').onclick=()=>{$('#lgf').classList.add('hide');$('#rsf').classList.remove('hide');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
+$('#rback').onclick=()=>{$('#rsf').classList.add('hide');$('#lgf').classList.remove('hide');};
+$('#rsf').onsubmit=e=>{e.preventDefault();const m=$('#re').value.trim();$('#rok').innerHTML='إذا كان <b>'+esc(m)+'</b> بريد حساب المدير، سيصلك رابط خلال دقائق.<br>افتحه واختر كلمة مرور جديدة.';$('#rok').classList.remove('hide');};
+document.addEventListener('click',e=>{if(e.target.id!=='pwSave')return;const f=$('#pwf');if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
+ if(d.n!==d.c){$('#pwerr').textContent='كلمتا المرور غير متطابقتين';return;}if(d.n===d.o){$('#pwerr').textContent='اختر كلمة مرور مختلفة عن الحالية';return;}
+ $('#pwerr').textContent='';f.reset();toast('تم تغيير كلمة المرور (معاينة)');});
 $('#out').onclick=()=>{try{sessionStorage.removeItem('yvAdmin')}catch(_){}location.hash='';location.reload();};
 try{const m=sessionStorage.getItem('yvAdmin');if(m)enter(m);}catch(_){}
 </script>
