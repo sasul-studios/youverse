@@ -205,7 +205,8 @@ function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
  if(S.screen==='email'){const e=$('#email'),err=$('#err');e.oninput=()=>{S.email=e.value;e.classList.remove('bad');err.textContent='';};
   e.onkeydown=ev=>{if(ev.key==='Enter')$('#reveal').click();};
   on('#reveal',()=>{const v=e.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){e.classList.add('bad');err.textContent=t.emailError;e.focus();return;}S.email=v;go('result');});}
- if(S.screen==='result'){const txt=$('#stext').textContent;
+ if(S.screen==='result'){try{localStorage.setItem('yvLight',S.light);}catch(x){}   /* the site header shows "Your Light: …" */
+ const txt=$('#stext').textContent;
   on('#enter',()=>{S.worldOpen=true;render(false);});
   on('#peek',e=>{e.preventDefault();try{sessionStorage.setItem('yvWorld',S.light);}catch(x){}location.href='app.html#youfinder'+(lang==='en'?'-en':'');});
   on('#copy',async()=>{const b=$('#copy');try{await navigator.clipboard.writeText(txt);b.textContent=T().copied;}catch(e){b.textContent=T().copyFailed;}setTimeout(()=>{if($('#copy'))$('#copy').textContent=T().copy;},1800);});
