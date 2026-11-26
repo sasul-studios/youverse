@@ -19,7 +19,7 @@ const PAIR={'Main.dc.html':'Main-EN.dc.html','YouFinder.dc.html':'YouFinder-EN.d
 function header(k){
  const en=/-EN\.dc\.html$/.test(k),base=en?k.replace('-EN',''):k,other=en?base:(PAIR[k]||'Main-EN.dc.html');
  const E=en?'-EN':'',on=f=>base===f?' style="color: #032E36"':'';
- const L=en?{home:'Home',you:'My space',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',langFont:"'Almarai', sans-serif"}
+ const L=en?{home:'Home',you:'My Space',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',langFont:"'Almarai', sans-serif"}
            :{home:'الرئيسية',you:'مساحتي',mentor:'يو مينتور',login:'تسجيل الدخول',test:'ابدأ الاختبار',your:'ضوؤك: ',lang:'EN',langFont:"'Lora', serif"};
  const t=light&&LN.ar[light]?L.your+LN[en?'en':'ar'][light]:L.test;
  const tHref=light?(en?'YouFinder-EN.dc.html':'YouFinder.dc.html'):(en?TEST+'?lang=en':TEST);
@@ -52,7 +52,7 @@ window.yvHeader=function(box,phone){yh(box,phone);
  if(document.documentElement.lang!=='en'){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const v=n.nodeValue,r=arName(v);if(r!==v)n.nodeValue=r.replace('ادخل عالمك في عالم يو فايندر','ادخل عالمك في يو فايندر');}}
  if(window.YVLater)window.YVLater(box,document.documentElement.lang==='en');
  box.querySelectorAll('header nav a').forEach(a=>{const t=a.textContent.trim();if((t==='يو مينتور'||t==='عالم يو مينتور'||t==='YouMentor')&&!a.querySelector('svg'))a.innerHTML=ico('mentor',16,'currentColor')+'<span>'+t+'</span>';
-  if((t==='مساحتي'||t==='My space')&&!a.querySelector('svg'))a.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>'+t+'</span>';});};
+  if((t==='مساحتي'||t==='My Space')&&!a.querySelector('svg'))a.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>'+t+'</span>';});};
 
 /* ---------- home: a portal with three doors ---------- */
 function portal(en){
@@ -86,10 +86,13 @@ ${doors}
 for(const [k,en] of [['Main.dc.html',false],['Main-EN.dc.html',true]]){const s=P[k],a=s.indexOf('<section',s.indexOf('</header>')),b=s.indexOf('</section>',a);
  if(a>0&&b>0)P[k]=s.slice(0,a)+portal(en)+s.slice(b+10);}
 
-/* journey: «You» is now «مساحتي» / «My space» */
-for(const [k,en] of [['Main.dc.html',false],['Main-EN.dc.html',true]]){let x=P[k];
- x=en?x.split("title:'You',").join("title:'My space',").split('Follow your journey in You').join('Follow your journey in My space')
-     :x.split("title:'You',").join("title:'مساحتي',").split('تابع رحلتك في You').join('تابع رحلتك في مساحتي');P[k]=x;}
+/* «You» (the personal space) is «مساحتي» / «My Space» everywhere; the journey gets a YouMentor card */
+const SP=[["{n:'4',title:'You',tag:'مساحتك',desc:'مساحتك: تقدمك وشهاداتك ونتائجك.'","{n:'4',title:'YouMentor',tag:'جلسات خاصة',desc:'جلسة خاصة أونلاين مع مرشد في تخصصك.',bg:'#FBF1DE',dot:'#9A6A12'},\n{n:'5',title:'مساحتي',tag:'تقدّمك',desc:'تقدّمك وشهاداتك ونتائجك في مكان واحد.'"],
+ ["{n:'4',title:'You',tag:'Your space',desc:'Your space: progress, certificates and results.'","{n:'4',title:'YouMentor',tag:'Private sessions',desc:'A private online session with a mentor in your field.',bg:'#FBF1DE',dot:'#9A6A12'},\n{n:'5',title:'My Space',tag:'Your progress',desc:'Your progress, certificates and results in one place.'"],
+ ['تابع رحلتك في You','تابع رحلتك في مساحتي'],['Follow your journey in You','Follow your journey in My Space'],
+ ['مساحتك You','مساحتي'],['مساحة You','مساحتي'],['Your space: You','My Space'],['Your results history in You','Your results history in My Space'],['Youverse · You<','Youverse · My Space<'],
+ ['grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; margin-top: 48px','grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-top: 48px']];
+for(const k in P){let x=P[k];for(const [a,b] of SP)x=x.split(a).join(b);P[k]=x;}
 
 /* emoji -> line icons (yv-icons.js) */
 if(window.YVI){const Y=window.YVI,M={'📖':'book','⏱️':'clock','⏱':'clock','🎧':'media','🏅':'award'};
