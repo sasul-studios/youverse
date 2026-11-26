@@ -2,7 +2,7 @@
 (function(){
 const P=window.DC_PAGES;
 const rep=(k,a,b)=>{if(P[k].indexOf(a)<0)console.warn('v2: not found in',k,a.slice(0,40));P[k]=P[k].split(a).join(b);};
-const tagHTML='<span style="align-self: flex-start; font-size: 13px; font-weight: 800; color: {{w.dot}}; background: #FFFFFF; padding: 5px 12px; border-radius: 30px">{{w.tag}}</span>\n<h3 ';
+const tagHTML='<span class="yv-wtag" style="align-self: flex-start; font-size: 13px; font-weight: 800; color: {{w.dot}}; background: #FFFFFF; padding: 5px 12px; border-radius: 30px">{{w.tag}}</span>\n<h3 ';
 /* Arabic */
 rep('Main.dc.html','أربعة عوالم، رحلة واحدة','اكتشف ضوءك، وادخل عالمك');
 rep('Main.dc.html','كل عالم له لون، لتعرف دائماً أين أنت في رحلتك.','اكتشف ضوءك ← ادخل عالمك في YouFinder ← تابع رحلتك في You');
