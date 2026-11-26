@@ -49,7 +49,8 @@ window.yvPhoneHeader=function(box){ph(box);
 const yh=window.yvHeader;
 const arName=t=>t.replace(/YouFinder(?!s)/g,'يو فايندر').replace(/YouPartner/g,'يو بارتنر').replace(/YouMentor/g,'يو مينتور').replace(/(?:عالم\s+)?(?:ال)?يو\s?(فايندر|بارتنر|مينتور)(?!ز)/g,'عالم يو $1');   /* Arabic: the three worlds are always «عالم يو فايندر / عالم يو بارتنر / عالم يو مينتور» */
 window.yvHeader=function(box,phone){yh(box,phone);
- if(document.documentElement.lang!=='en'){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const v=n.nodeValue,r=arName(v);if(r!==v)n.nodeValue=r;}}
+ if(document.documentElement.lang!=='en'){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const v=n.nodeValue,r=arName(v);if(r!==v)n.nodeValue=r.replace('ادخل عالمك في عالم يو فايندر','ادخل عالمك في يو فايندر');}}
+ if(window.YVLater)window.YVLater(box,document.documentElement.lang==='en');
  box.querySelectorAll('header nav a').forEach(a=>{const t=a.textContent.trim();if((t==='يو مينتور'||t==='عالم يو مينتور'||t==='YouMentor')&&!a.querySelector('svg'))a.innerHTML=ico('mentor',16,'currentColor')+'<span>'+t+'</span>';});};
 
 /* ---------- home: a portal with three doors ---------- */

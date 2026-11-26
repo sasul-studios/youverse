@@ -25,4 +25,13 @@ const P={
  play:'<path d="M8 5.5v13l10-6.5Z"/>'};
 window.YVI=function(n,s,c,w){return '<svg class="yvi" viewBox="0 0 24 24" width="'+(s||20)+'" height="'+(s||20)+'" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="'+(w||1.7)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;vertical-align:-0.18em">'+(P[n]||'')+'</svg>';};
 window.YVI.paths=P;
+/* placeholders waiting for the client: «[X]» shows as red «(X لاحقاً)» so we can tell them apart */
+const st=document.createElement('style');st.textContent='.yv-later{color:#E5484D!important;font-weight:700}';(document.head||document.documentElement).appendChild(st);
+const lbl=(x,en)=>{x=x.trim();if(en){if(/name/i.test(x))x='Name';return '('+x+', later)';}
+ if(/^اسم/.test(x))x='الاسم';return '('+x+' لاحقاً)';};
+window.YVLater=function(root,en){if(!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),list=[];let n;
+ while((n=w.nextNode()))if(/\[[^\]]+\]/.test(n.nodeValue)&&!(n.parentNode&&n.parentNode.closest&&n.parentNode.closest('script,style,textarea,.yv-later')))list.push(n);
+ list.forEach(n=>{const f=document.createDocumentFragment(),v=n.nodeValue,re=/\[([^\]]+)\](\s*ر\.ق)?/g;let i=0,m;
+  while((m=re.exec(v))){if(m.index>i)f.appendChild(document.createTextNode(v.slice(i,m.index)));const sp=document.createElement('span');sp.className='yv-later';sp.textContent=lbl(m[1],en);f.appendChild(sp);i=re.lastIndex;}
+  if(i<v.length)f.appendChild(document.createTextNode(v.slice(i)));n.parentNode.replaceChild(f,n);});};
 })();

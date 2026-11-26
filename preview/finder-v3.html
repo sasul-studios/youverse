@@ -123,7 +123,7 @@ const order=mine?[mine,...ORDER.filter(k=>k!==mine)]:ORDER;
 let filter='all';
 const pos={4:[[22,32],[48,62],[72,30],[88,68]],3:[[28,58],[55,28],[80,62]],2:[[35,45],[68,55]],1:[[50,48]]};
 const face=p=>p.photo?`<img src="${p.photo}" alt="">`:p.ini;
-function build(){
+function build(){setTimeout(()=>YVLater(document.querySelector('main'),en));
  $('#chips').innerHTML=`<button class="chip" data-f="all" aria-pressed="${filter==='all'}">${T.all}</button>`+order.map(k=>`<button class="chip${k===mine?' mine':''}" style="--c:${C[k]}" data-f="${k}" aria-pressed="${filter===k}">${YVI(k,16,filter===k?'#032E36':C[k])}${L[k].name}${k===mine?`<b>${T.yours}</b>`:''}</button>`).join('');
  $('#space').innerHTML=order.map((k,ri)=>{const ps=PEOPLE[k],P=pos[Math.min(ps.length,4)]||[];
   return `<section class="region${k===mine?' mine':''}${filter!=='all'&&filter!==k?' dim':''}" style="--c:${C[k]}" data-r="${k}" aria-labelledby="r${k}">
@@ -132,7 +132,7 @@ function build(){
    :`<div class="soon" style="--c:${C[k]}"><i></i><i></i><span>${T.soon}</span><i></i></div>`}</section>`;}).join('');
  $('#list').innerHTML=order.filter(k=>filter==='all'||filter===k).map(k=>`<div class="lg" style="--c:${C[k]}"><h2>${YVI(k,22)}${L[k].world}</h2><div class="lt" style="color:${C[k]};font-size:13px;font-weight:800">${T.light} ${L[k].name}</div>
   ${PEOPLE[k].length?`<ul>${PEOPLE[k].map(p=>`<li><a href="${p.href}"><span class="av">${face(p)}</span><span><b>${p.name}</b><small>${p.line}</small></span></a></li>`).join('')}</ul>`:`<div class="none">${T.none}</div>`}</div>`).join('');}
-build();
+build();YVLater(document.querySelector('main'),en);
 document.addEventListener('click',e=>{
  const c=e.target.closest('.chip');if(c){filter=c.dataset.f;build();closePeek();
   if(filter!=='all'){const r=document.querySelector('.region[data-r="'+filter+'"]');if(r&&!document.body.classList.contains('listing'))r.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'});}return;}
@@ -144,7 +144,7 @@ function setView(l){document.body.classList.toggle('listing',l);$('#vSpace').set
 let lastStar=null;
 function openPeek(s){const k=s.dataset.r,p=PEOPLE[k][+s.dataset.i],pk=$('#peek');
  document.querySelectorAll('.star.on').forEach(x=>x.classList.remove('on'));s.classList.add('on');lastStar=s;
- pk.style.setProperty('--c',C[k]);$('#pav').innerHTML=face(p);$('#pav').style.borderColor=C[k];$('#pn').textContent=p.name;$('#pl').textContent=p.line;
+ pk.style.setProperty('--c',C[k]);$('#pav').innerHTML=face(p);$('#pav').style.borderColor=C[k];$('#pn').textContent=p.name;$('#pl').textContent=p.line;YVLater($('#peek'),en);
  const go=$('#pgo');go.href=p.href;go.innerHTML=T.go+' '+YVI('play',11,'#03060E',2.4);
  if(innerWidth>760){const r=s.getBoundingClientRect(),W=300;let x=r.left+r.width/2-W/2+scrollX;x=Math.max(16,Math.min(x,innerWidth-W-16));
   pk.style.left=x+'px';pk.style.top=(r.bottom+scrollY+8)+'px';}

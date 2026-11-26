@@ -154,7 +154,8 @@ const T=en?{h1:'YouMentor',sub:'A private session with someone who gets your pat
  saved:'تم الحفظ (معاينة)',name:'[اسم المرشد]',field:'[التخصص]',bio:'[نبذة قصيرة عن المرشد: خبرته، وبماذا يساعد، ومع من يحب أن يعمل.]',sample:'أسعار تجريبية',
  days:['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']};
 $('#h1').textContent=T.h1;$('#sub').textContent=T.sub;$('#tYouer').textContent=T.youer;$('#tMentor').textContent=T.mentor;$('#allT').textContent=T.all;
-const cur=n=>en?'QAR '+n:n+' ر.ق';
+const cur=n=>'<span class="yv-later">'+(en?'(Price, later)':'(السعر لاحقاً)')+'</span>';   /* prices come from the client */
+const later=t=>'<span class="yv-later">('+t+(en?', later)':' لاحقاً)')+'</span>';
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2400);};
 
 /* sample mentors (names and photos come from the client; fields here are examples) */
@@ -187,9 +188,9 @@ const ok=m=>{if(FL.spec&&m.f!==FL.spec)return false;if(FL.lang&&!m.langs.include
 const langTxt=m=>m.langs.length>1?T.both:(m.langs[0]==='ar'?T.ar:T.en);
 const card=m=>`<article class="card"><div class="mh" data-p="${m.id}"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><b>${m.name}</b><small>${F[m.f]}</small></div></div>
  <div class="tags"><span>${YVI('world',14)}${langTxt(m)}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
- <div class="meta"><span>${YVI('clock',15)}30 ${T.min} · ${cur(m.p30)}</span><span>${YVI('calendar',15)}${rel(nextSlot(m))}</span></div>
+ <div class="meta"><span>${YVI('clock',15)}30 ${T.min} · ${cur(m.p30)}</span><span>${YVI('calendar',15)}${later(en?'Next slot':'الموعد')}</span></div>
  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" data-b="${m.id}">${T.book}</button><button class="btn ghost" data-p="${m.id}">${T.profile}</button></div></article>`;
-function renderDir(){const L=SH.light,list=M.filter(ok);
+function renderDir(){setTimeout(()=>YVLater(document.querySelector('main'),en));const L=SH.light,list=M.filter(ok);
  const rec=L?list.filter(m=>m.l===L):[];
  $('#recWrap').innerHTML=rec.length?`<div class="rec">${YVI(L,18)}${T.rec}: ${LT[L].name}</div><div class="grid">${rec.map(card).join('')}</div>`:'';
  const rest=list.filter(m=>!rec.includes(m));$('#allT').style.display=rest.length||!rec.length?'':'none';
@@ -198,7 +199,7 @@ renderDir();
 
 /* sheet: profile + booking */
 let B=null;
-function open(h){$('#sb').innerHTML=h;$('#sheet').classList.add('on');$('#ov').classList.add('on');$('#sheet').scrollTop=0;}
+function open(h){$('#sb').innerHTML=h;YVLater($('#sb'),en);$('#sheet').classList.add('on');$('#ov').classList.add('on');$('#sheet').scrollTop=0;}
 function close(){$('#sheet').classList.remove('on');$('#ov').classList.remove('on');}
 $('#ov').onclick=close;$('#sheet .x').onclick=close;addEventListener('keydown',e=>{if(e.key==='Escape')close();});
 document.addEventListener('click',e=>{const p=e.target.closest('[data-p]'),b=e.target.closest('[data-b]');
@@ -207,7 +208,7 @@ const head=m=>`<div class="ph"><span class="av" style="--c:${COL[m.l]}">${m.ini}
 function profile(id){const m=M[id];open(`${head(m)}<p class="bio">${T.bio}</p>
  <div class="h4">${T.fields}</div><div class="tags"><span>${F[m.f]}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
  <div class="h4">${T.session}</div><div class="opts"><div class="opt" style="cursor:default"><b>30 ${T.min}</b><small>${cur(m.p30)}</small></div><div class="opt" style="cursor:default"><b>60 ${T.min}</b><small>${cur(m.p60)}</small></div></div>
- <div class="tz">${YVI('calendar',14)}${T.next}: ${rel(nextSlot(m))}</div>
+ <div class="tz">${YVI('calendar',14)}${T.next}: ${later(en?'Slot':'الموعد')}</div>
  <button class="btn" style="width:100%;margin-top:22px" id="goBook">${T.book}</button><p class="fine">${T.code}</p>`);$('#goBook').onclick=()=>booking(id);}
 function booking(id){const m=M[id];B={m,len:30,day:null,t:null,note:'',minor:false,agree:false,parent:''};
  for(let d=0;d<14;d++)if(slots(m,d).length){B.day=d;break;}drawB();}
@@ -219,14 +220,14 @@ function drawB(){const m=B.m,days=[...Array(14)].map((_,d)=>d),q=showTZ===SLOT_T
  <div class="h4"><i>1</i>${T.s1}</div>
  <div class="days">${days.map(d=>{const dt=new Date(Date.now()+d*864e5),has=slots(m,d).length;return `<button class="day" data-day="${d}" aria-pressed="${B.day===d}" ${has?'':'disabled'}><small>${dt.toLocaleDateString(en?'en-US':'ar',{weekday:'short',timeZone:showTZ})}</small><b>${dt.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{day:'numeric',timeZone:showTZ})}</b></button>`}).join('')}</div>
  <div class="slots">${s.map(t=>`<button class="slot" data-t="${t.getTime()}" aria-pressed="${B.t===t.getTime()}">${fmtT(t)}</button>`).join('')}</div>
- <div class="tz">${YVI('world',14)}${q?T.tzQ:T.tzMine+' ('+myTZ+')'}${myTZ!==SLOT_TZ?` · <button id="tzb">${q?T.showMine:T.showQ}</button>`:''}</div>
+ <div class="tz">${later(en?'Times are examples':'الأوقات أمثلة')}</div><div class="tz">${YVI('world',14)}${q?T.tzQ:T.tzMine+' ('+myTZ+')'}${myTZ!==SLOT_TZ?` · <button id="tzb">${q?T.showMine:T.showQ}</button>`:''}</div>
  <div class="h4"><i>2</i>${T.s2}</div><textarea id="note" maxlength="240" placeholder="${esc(T.help)}">${esc(B.note)}</textarea><div class="count"><span id="cnt">${B.note.length}</span>/240</div>
  <div class="h4"><i>3</i>${T.s3}</div>
  <div class="policy"><b>${T.pol}</b><ul>${T.polL.map(x=>`<li>${x}</li>`).join('')}</ul></div>
  <label class="chk"><input type="checkbox" id="under" ${B.minor?'checked':''}>${T.under}</label>
  ${B.minor?`<div class="minor">${T.minor}<input id="par" type="email" placeholder="${T.parent}" value="${esc(B.parent)}" style="width:100%;height:44px;margin-top:10px;border:1.5px solid #F2DDAA;border-radius:12px;padding:0 12px;background:#fff;outline:none" dir="ltr"></div>`:''}
  <label class="chk"><input type="checkbox" id="agree" ${B.agree?'checked':''}>${T.agree}</label>
- <div class="sum"><span>${T.total} <small style="color:var(--mut)">(${T.sample})</small></span><b>${cur(price)}</b></div>
+ <div class="sum"><span>${T.total}</span><b>${cur(price)}</b></div>
  <button class="btn dark pay" id="pay" ${ready?'':'disabled'}>${T.pay}</button><p class="fine">${T.fine}</p>`);
  const sb=$('#sb');
  sb.querySelectorAll('[data-len]').forEach(b=>b.onclick=()=>{B.len=+b.dataset.len;keep(drawB);});
@@ -248,7 +249,7 @@ function confirmB(){const t=new Date(B.t),ic=n=>YVI(n,18);
 
 /* mentor side */
 const W={days:[0,1,3],from:'16:00',to:'21:00',p30:150,p60:260};
-function renderSide(){const ups=[{n:'[اسم اليوير]',ini:'س',note:en?'I want feedback on my first design portfolio.':'أريد رأياً في أول ملف أعمال صممته.',d:1,h:'5:30',st:'pending'},
+function renderSide(){setTimeout(()=>YVLater($('#side'),en));const ups=[{n:'[اسم اليوير]',ini:'س',note:en?'I want feedback on my first design portfolio.':'أريد رأياً في أول ملف أعمال صممته.',d:1,h:'5:30',st:'pending'},
  {n:'[اسم اليوير]',ini:'م',note:en?'How do I price my first freelance project?':'كيف أسعّر أول مشروع حر لي؟',d:2,h:'7:00',st:'ok'},
  {n:'[اسم اليوير]',ini:'ر',note:en?'Choosing between two university majors.':'أحتار بين تخصصين في الجامعة.',d:4,h:'4:00',st:'ok'}];
  $('#side').innerHTML=`<div class="kp"><div class="box"><small>${T.kp1}</small><b>3</b></div><div class="box"><small>${T.kp2}</small><b>${cur(1240)}</b></div><div class="box"><small>${T.kp3}</small><b>4.9</b></div></div>
