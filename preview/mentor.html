@@ -203,7 +203,7 @@ function renderDir(){setTimeout(()=>YVLater(document.querySelector('main'),en));
 renderDir();
 /* approved mentors from the database replace the samples as soon as there is at least one */
 (async()=>{try{if(!window.supabase)return;const sb=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm',{auth:{persistSession:false}});
- const [mt,av]=await Promise.all([sb.from('mentors').select('id,name,field,bio,langs,light,price_30,price_60').eq('approved',true).order('created_at'),sb.from('mentor_availability').select('mentor_id,weekday,start_time,end_time')]);
+ const [mt,av]=await Promise.all([sb.from('mentors').select('id,name,field,bio,langs,light,price_30,price_60').eq('approved',true).eq('kind','mentor').order('created_at'),sb.from('mentor_availability').select('mentor_id,weekday,start_time,end_time')]);
  if(mt.error||av.error||!mt.data.length)return;
  const toH=t=>{const [h,m]=t.split(':');return +h+(+m)/60;};
  M=mt.data.map((r,i)=>{const hd={};av.data.filter(a=>a.mentor_id===r.id).forEach(a=>{const s=toH(a.start_time),e=toH(a.end_time),list=hd[a.weekday]=hd[a.weekday]||[];for(let h=s;h+0.5<=e;h+=1.5)list.push(h);});
