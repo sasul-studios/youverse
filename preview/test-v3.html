@@ -157,7 +157,7 @@ function score(){const n={H:0,F:0,O:0,S:0,C:0};   /* client's table: one point p
  return ['H','F','O','S','C'].find(k=>n[k]===top);}   /* tie: first in this order wins - Horizon, Forge, Orbit, Spark, Compass */
 function render(anim){const t=T();let h='';document.body.className=S.screen==='result'?'lit':'dark';
  if(S.screen==='welcome'){
-  h=`<section class="screen c">${HALO('')}<h1 class="serif st" style="--d:.1s">${esc(t.headline)}</h1><p class="under st" style="--d:.6s">${esc(t.underline)}</p>
+  h=`<section class="screen c">${HALO('')}<h1 class="serif st" style="--d:.1s">${esc(t.headline)}</h1>${t.underline?`<p class="under st" style="--d:.6s">${esc(t.underline)}</p>`:''}
   <p class="lead st" style="--d:.95s">${esc(t.intro)}</p>
   <input class="field st" style="--d:1.1s" id="name" maxlength="30" autocomplete="given-name" placeholder="${esc(t.nameField)}" value="${esc(S.name)}">
   <div class="st" style="--d:1.25s"><button class="btn" id="start" type="button">${esc(t.start)}</button></div><p class="note st" style="--d:1.4s">${esc(t.startNote)}</p></section>`;}

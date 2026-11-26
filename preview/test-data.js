@@ -11,7 +11,7 @@ window.YV_TEST = {
   en: {
     dir: 'ltr',
     headline: 'The world is dark. Find your Light.',
-    underline: 'اكتشف ضوءك',
+    underline: '',
     intro: 'Ten questions tell you which Light you are, which World you belong in, and what to do in your first seven days as a Youer.',
     nameField: 'Your first name', start: 'Enter the Youverse', startNote: 'About three minutes. Free.', you: 'You',
     qOf: (n) => 'Question ' + n + ' of 10', cont: 'Continue', back: 'Back', close: 'Exit',
