@@ -86,6 +86,11 @@ ${doors}
 for(const [k,en] of [['Main.dc.html',false],['Main-EN.dc.html',true]]){const s=P[k],a=s.indexOf('<section',s.indexOf('</header>')),b=s.indexOf('</section>',a);
  if(a>0&&b>0)P[k]=s.slice(0,a)+portal(en)+s.slice(b+10);}
 
+/* journey: «You» is now «مساحتي» / «My space» */
+for(const [k,en] of [['Main.dc.html',false],['Main-EN.dc.html',true]]){let x=P[k];
+ x=en?x.split("title:'You',").join("title:'My space',").split('Follow your journey in You').join('Follow your journey in My space')
+     :x.split("title:'You',").join("title:'مساحتي',").split('تابع رحلتك في You').join('تابع رحلتك في مساحتي');P[k]=x;}
+
 /* emoji -> line icons (yv-icons.js) */
 if(window.YVI){const Y=window.YVI,M={'📖':'book','⏱️':'clock','⏱':'clock','🎧':'media','🏅':'award'};
  for(const k in P){let s=P[k];
