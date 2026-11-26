@@ -88,6 +88,17 @@ body.listing .list{display:block}body.listing .space{display:none}
  .peek{position:fixed;left:12px!important;right:12px!important;top:auto!important;bottom:16px;width:auto}
 }
 </style>
+<link rel="preload" as="image" href="img/logo-h128.webp">
+<script>window.YV_LOGO='img/logo-h128.webp';</script>
+<style id="yv-fix-stars">
+html,body{overscroll-behavior-y:none}html{background:#03060E}
+@media (max-width:760px){
+ .stars{padding:30px 18px 26px!important;margin:-6px -18px -10px!important}
+ .star i{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 10%,transparent),0 0 16px -4px var(--c)!important}
+ .star.on i,.star:focus-visible i{transform:scale(1.08)!important;box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 22%,transparent),0 0 22px 0 var(--c)!important}
+ .star:focus-visible{outline:none}
+}
+</style>
 </head>
 <body>
 <div id="sky"><canvas id="s1"></canvas><canvas id="s2"></canvas><canvas id="s3"></canvas></div>

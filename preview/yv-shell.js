@@ -21,7 +21,7 @@ const tLabel=light&&LN.ar[light]?T.your+LN[en?'en':'ar'][light]:T.test,tHref=lig
 const nav=links.map(([k,t,u])=>'<a href="'+u+'"'+(k===page?' class="on" aria-current="page"':'')+'>'+svg(k)+'<span>'+t+'</span></a>').join('');
 const other=location.pathname.split('/').pop()+(en?'':'?lang=en');
 box.outerHTML=`<header class="ys" dir="${en?'ltr':'rtl'}"><div class="ys-row">
-<a class="ys-logo" href="${APP+h}" aria-label="Youverse"><img src="${window.YV_LOGO||'img/1e4dffc431313b7bc68eadda79d3417c.png'}" alt="Youverse" width="86" height="32"></a>
+<a class="ys-logo" href="${APP+h}" aria-label="Youverse"><img src="${window.YV_LOGO||'img/logo-h128.webp'}" alt="Youverse" width="86" height="32"></a>
 <nav class="ys-nav">${nav}</nav>
 <div class="ys-acts"><a class="ys-sec" href="${APP}#${en?'register-en':'register'}">${T.login}</a><a class="ys-lang" href="${other}">${svg('globe')}<span>${T.lang}</span></a><a class="ys-test" href="${tHref}">${tLabel}</a>
 <button class="ys-burger" type="button" aria-label="${T.menu}" aria-expanded="false"><i></i><i></i><i></i></button></div>

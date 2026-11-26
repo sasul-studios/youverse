@@ -25,7 +25,7 @@ function header(k){
  const tHref=light?(en?'YouFinder-EN.dc.html':'YouFinder.dc.html'):(en?TEST+'?lang=en':TEST);
  return `<header style="background: #FFFFFF; border-bottom: 1px solid #E6EEF0">
 <div style="max-width: 1240px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
-<a href="Main${E}.dc.html" aria-label="${en?'Youverse home':'Youverse الرئيسية'}"><img src="/_blob/1e4dffc431313b7bc68eadda79d3417c" alt="Youverse" style="height: 44px; display: block"></a>
+<a href="Main${E}.dc.html" aria-label="${en?'Youverse home':'Youverse الرئيسية'}"><img src="img/logo-h128.webp" alt="Youverse" style="height: 44px; display: block"></a>
 <nav style="display: flex; flex-wrap: wrap; gap: 28px; font-size: 16px; font-weight: 700"><a href="Main${E}.dc.html"${on('Main.dc.html')}>${L.home}</a><a href="YouFinder${E}.dc.html"${on('YouFinder.dc.html')}>YouFinder</a><a href="Main${E}.dc.html#worlds">YouPartner</a><a href="mentor.html${en?'?lang=en':''}">${L.mentor}</a><a href="You${E}.dc.html"${on('You.dc.html')}>${L.you}</a></nav>
 <div style="display: flex; gap: 12px; align-items: center">
 <a href="Register${E}.dc.html" style="font-weight: 700; padding: 12px 18px">${L.login}</a>
