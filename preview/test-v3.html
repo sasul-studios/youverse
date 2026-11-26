@@ -182,7 +182,7 @@ function render(anim){const t=T();let h='';document.body.className=S.screen==='r
   <div class="grid2"><div class="card"><h3>${YVI("bolt",19)} ${esc(t.sections.superpower)}</h3><p>${esc(L.superpower)}</p></div>
   <div class="card"><h3>${YVI("moon",19)} ${esc(t.sections.shadow)}</h3><p>${esc(L.shadow)}</p></div></div>
   <div class="card world sec"><h3>${YVI("world",19)} ${esc(t.sections.world)}</h3><div class="wn serif">${esc(L.world)}</div><p style="color:rgba(234,244,246,.85)">${esc(L.worldDesc)}</p>
-   <button class="btn" id="enter" type="button">${esc(t.enterWorld(L.world))}</button>${S.worldOpen?`<div class="soon">${esc(t.worldSoon)}<br><a href="#" id="peek" style="color:var(--c);font-weight:800">${lang==='ar'?'معاينة: شاهد عالمك في YouFinder ←':'Preview: see your World in YouFinder →'}</a></div>`:''}</div>
+   <button class="btn" id="enter" type="button">${esc(t.enterWorld(L.world))}</button>${S.worldOpen?`<div class="soon">${esc(t.worldSoon)}<br><a href="#" id="peek" style="color:var(--c);font-weight:800">${lang==='ar'?'معاينة: شاهد عالمك في عالم يو فايندر ←':'Preview: see your World in YouFinder →'}</a></div>`:''}</div>
   <div class="card sec"><h3>${YVI("cap",19)} ${esc(t.sections.matches)}</h3><div class="mlist">${L.matches.map(m=>`<div class="mi"><i>${YVI("play",12,"currentColor",2)}</i><span>${esc(m)}</span></div>`).join('')}</div></div>
   <div class="card sec"><h3 style="justify-content:space-between"><span>${YVI("calendar",19)} ${esc(t.sections.days)}</span><span class="draft">${lang==='ar'?'مسودة':'Draft'}</span></h3>
    <div class="days">${L.days.map((d,k)=>`<div class="day"><small>${esc(t.dayLabel(k+1))}</small><span>${esc(d)}</span></div>`).join('')}</div></div>

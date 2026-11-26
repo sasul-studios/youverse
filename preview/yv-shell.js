@@ -7,15 +7,15 @@ const APP='app'+X+'.html',TEST='test'+X+'.html',FINDER='finder'+X+'.html',MENTOR
 let light=null;try{light=localStorage.getItem('yvLight');}catch(e){}
 const LN={ar:{H:'الأفق',F:'الصانع',O:'المدار',S:'الشرارة',C:'البوصلة'},en:{H:'Horizon',F:'Forge',O:'Orbit',S:'Spark',C:'Compass'}};
 const box=document.getElementById('yv-shell');const page=box&&box.dataset.page||'';
-const T=en?{home:'Home',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',menu:'Menu'}
-          :{home:'الرئيسية',mentor:'يو مينتور',login:'تسجيل الدخول',test:'ابدأ الاختبار',your:'ضوؤك: ',lang:'EN',menu:'القائمة'};
+const T=en?{home:'Home',finder:'YouFinder',partner:'YouPartner',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',menu:'Menu'}
+          :{home:'الرئيسية',finder:'عالم يو فايندر',partner:'عالم يو بارتنر',mentor:'عالم يو مينتور',login:'تسجيل الدخول',test:'ابدأ الاختبار',your:'ضوؤك: ',lang:'EN',menu:'القائمة'};
 const q=en?'?lang=en':'',h=en?'#en':'#home';
 const I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',finder:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
  partner:'<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M10.5 20a5.5 5.5 0 0 1 11 0"/>',
  mentor:'<path d="M4.5 5.5h15a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5h-1a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z"/><path d="M8.5 10h7M8.5 13h4.5"/>',
  you:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'};
 const svg=k=>'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[k]+'</svg>';
-const links=[['home',T.home,APP+h],['finder','YouFinder',FINDER+q],['partner','YouPartner',APP+h.replace('#','#')+'' ],['mentor',T.mentor,MENTOR+q],['you','You',APP+(en?'#you-en':'#you')]];
+const links=[['home',T.home,APP+h],['finder',T.finder,FINDER+q],['partner',T.partner,APP+h.replace('#','#')+'' ],['mentor',T.mentor,MENTOR+q],['you','You',APP+(en?'#you-en':'#you')]];
 links[2][2]=APP+(en?'#en':'#home');   /* YouPartner lives on the home page for now */
 const tLabel=light&&LN.ar[light]?T.your+LN[en?'en':'ar'][light]:T.test,tHref=light?FINDER+q:TEST+q;
 const nav=links.map(([k,t,u])=>'<a href="'+u+'"'+(k===page?' class="on" aria-current="page"':'')+'>'+svg(k)+'<span>'+t+'</span></a>').join('');

@@ -47,8 +47,10 @@ window.yvPhoneHeader=function(box){ph(box);
 
 /* nav icon for YouMentor (same line style as the other header icons) */
 const yh=window.yvHeader;
+const arName=t=>t.replace(/YouFinder(?!s)/g,'يو فايندر').replace(/YouPartner/g,'يو بارتنر').replace(/YouMentor/g,'يو مينتور').replace(/(?:عالم\s+)?(?:ال)?يو\s?(فايندر|بارتنر|مينتور)(?!ز)/g,'عالم يو $1');   /* Arabic: the three worlds are always «عالم يو فايندر / عالم يو بارتنر / عالم يو مينتور» */
 window.yvHeader=function(box,phone){yh(box,phone);
- box.querySelectorAll('header nav a').forEach(a=>{const t=a.textContent.trim();if((t==='يو مينتور'||t==='YouMentor')&&!a.querySelector('svg'))a.innerHTML=ico('mentor',16,'currentColor')+'<span>'+t+'</span>';});};
+ if(document.documentElement.lang!=='en'){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const v=n.nodeValue,r=arName(v);if(r!==v)n.nodeValue=r;}}
+ box.querySelectorAll('header nav a').forEach(a=>{const t=a.textContent.trim();if((t==='يو مينتور'||t==='عالم يو مينتور'||t==='YouMentor')&&!a.querySelector('svg'))a.innerHTML=ico('mentor',16,'currentColor')+'<span>'+t+'</span>';});};
 
 /* ---------- home: a portal with three doors ---------- */
 function portal(en){
@@ -56,9 +58,9 @@ function portal(en){
   {h:'YouFinder.dc.html',t:'YouFinder World',d:'People who built something real, each with their own world.',i:'finder',bg:'#0C1E25',fg:'#FFFFFF',sub:'rgba(232,244,246,0.75)',ib:'rgba(92,225,230,0.12)',ic:'#5CE1E6',bb:'#BFF3F5',bc:'#032E36'},
   {h:'Main-EN.dc.html#worlds',t:'YouPartner World',d:'Partners who open doors: internships, masterclasses and certificates.',i:'partner',bg:'#DFF4F5',fg:'#032E36',sub:'#3E5C62',ib:'#FFFFFF',ic:'#127F87',bb:'#032E36',bc:'#FFFFFF'},
   {h:'mentor.html?lang=en',t:'YouMentor',d:'Book a one-to-one online session with a mentor in your field.',i:'mentor',bg:'#FBF1DE',fg:'#032E36',sub:'#5B5446',ib:'#FFFFFF',ic:'#9A6A12',bb:'#032E36',bc:'#FFFFFF'}]:[
-  {h:'YouFinder.dc.html',t:'عالم اليو فايندر',d:'شخصيات بنت شيئاً حقيقياً، ولكل منها عالمها.',i:'finder',bg:'#0C1E25',fg:'#FFFFFF',sub:'rgba(232,244,246,0.75)',ib:'rgba(92,225,230,0.12)',ic:'#5CE1E6',bb:'#BFF3F5',bc:'#032E36'},
-  {h:'Main.dc.html#worlds',t:'عالم اليو بارتنر',d:'جهات تفتح لك الأبواب: تدريب وماستركلاس وشهادات.',i:'partner',bg:'#DFF4F5',fg:'#032E36',sub:'#3E5C62',ib:'#FFFFFF',ic:'#127F87',bb:'#032E36',bc:'#FFFFFF'},
-  {h:'mentor.html',t:'يو مينتور',d:'احجز جلسة فردية أونلاين مع مرشد في تخصصك.',i:'mentor',bg:'#FBF1DE',fg:'#032E36',sub:'#5B5446',ib:'#FFFFFF',ic:'#9A6A12',bb:'#032E36',bc:'#FFFFFF'}];
+  {h:'YouFinder.dc.html',t:'عالم يو فايندر',d:'شخصيات بنت شيئاً حقيقياً، ولكل منها عالمها.',i:'finder',bg:'#0C1E25',fg:'#FFFFFF',sub:'rgba(232,244,246,0.75)',ib:'rgba(92,225,230,0.12)',ic:'#5CE1E6',bb:'#BFF3F5',bc:'#032E36'},
+  {h:'Main.dc.html#worlds',t:'عالم يو بارتنر',d:'جهات تفتح لك الأبواب: تدريب وماستركلاس وشهادات.',i:'partner',bg:'#DFF4F5',fg:'#032E36',sub:'#3E5C62',ib:'#FFFFFF',ic:'#127F87',bb:'#032E36',bc:'#FFFFFF'},
+  {h:'mentor.html',t:'عالم يو مينتور',d:'احجز جلسة فردية أونلاين مع مرشد في تخصصك.',i:'mentor',bg:'#FBF1DE',fg:'#032E36',sub:'#5B5446',ib:'#FFFFFF',ic:'#9A6A12',bb:'#032E36',bc:'#FFFFFF'}];
  const T=en?{badge:'A platform to discover yourself and your skills',h1:'Discover your world,<br>begin your journey',sub:'Three worlds are waiting for you. Choose what suits you and step in.',go:'Enter',dark:'The world is dark.',find:'Find your Light.',orb:'Ten questions tell you which Light you are, and which world you belong to.',cta:'Take the test'}
            :{badge:'منصة لاكتشاف الذات والمهارات',h1:'اكتشف عالمك،<br>وابدأ رحلتك',sub:'ثلاثة عوالم بانتظارك. اختر ما يناسبك وادخل.',go:'ادخل',dark:'العالم مظلم.',find:'اكتشف ضوءك.',orb:'عشرة أسئلة تخبرك أي ضوء أنت، وأي عالم تنتمي إليه.',cta:'ابدأ الاختبار'};
  const doors=D.map(d=>`<a class="yv-door" href="${d.h}" style="display: flex; flex-direction: column; gap: 14px; min-height: 300px; padding: 30px 30px 28px; border-radius: 28px; background: ${d.bg}; color: ${d.fg}; box-shadow: 0 24px 50px -32px rgba(3,46,54,0.45); border: 1px solid rgba(3,46,54,0.06)">
