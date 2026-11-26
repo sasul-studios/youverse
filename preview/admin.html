@@ -157,17 +157,26 @@ html[dir=rtl] .dr{transform:translateX(-105%)}.dr.on{transform:none!important}
   <button type="button" class="fg" id="fgo">نسيت كلمة المرور؟</button>
   <div class="err" id="lerr"></div>
   <button type="submit">دخول</button>
-  <div class="note">نسخة معاينة ببيانات تجريبية: اكتب أي بريد وكلمة مرور.<br>بعد الربط بـ Supabase يصير الدخول لحساب المدير فقط.</div>
+  <button type="button" class="back" id="first">أول دخول للمدير؟ أرسل لي رابط الدخول</button>
+  <button type="button" class="back" id="demo" style="margin-top:6px">تصفّح نسخة تجريبية ببيانات وهمية</button>
+ </form>
+ <form class="lg hide" id="npf" autocomplete="off">
+  <img src="img/e71bb002c61cd7d156a7ad3ffea2d570.png" alt="Youverse">
+  <h1>كلمة مرور جديدة</h1>
+  <p>اختر كلمة مرور لحساب المدير</p>
+  <label>كلمة المرور الجديدة</label><input id="np1" type="password" minlength="8" required>
+  <label>تأكيدها</label><input id="np2" type="password" minlength="8" required>
+  <div class="err" id="nperr"></div>
+  <button type="submit">حفظ والدخول</button>
  </form>
  <form class="lg hide" id="rsf" autocomplete="off">
   <img src="img/e71bb002c61cd7d156a7ad3ffea2d570.png" alt="Youverse">
-  <h1>استعادة كلمة المرور</h1>
-  <p>اكتب بريد حساب المدير، ونرسل لك رابطاً لتعيين كلمة مرور جديدة</p>
+  <h1 id="rsT">استعادة كلمة المرور</h1>
+  <p id="rsP">اكتب بريد حساب المدير، ونرسل لك رابطاً لتعيين كلمة مرور جديدة</p>
   <label>البريد الإلكتروني</label><input id="re" type="email" placeholder="admin@youverse.qa" required>
-  <button type="submit">إرسال رابط الاستعادة</button>
+  <button type="submit" id="rsB">إرسال رابط الاستعادة</button>
   <div class="ok hide" id="rok"></div>
   <button type="button" class="back" id="rback">→ العودة لتسجيل الدخول</button>
-  <div class="note">نسخة معاينة: الرابط يوصل فعلياً بعد الربط بـ Supabase.</div>
  </form>
 </section>
 
@@ -181,7 +190,7 @@ html[dir=rtl] .dr{transform:translateX(-105%)}.dr.on{transform:none!important}
   <div class="top">
    <button class="burger" id="burger">☰</button>
    <div><h1 id="pt"></h1><div class="sub" id="ps"></div></div>
-   <div class="r"><span class="chip demo">بيانات تجريبية</span><span class="chip" id="today"></span></div>
+   <div class="r"><span class="chip demo" id="modeChip">بيانات تجريبية</span><span class="chip" id="today"></span></div>
   </div>
   <div id="view"></div>
  </main>
@@ -192,39 +201,62 @@ html[dir=rtl] .dr{transform:translateX(-105%)}.dr.on{transform:none!important}
 <div class="md" id="md"><button class="x" data-close>×</button><div id="mdb"></div></div>
 <div class="toast" id="toast"></div>
 
+<script src="yv-icons.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=n=>n.toLocaleString('en-US'),qar=n=>fmt(n)+' ر.ق';
 
-/* ---------- sample data (replaced by Supabase later) ---------- */
-const LIGHTS={H:{n:'الأفق',e:'🔭',w:'عالم المؤسسين',c:'#7FB2FF'},F:{n:'الصانع',e:'🏗️',w:'عالم الصنّاع',c:'#F2A93B'},O:{n:'المدار',e:'🌐',w:'عالم التأثير',c:'#5CE1E6'},S:{n:'الشرارة',e:'🎨',w:'عالم المبدعين',c:'#F08BB4'},C:{n:'البوصلة',e:'🧭',w:'عالم الاكتشاف',c:'#A99BFF'}};
-let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280,pick=a=>a[Math.floor(rnd()*a.length)];
-const FN=['سارة','محمد','نورة','عبدالله','مريم','خالد','ريم','فهد','لولوة','حمد','جواهر','يوسف','هيا','علي','دانة','سلطان','شيخة','راشد','العنود','ناصر','أمل','تميم','ليان','جاسم','روضة','مبارك','غلا','عمر','نوف','سعود'];
-const LN=['الكواري','المري','السليطي','العطية','النعيمي','الهاجري','المهندي','الخليفي','البوعينين','الدوسري','الكبيسي','المناعي'];
-const MC=[
- {id:1,t:'كيف تبدأ مشروعك الأول',m:'د. هند الأنصاري',w:'H',ch:6,min:45,p:149,st:'pub',en:214},
- {id:2,t:'صناعة المحتوى الذي يُلهم',m:'أ. فيصل الملا',w:'S',ch:8,min:60,p:179,st:'pub',en:301},
- {id:3,t:'التفكير الهندسي للمبتدئين',m:'م. عائشة الجابر',w:'F',ch:5,min:40,p:129,st:'pub',en:122},
- {id:4,t:'فن الإقناع والتأثير',m:'أ. ماجد الحمادي',w:'O',ch:7,min:55,p:169,st:'pub',en:187},
- {id:5,t:'اكتشف شغفك الحقيقي',m:'د. لمى الشهابي',w:'C',ch:6,min:50,p:0,st:'pub',en:356},
- {id:6,t:'القيادة في عمر مبكر',m:'أ. بدر السويدي',w:'H',ch:4,min:35,p:149,st:'draft',en:0}];
-const USERS=[];const now=Date.now(),DAY=864e5;
-for(let i=0;i<64;i++){const f=pick(FN),l=pick(LN),lt=rnd()<.12?null:pick(Object.keys(LIGHTS)),age=13+Math.floor(rnd()*14),j=Math.floor(rnd()*60);
- const plan=lt&&rnd()<.42?pick(['شهري','سنوي']):null;
- USERS.push({id:1000+i,n:f+' '+l,e:'user'+(1000+i)+'@mail.com',age,lt,joined:now-j*DAY-Math.floor(rnd()*DAY),plan,
-  consent:age<18?(rnd()<.8?'ok':'wait'):null,prog:lt?Math.floor(rnd()*100):0,mcs:lt?Math.floor(rnd()*4):0,act:now-Math.floor(rnd()*9)*DAY,status:rnd()<.04?'blocked':'active'});}
-USERS.sort((a,b)=>b.joined-a.joined);
-const PAYS=[];USERS.filter(u=>u.plan||u.mcs).forEach((u,i)=>{const n=1+Math.floor(rnd()*2);for(let k=0;k<n;k++){const sub=u.plan&&k===0,m=pick(MC.filter(x=>x.p));
- PAYS.push({id:'SC-'+(48210+PAYS.length*7),u,what:sub?'اشتراك '+u.plan:m.t,amt:sub?(u.plan==='سنوي'?990:99):m.p,when:u.joined+Math.floor(rnd()*5)*DAY,st:rnd()<.86?'paid':rnd()<.6?'pend':'ref'});}});
-PAYS.sort((a,b)=>b.when-a.when);
+/* ---------- data: live from Supabase, or sample data for a demo ---------- */
+const SB=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm');   /* publishable key: safe in the page, access is enforced by row-level security */
+const LIGHTS={H:{n:'الأفق',e:YVI('H',15),w:'عالم المؤسسين',c:'#7FB2FF'},F:{n:'الصانع',e:YVI('F',15),w:'عالم الصنّاع',c:'#F2A93B'},O:{n:'المدار',e:YVI('O',15),w:'عالم التأثير',c:'#5CE1E6'},S:{n:'الشرارة',e:YVI('S',15),w:'عالم المبدعين',c:'#F08BB4'},C:{n:'البوصلة',e:YVI('C',15),w:'عالم الاكتشاف',c:'#A99BFF'}};
+const now=Date.now(),DAY=864e5;
+let DEMO=false,ME=null,USERS=[],PAYS=[],MC=[],RESULTS=[],SETTINGS={};
+function loadSample(){DEMO=true;let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280,pick=a=>a[Math.floor(rnd()*a.length)];
+ const FN=['سارة','محمد','نورة','عبدالله','مريم','خالد','ريم','فهد','لولوة','حمد','جواهر','يوسف','هيا','علي','دانة','سلطان','شيخة','راشد','العنود','ناصر','أمل','تميم','ليان','جاسم','روضة','مبارك','غلا','عمر','نوف','سعود'];
+ const LN=['الكواري','المري','السليطي','العطية','النعيمي','الهاجري','المهندي','الخليفي','البوعينين','الدوسري','الكبيسي','المناعي'];
+ MC=[{id:1,t:'كيف تبدأ مشروعك الأول',m:'د. هند الأنصاري',w:'H',ch:6,min:45,p:149,st:'pub',en:214},{id:2,t:'صناعة المحتوى الذي يُلهم',m:'أ. فيصل الملا',w:'S',ch:8,min:60,p:179,st:'pub',en:301},
+  {id:3,t:'التفكير الهندسي للمبتدئين',m:'م. عائشة الجابر',w:'F',ch:5,min:40,p:129,st:'pub',en:122},{id:4,t:'فن الإقناع والتأثير',m:'أ. ماجد الحمادي',w:'O',ch:7,min:55,p:169,st:'pub',en:187},
+  {id:5,t:'اكتشف شغفك الحقيقي',m:'د. لمى الشهابي',w:'C',ch:6,min:50,p:0,st:'pub',en:356},{id:6,t:'القيادة في عمر مبكر',m:'أ. بدر السويدي',w:'H',ch:4,min:35,p:149,st:'draft',en:0}];
+ USERS=[];for(let i=0;i<64;i++){const f=pick(FN),l=pick(LN),lt=rnd()<.12?null:pick(Object.keys(LIGHTS)),age=13+Math.floor(rnd()*14),j=Math.floor(rnd()*60);
+  const plan=lt&&rnd()<.42?pick(['شهري','سنوي']):null;
+  USERS.push({id:1000+i,n:f+' '+l,e:'user'+(1000+i)+'@mail.com',age,lt,joined:now-j*DAY-Math.floor(rnd()*DAY),plan,
+   consent:age<18?(rnd()<.8?'ok':'wait'):null,prog:lt?Math.floor(rnd()*100):0,mcs:lt?Math.floor(rnd()*4):0,act:now-Math.floor(rnd()*9)*DAY,status:rnd()<.04?'blocked':'active'});}
+ USERS.sort((a,b)=>b.joined-a.joined);
+ PAYS=[];USERS.filter(u=>u.plan||u.mcs).forEach(u=>{const n=1+Math.floor(rnd()*2);for(let k=0;k<n;k++){const sub=u.plan&&k===0,m=pick(MC.filter(x=>x.p));
+  PAYS.push({id:'SC-'+(48210+PAYS.length*7),u,what:sub?'اشتراك '+u.plan:m.t,amt:sub?(u.plan==='سنوي'?990:99):m.p,when:u.joined+Math.floor(rnd()*5)*DAY,st:rnd()<.86?'paid':rnd()<.6?'pend':'ref'});}});
+ PAYS.sort((a,b)=>b.when-a.when);
+ RESULTS=USERS.filter(u=>u.lt).map((u,i)=>({id:'r'+u.id,n:u.n,e:u.e,lt:u.lt,plan:i%4>0,when:u.joined,uid:u.id}));
+ SETTINGS={registration_open:true,parental_consent_required:true,send_7day_plan:true,maintenance:false,notify_each_payment:true,weekly_summary:true,notify_consent_request:false};}
+const T=t=>t?new Date(t).getTime():null;
+async function loadReal(){DEMO=false;
+ const [pr,rs,od,mc,en,st]=await Promise.all([SB.from('profiles').select('*').order('created_at',{ascending:false}),SB.from('test_results').select('*').order('created_at',{ascending:false}).limit(1000),
+  SB.from('orders').select('*').order('created_at',{ascending:false}).limit(1000),SB.from('masterclasses').select('*').order('created_at',{ascending:false}),
+  SB.from('enrollments').select('user_id,masterclass_id,progress'),SB.from('settings').select('key,value')]);
+ for(const r of [pr,rs,od,mc,en,st])if(r.error)throw r.error;
+ const lastLight={};rs.data.forEach(r=>{const k=r.user_id||('mail:'+(r.email||'').toLowerCase());if(!lastLight[k])lastLight[k]=r.light;});
+ const enr={};en.data.forEach(x=>{(enr[x.user_id]=enr[x.user_id]||[]).push(x);});
+ const yr=new Date().getFullYear();
+ USERS=pr.data.filter(p=>p.role!=='admin').map(p=>{const e=enr[p.id]||[];return {id:p.id,n:p.full_name||p.email||'—',e:p.email||'',age:p.birth_year?yr-p.birth_year:'—',lt:p.light||lastLight[p.id]||lastLight['mail:'+(p.email||'').toLowerCase()]||null,
+  joined:T(p.created_at),plan:p.plan==='monthly'?'شهري':p.plan==='yearly'?'سنوي':null,consent:p.is_minor?(p.parent_consent==='approved'?'ok':'wait'):null,
+  prog:e.length?Math.round(e.reduce((s,x)=>s+x.progress,0)/e.length):0,mcs:e.length,act:T(p.last_seen_at||p.created_at),status:p.status};});
+ const byId={};USERS.forEach(u=>byId[u.id]=u);
+ PAYS=od.data.map(o=>({id:o.skipcash_payment_id||o.id.slice(0,8).toUpperCase(),u:byId[o.user_id]||{id:'',n:'—'},what:o.item_label||o.item_type,amt:+o.amount_qar,when:T(o.paid_at||o.created_at),
+  st:{paid:'paid',pending:'pend',refunded:'ref',failed:'fail',cancelled:'fail'}[o.status]}));
+ const cnt={};en.data.forEach(x=>cnt[x.masterclass_id]=(cnt[x.masterclass_id]||0)+1);
+ MC=mc.data.map(m=>({id:m.id,t:m.title_ar,m:m.mentor_name||'',w:m.world,ch:m.chapters,min:m.minutes,p:+m.price_qar,st:m.status==='published'?'pub':'draft',en:cnt[m.id]||0,d:m.description_ar||''}));
+ RESULTS=rs.data.map(r=>({id:r.id,n:r.name||'—',e:r.email||'',lt:r.light,plan:r.plan_requested,when:T(r.created_at),uid:r.user_id||''}));
+ SETTINGS={};st.data.forEach(x=>SETTINGS[x.key]=x.value===true||x.value==='true');}
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const emptyMsg=t=>`<div class="empty">${t}</div>`;
 
 /* ---------- helpers ---------- */
 const ago=t=>{const d=Math.floor((now-t)/DAY);return d<=0?'اليوم':d===1?'أمس':d===2?'قبل يومين':d<11?'قبل '+d+' أيام':'قبل '+d+' يوم';};
 const date=t=>new Date(t).toLocaleDateString('ar-QA',{day:'numeric',month:'short',year:'numeric'});
 const lightTag=k=>k?`<span class="lt" style="background:${LIGHTS[k].c}22;color:#032E36">${LIGHTS[k].e} ${LIGHTS[k].n}</span>`:'<span class="st mute">لم يكمل الاختبار</span>';
-const ini=n=>n.trim()[0];
+const ini=n=>(String(n).trim()[0]||'؟');
 const avatar=(n,k)=>`<div class="av" style="background:linear-gradient(135deg,${k?LIGHTS[k].c:'#CFE3E6'},#D9D5F5)">${esc(ini(n))}</div>`;
-const payStat=s=>({paid:'<span class="st ok">مدفوع</span>',pend:'<span class="st warn">معلّق</span>',ref:'<span class="st bad">مسترد</span>'}[s]);
+const payStat=s=>({paid:'<span class="st ok">مدفوع</span>',pend:'<span class="st warn">معلّق</span>',ref:'<span class="st bad">مسترد</span>',fail:'<span class="st mute">فشل / ملغى</span>'}[s]);
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200);};
 const csv=(name,rows)=>{const b=new Blob(['﻿'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();};
 const I={
@@ -245,27 +277,28 @@ const PAGES=[
 /* ---------- views ---------- */
 const V={};
 V.home=()=>{
- const done=USERS.filter(u=>u.lt),subs=USERS.filter(u=>u.plan),month=PAYS.filter(p=>p.st==='paid'&&now-p.when<30*DAY).reduce((s,p)=>s+p.amt,0);
+ const done=RESULTS,subs=USERS.filter(u=>u.plan),month=PAYS.filter(p=>p.st==='paid'&&now-p.when<30*DAY).reduce((s,p)=>s+p.amt,0),new7=USERS.filter(u=>now-u.joined<7*DAY).length;
  const days=[...Array(30)].map((_,i)=>USERS.filter(u=>Math.floor((now-u.joined)/DAY)===29-i).length);
  const cnt=k=>done.filter(u=>u.lt===k).length;
  const act=[...USERS.slice(0,4).map(u=>({t:u.joined,h:`${avatar(u.n,u.lt)}<div><b>${esc(u.n)}</b> سجّل في المنصة<small>${u.lt?'نتيجته: '+LIGHTS[u.lt].e+' '+LIGHTS[u.lt].n:'لم يكمل الاختبار بعد'}</small></div>`})),
-  ...PAYS.slice(0,3).map(p=>({t:p.when,h:`<div class="av" style="background:#E3F6EE">💳</div><div><b>${esc(p.u.n)}</b> دفع ${qar(p.amt)}<small>${esc(p.what)}</small></div>`}))].sort((a,b)=>b.t-a.t).slice(0,6);
+  ...RESULTS.filter(r=>!r.uid).slice(0,3).map(r=>({t:r.when,h:`${avatar(r.n,r.lt)}<div><b>${esc(r.n)}</b> أكمل اختبار الضوء<small>${LIGHTS[r.lt].e} ${LIGHTS[r.lt].n}</small></div>`})),
+  ...PAYS.slice(0,3).map(p=>({t:p.when,h:`<div class="av" style="background:#E3F6EE">${YVI('award',18,'#1E9E6A')}</div><div><b>${esc(p.u.n)}</b> دفع ${qar(p.amt)}<small>${esc(p.what)}</small></div>`}))].sort((a,b)=>b.t-a.t).slice(0,6);
  return `<div class="grid kpis">
-  ${kpi('👥','#E8F7F8','المستخدمون المسجلون',fmt(USERS.length),'+18% عن الشهر الماضي',1)}
-  ${kpi('✨','#EEEBFC','أكملوا اختبار الضوء',fmt(done.length),Math.round(done.length/USERS.length*100)+'% من المسجلين',1)}
-  ${kpi('🎓','#FCEEF3','الاشتراكات النشطة',fmt(subs.length),'+6 هذا الأسبوع',1)}
-  ${kpi('💰','#FFF3DA','إيرادات آخر 30 يوم',qar(month),'+11% عن الشهر الماضي',1)}
+  ${kpi(YVI('stack',17,'#127F87'),'#E8F7F8','المستخدمون المسجلون',fmt(USERS.length),'+'+new7+' هذا الأسبوع',1)}
+  ${kpi(YVI('sparkle',17,'#6B5BD6'),'#EEEBFC','نتائج اختبار الضوء',fmt(done.length),'تشمل الزوار بدون حساب',1)}
+  ${kpi(YVI('cap',17,'#C2507F'),'#FCEEF3','الاشتراكات النشطة',fmt(subs.length),pct(subs.length,USERS.length)+'% من المسجلين',1)}
+  ${kpi(YVI('award',17,'#B8860B'),'#FFF3DA','إيرادات آخر 30 يوم',qar(month),PAYS.filter(p=>p.st==='paid'&&now-p.when<30*DAY).length+' عملية مدفوعة',1)}
  </div>
  <div class="grid two">
   <div class="card"><h3>التسجيلات اليومية</h3><div class="hint">عدد الحسابات الجديدة كل يوم</div>${line(days)}</div>
-  <div class="card"><h3>توزيع الأضواء</h3><div class="hint">نتائج ${fmt(done.length)} مستخدم أكملوا الاختبار</div><div class="bars">
-   ${Object.keys(LIGHTS).map(k=>{const c=cnt(k),p=Math.round(c/done.length*100);return `<div class="bar"><div class="t">${LIGHTS[k].e} ${LIGHTS[k].n} <span>${c} · ${p}%</span></div><div class="b"><i style="width:${p*2.2}%;background:${LIGHTS[k].c}"></i></div></div>`}).join('')}
+  <div class="card"><h3>توزيع الأضواء</h3><div class="hint">نتائج ${fmt(done.length)} اختبار</div><div class="bars">
+   ${done.length?'':emptyMsg('لا توجد نتائج بعد')}${!done.length?'':Object.keys(LIGHTS).map(k=>{const c=cnt(k),p=pct(c,done.length);return `<div class="bar"><div class="t">${LIGHTS[k].e} ${LIGHTS[k].n} <span>${c} · ${p}%</span></div><div class="b"><i style="width:${p*2.2}%;background:${LIGHTS[k].c}"></i></div></div>`}).join('')}
   </div></div>
  </div>
  <div class="grid two">
-  <div class="card"><h3>آخر النشاطات</h3><div class="hint">تسجيلات ومدفوعات جديدة</div><div class="list">${act.map(a=>`<div class="it">${a.h}<span class="when">${ago(a.t)}</span></div>`).join('')}</div></div>
+  <div class="card"><h3>آخر النشاطات</h3><div class="hint">تسجيلات ومدفوعات جديدة</div><div class="list">${act.length?act.map(a=>`<div class="it">${a.h}<span class="when">${ago(a.t)}</span></div>`).join(''):emptyMsg('لا يوجد نشاط بعد')}</div></div>
   <div class="card"><h3>الأكثر التحاقاً</h3><div class="hint">الماستركلاس حسب عدد الملتحقين</div><div class="list">
-   ${MC.filter(m=>m.st==='pub').sort((a,b)=>b.en-a.en).slice(0,5).map((m,i)=>`<div class="it"><span class="dot" style="background:${LIGHTS[m.w].c}"></span><div><b>${esc(m.t)}</b><small>${esc(m.m)}</small></div><span class="when">${fmt(m.en)} ملتحق</span></div>`).join('')}
+   ${MC.filter(m=>m.st==='pub').length?'':emptyMsg('لا توجد ماستركلاس منشورة بعد')}${MC.filter(m=>m.st==='pub').sort((a,b)=>b.en-a.en).slice(0,5).map((m,i)=>`<div class="it"><span class="dot" style="background:${LIGHTS[m.w].c}"></span><div><b>${esc(m.t)}</b><small>${esc(m.m)}</small></div><span class="when">${fmt(m.en)} ملتحق</span></div>`).join('')}
   </div></div>
  </div>`;};
 const kpi=(e,bg,l,v,d,up)=>`<div class="card kpi"><div class="l"><i style="background:${bg}">${e}</i>${l}</div><div class="v">${v}</div><div class="d ${up?'up':'dn'}">${d}</div></div>`;
@@ -289,7 +322,7 @@ const uFilter=()=>USERS.filter(u=>(!uq||u.n.includes(uq)||u.e.includes(uq))&&(!u
 const uRows=()=>{const r=uFilter();$('#ub').innerHTML=r.length?r.map(u=>`<tr data-u="${u.id}"><td><div class="u">${avatar(u.n,u.lt)}<div><b>${esc(u.n)}</b><small>${u.e}</small></div></div></td><td>${lightTag(u.lt)}</td><td>${u.age}</td>
  <td>${u.plan?'<span class="st ok">'+u.plan+'</span>':'<span class="st mute">مجاني</span>'}</td><td>${u.consent==null?'—':u.consent==='ok'?'<span class="st ok">تمت</span>':'<span class="st warn">بانتظار</span>'}</td><td>${ago(u.act)}</td><td>${date(u.joined)}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">لا توجد نتائج</td></tr>';
  $('#uc').textContent=r.length+' مستخدم';};
-const userDrawer=id=>{const u=USERS.find(x=>x.id==id),ps=PAYS.filter(p=>p.u===u);
+const userDrawer=id=>{const u=USERS.find(x=>x.id==id);if(!u)return;const ps=PAYS.filter(p=>p.u===u);
  openDr(`<div class="hd">${avatar(u.n,u.lt)}<div><h2>${esc(u.n)}</h2><small>${u.e}</small></div></div>
  <dl class="kv"><dt>الضوء</dt><dd>${lightTag(u.lt)}</dd>${u.lt?`<dt>العالم</dt><dd>${LIGHTS[u.lt].w}</dd>`:''}<dt>العمر</dt><dd>${u.age} سنة</dd>
  ${u.consent?`<dt>ولي الأمر</dt><dd>${u.consent==='ok'?'<span class="st ok">وافق</span>':'<span class="st warn">بانتظار الموافقة</span>'}</dd>`:''}
@@ -297,29 +330,29 @@ const userDrawer=id=>{const u=USERS.find(x=>x.id==id),ps=PAYS.filter(p=>p.u===u)
  <div class="sec">التقدّم</div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>${u.mcs} ماستركلاس</span><b>${u.prog}%</b></div><div class="prog"><i style="width:${u.prog}%"></i></div>
  <div class="sec">المدفوعات</div><div class="list">${ps.length?ps.map(p=>`<div class="it"><div><b>${esc(p.what)}</b><small>${p.id} · ${date(p.when)}</small></div><span class="when">${qar(p.amt)} ${payStat(p.st)}</span></div>`).join(''):'<div class="empty">لا توجد مدفوعات</div>'}</div>
  <div class="act" style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">${u.consent==='wait'?'<button class="btn sm" data-a="remind">تذكير ولي الأمر</button>':''}<button class="btn sm ghost" data-a="mail">مراسلة</button><button class="btn sm ghost" data-a="block" style="color:var(--bad)">${u.status==='active'?'إيقاف الحساب':'تفعيل الحساب'}</button></div>`);
- $('#drb').onclick=e=>{const a=e.target.dataset.a;if(!a)return;if(a==='block'){u.status=u.status==='active'?'blocked':'active';userDrawer(id);toast(u.status==='active'?'تم تفعيل الحساب':'تم إيقاف الحساب');}else toast(a==='remind'?'سيُرسل التذكير بعد ربط البريد':'المراسلة تعمل بعد ربط البريد');};};
+ $('#drb').onclick=e=>{const a=e.target.dataset.a;if(!a)return;if(a==='block'){const ns=u.status==='active'?'blocked':'active';if(!DEMO){SB.from('profiles').update({status:ns}).eq('id',u.id).then(({error})=>{if(error)return toast('تعذّر الحفظ: '+error.message);u.status=ns;userDrawer(id);toast(ns==='active'?'تم تفعيل الحساب':'تم إيقاف الحساب');});return;}u.status=ns;userDrawer(id);toast(ns==='active'?'تم تفعيل الحساب':'تم إيقاف الحساب');}else toast(a==='remind'?'سيُرسل التذكير بعد ربط البريد':'المراسلة تعمل بعد ربط البريد');};};
 
-V.test=()=>{const done=USERS.filter(u=>u.lt);return `<div class="grid kpis">
- ${kpi('✨','#EEEBFC','أكملوا الاختبار',fmt(done.length),'من '+USERS.length+' مسجل',1)}
- ${kpi('⏱️','#E8F7F8','متوسط مدة الاختبار','3:12 د','أسرع من المتوقع (3 د)',1)}
- ${kpi('📩','#FCEEF3','طلبوا خطة الأيام السبعة',fmt(Math.round(done.length*.74)),'74% من المكملين',1)}
- ${kpi('🚪','#FFF3DA','دخلوا عالمهم بعد النتيجة',fmt(Math.round(done.length*.58)),'58% من المكملين',1)}</div>
+V.test=()=>{const done=RESULTS,pl=done.filter(r=>r.plan).length,acc=done.filter(r=>r.uid).length;return `<div class="grid kpis">
+ ${kpi(YVI('sparkle',17,'#6B5BD6'),'#EEEBFC','نتائج الاختبار',fmt(done.length),'كل من أكمل الاختبار',1)}
+ ${kpi(YVI('stack',17,'#127F87'),'#E8F7F8','بحساب في المنصة',fmt(acc),pct(acc,done.length)+'% من النتائج',1)}
+ ${kpi(YVI('mail',17,'#C2507F'),'#FCEEF3','طلبوا خطة الأيام السبعة',fmt(pl),pct(pl,done.length)+'% من النتائج',1)}
+ ${kpi(YVI('calendar',17,'#B8860B'),'#FFF3DA','آخر 7 أيام',fmt(done.filter(r=>now-r.when<7*DAY).length),'نتيجة جديدة',1)}</div>
  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:18px">
- ${Object.keys(LIGHTS).map(k=>{const c=done.filter(u=>u.lt===k).length;return `<div class="card" style="border-top:4px solid ${LIGHTS[k].c}"><div style="font-size:30px">${LIGHTS[k].e}</div><h3 style="margin-top:6px">${LIGHTS[k].n}</h3><div class="hint" style="margin:2px 0 8px">${LIGHTS[k].w}</div><b style="font-size:26px">${c}</b> <span style="color:var(--mut);font-size:13px">${Math.round(c/done.length*100)}%</span></div>`}).join('')}</div>
+ ${Object.keys(LIGHTS).map(k=>{const c=done.filter(r=>r.lt===k).length;return `<div class="card" style="border-top:4px solid ${LIGHTS[k].c}"><div style="color:${LIGHTS[k].c}">${YVI(k,30)}</div><h3 style="margin-top:6px">${LIGHTS[k].n}</h3><div class="hint" style="margin:2px 0 8px">${LIGHTS[k].w}</div><b style="font-size:26px">${c}</b> <span style="color:var(--mut);font-size:13px">${pct(c,done.length)}%</span></div>`}).join('')}</div>
  <div class="card" style="margin-top:18px"><div class="tools"><h3 style="margin-inline-end:auto">آخر النتائج</h3><button class="btn ghost" id="tcsv">تصدير CSV</button></div>
- <div class="tw"><table><thead><tr><th>المستخدم</th><th>الضوء</th><th>العالم</th><th>خطة 7 أيام</th><th>التاريخ</th></tr></thead><tbody>
- ${done.slice(0,15).map((u,i)=>`<tr data-u="${u.id}"><td><div class="u">${avatar(u.n,u.lt)}<b>${esc(u.n)}</b></div></td><td>${lightTag(u.lt)}</td><td>${LIGHTS[u.lt].w}</td><td>${i%4?'<span class="st ok">أُرسلت</span>':'<span class="st mute">لم يطلبها</span>'}</td><td>${date(u.joined)}</td></tr>`).join('')}</tbody></table></div>
+ <div class="tw"><table><thead><tr><th>الاسم</th><th>الضوء</th><th>العالم</th><th>خطة 7 أيام</th><th>التاريخ</th></tr></thead><tbody>
+ ${done.length?done.slice(0,50).map(r=>`<tr ${r.uid?`data-u="${r.uid}"`:''}><td><div class="u">${avatar(r.n,r.lt)}<div><b>${esc(r.n)}</b><small>${esc(r.e)}</small></div></div></td><td>${lightTag(r.lt)}</td><td>${LIGHTS[r.lt].w}</td><td>${r.plan?'<span class="st ok">طلبها</span>':'<span class="st mute">لم يطلبها</span>'}</td><td>${date(r.when)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">لا توجد نتائج بعد</td></tr>'}</tbody></table></div>
  <div class="hint" style="margin:14px 0 0">النتيجة تُحسب بجدول العميل: نقطة لكل إجابة، والأعلى يفوز، وعند التعادل الترتيب: الأفق، الصانع، المدار، الشرارة، البوصلة.</div></div>`;};
 
 V.mc=()=>`<div class="tools"><button class="btn" id="mcAdd">+ ماستركلاس جديد</button><span class="chip">${MC.filter(m=>m.st==='pub').length} منشور · ${MC.filter(m=>m.st!=='pub').length} مسودة</span></div>
- <div class="grid mcs">${MC.map(m=>`<div class="card mc"><div class="cv" style="background:linear-gradient(135deg,${LIGHTS[m.w].c},#032E36)">${m.st==='pub'?'<span class="st ok">منشور</span>':'<span class="st warn">مسودة</span>'}<h4>${esc(m.t)}</h4></div>
- <div class="bd"><div style="font-size:14px;color:var(--ink2)">${esc(m.m)}</div><div class="meta"><span>${LIGHTS[m.w].e} ${LIGHTS[m.w].w}</span><span>📖 ${m.ch} فصول</span><span>⏱️ ${m.min} دقيقة</span></div>
+ ${MC.length?'':emptyMsg('لا توجد ماستركلاس بعد. أضف أول واحدة من الزر فوق.')}<div class="grid mcs">${MC.map(m=>`<div class="card mc"><div class="cv" style="background:linear-gradient(135deg,${LIGHTS[m.w].c},#032E36)">${m.st==='pub'?'<span class="st ok">منشور</span>':'<span class="st warn">مسودة</span>'}<h4>${esc(m.t)}</h4></div>
+ <div class="bd"><div style="font-size:14px;color:var(--ink2)">${esc(m.m)}</div><div class="meta"><span>${LIGHTS[m.w].e} ${LIGHTS[m.w].w}</span><span>${YVI('book',13)} ${m.ch} فصول</span><span>${YVI('clock',13)} ${m.min} دقيقة</span></div>
  <div class="row"><span><b>${m.p?qar(m.p):'مجاني'}</b></span><span>${fmt(m.en)} ملتحق</span></div><div style="display:flex;gap:8px"><button class="btn sm ghost" data-e="${m.id}">تعديل</button><button class="btn sm ghost" data-p="${m.id}">${m.st==='pub'?'إخفاء':'نشر'}</button></div></div></div>`).join('')}</div>`;
-const mcForm=id=>{const m=MC.find(x=>x.id==id)||{t:'',m:'',w:'H',ch:6,min:45,p:149,st:'draft',d:''};
+const mcForm=id=>{const m=MC.find(x=>String(x.id)===String(id))||{t:'',m:'',w:'H',ch:6,min:45,p:149,st:'draft',d:''};
  openMd(`<h2>${id?'تعديل الماستركلاس':'ماستركلاس جديد'}</h2><form class="fm" id="mcf">
  <label class="w">العنوان<input name="t" value="${esc(m.t)}" required></label>
  <label>المدرّب<input name="m" value="${esc(m.m)}" required></label>
- <label>العالم<select name="w">${Object.keys(LIGHTS).map(k=>`<option value="${k}" ${m.w===k?'selected':''}>${LIGHTS[k].e} ${LIGHTS[k].w}</option>`).join('')}</select></label>
+ <label>العالم<select name="w">${Object.keys(LIGHTS).map(k=>`<option value="${k}" ${m.w===k?'selected':''}>${LIGHTS[k].n} · ${LIGHTS[k].w}</option>`).join('')}</select></label>
  <label>عدد الفصول<input name="ch" type="number" min="1" value="${m.ch}"></label>
  <label>المدة (دقيقة)<input name="min" type="number" min="1" value="${m.min}"></label>
  <label>السعر (ر.ق، 0 = مجاني)<input name="p" type="number" min="0" value="${m.p}"></label>
@@ -328,22 +361,24 @@ const mcForm=id=>{const m=MC.find(x=>x.id==id)||{t:'',m:'',w:'H',ch:6,min:45,p:1
  <label class="w">الفيديو والملفات<input type="file" multiple accept="video/*,audio/*,.pdf"></label>
  </form><div class="act"><button class="btn" id="mcSave">حفظ</button><button class="btn ghost" data-close>إلغاء</button></div>`);
  $('#mcSave').onclick=()=>{const f=$('#mcf');if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));['ch','min','p'].forEach(k=>d[k]=+d[k]);
-  if(id)Object.assign(m,d);else MC.unshift({...d,id:Date.now(),en:0});closeAll();go('mc');toast('تم الحفظ');};};
+  if(DEMO){if(id)Object.assign(m,d);else MC.unshift({...d,id:Date.now(),en:0});closeAll();go('mc');return toast('تم الحفظ (بيانات تجريبية)');}
+  const row={title_ar:d.t,mentor_name:d.m,world:d.w,chapters:d.ch,minutes:d.min,price_qar:d.p,status:d.st==='pub'?'published':'draft',description_ar:d.d,updated_at:new Date().toISOString()};
+  $('#mcSave').disabled=true;(id?SB.from('masterclasses').update(row).eq('id',id):SB.from('masterclasses').insert(row)).then(async({error})=>{
+   if(error){$('#mcSave').disabled=false;return toast('تعذّر الحفظ: '+error.message);}await refresh();closeAll();go('mc');toast('تم الحفظ');});};};
 
 let pf='';
 V.pay=()=>{const paid=PAYS.filter(p=>p.st==='paid'),r=PAYS.filter(p=>!pf||p.st===pf);return `<div class="grid kpis">
- ${kpi('💰','#FFF3DA','إجمالي المدفوع',qar(paid.reduce((s,p)=>s+p.amt,0)),paid.length+' عملية',1)}
- ${kpi('🎓','#E8F7F8','من الاشتراكات',qar(paid.filter(p=>p.what.startsWith('اشتراك')).reduce((s,p)=>s+p.amt,0)),'شهري 99 · سنوي 990',1)}
- ${kpi('⏳','#FFF3DA','معلّقة',fmt(PAYS.filter(p=>p.st==='pend').length),'بانتظار تأكيد SkipCash',0)}
- ${kpi('↩️','#FDE7EA','مستردة',fmt(PAYS.filter(p=>p.st==='ref').length),'هذا الشهر',0)}</div>
- <div class="card" style="margin-top:18px"><div class="tools"><select id="pf"><option value="">كل الحالات</option><option value="paid" ${pf==='paid'?'selected':''}>مدفوع</option><option value="pend" ${pf==='pend'?'selected':''}>معلّق</option><option value="ref" ${pf==='ref'?'selected':''}>مسترد</option></select><button class="btn ghost" id="pcsv">تصدير CSV</button><span class="chip demo" style="margin-inline-start:auto">SkipCash · وضع التجربة</span></div>
+ ${kpi(YVI('award',17,'#B8860B'),'#FFF3DA','إجمالي المدفوع',qar(paid.reduce((s,p)=>s+p.amt,0)),paid.length+' عملية',1)}
+ ${kpi(YVI('cap',17,'#127F87'),'#E8F7F8','من الاشتراكات',qar(paid.filter(p=>p.what.startsWith('اشتراك')).reduce((s,p)=>s+p.amt,0)),'شهري 99 · سنوي 990',1)}
+ ${kpi(YVI('clock',17,'#C98A12'),'#FFF3DA','معلّقة',fmt(PAYS.filter(p=>p.st==='pend').length),'بانتظار تأكيد SkipCash',0)}
+ ${kpi(YVI('bolt',17,'#D0465A'),'#FDE7EA','مستردة',fmt(PAYS.filter(p=>p.st==='ref').length),'كل الفترات',0)}</div>
+ <div class="card" style="margin-top:18px"><div class="tools"><select id="pf"><option value="">كل الحالات</option><option value="paid" ${pf==='paid'?'selected':''}>مدفوع</option><option value="pend" ${pf==='pend'?'selected':''}>معلّق</option><option value="ref" ${pf==='ref'?'selected':''}>مسترد</option><option value="fail" ${pf==='fail'?'selected':''}>فشل / ملغى</option></select><button class="btn ghost" id="pcsv">تصدير CSV</button><span class="chip demo" style="margin-inline-start:auto">SkipCash · وضع التجربة</span></div>
  <div class="tw"><table><thead><tr><th>رقم العملية</th><th>المستخدم</th><th>البند</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>
- ${r.slice(0,40).map(p=>`<tr data-u="${p.u.id}"><td style="font-family:monospace;direction:ltr;text-align:end">${p.id}</td><td>${esc(p.u.n)}</td><td>${esc(p.what)}</td><td><b>${qar(p.amt)}</b></td><td>${payStat(p.st)}</td><td>${date(p.when)}</td></tr>`).join('')}</tbody></table></div></div>`;};
+ ${r.length?'':'<tr><td colspan="6" class="empty">لا توجد عمليات دفع بعد</td></tr>'}${r.slice(0,40).map(p=>`<tr data-u="${p.u.id}"><td style="font-family:monospace;direction:ltr;text-align:end">${p.id}</td><td>${esc(p.u.n)}</td><td>${esc(p.what)}</td><td><b>${qar(p.amt)}</b></td><td>${payStat(p.st)}</td><td>${date(p.when)}</td></tr>`).join('')}</tbody></table></div></div>`;};
 
 V.set=()=>`<div class="grid set">
  <div class="card"><h3>حساب المدير</h3><div class="hint">حساب واحد فقط يدخل اللوحة</div><form class="fm">
-  <label class="w">الاسم<input value="مدير المنصة"></label><label class="w">البريد<input value="${esc($('#meMail').textContent)}" dir="ltr"></label></form>
-  <div class="act" style="margin-top:16px"><button class="btn ghost" data-t="تم الحفظ (معاينة)">حفظ</button></div>
+  <label class="w">البريد<input value="${esc($('#meMail').textContent)}" dir="ltr" readonly></label></form>
   <div class="sec" style="margin-top:26px">تغيير كلمة المرور</div><form class="fm" id="pwf">
   <label class="w">كلمة المرور الحالية<input type="password" name="o" required></label>
   <label>كلمة المرور الجديدة<input type="password" name="n" minlength="8" required></label>
@@ -353,15 +388,15 @@ V.set=()=>`<div class="grid set">
   <div class="act" style="margin-top:6px"><button class="btn" id="pwSave">تغيير كلمة المرور</button></div>
   <div class="sw" style="margin-top:14px;border-top:1px solid #F0F5F6"><div><b>التحقق بخطوتين</b><small>كود من تطبيق مثل Google Authenticator عند كل دخول</small></div><button class="tg"></button></div></div>
  <div class="card"><h3>إعدادات المنصة</h3><div class="hint">تتحكم في تجربة الزوار</div>
-  ${[['التسجيل مفتوح','الزوار يقدرون يسوون حسابات جديدة',1],['موافقة ولي الأمر لمن هم تحت 18','لازم موافقة قبل الاشتراك أو الدفع',1],['إرسال خطة الأيام السبعة بالبريد','بعد ما يكتب المستخدم بريده في النتيجة',1],['وضع الصيانة','يقفل الموقع للزوار مؤقتاً',0]].map(s=>`<div class="sw"><div><b>${s[0]}</b><small>${s[1]}</small></div><button class="tg ${s[2]?'on':''}"></button></div>`).join('')}</div>
+  ${[['registration_open','التسجيل مفتوح','الزوار يقدرون يسوون حسابات جديدة'],['parental_consent_required','موافقة ولي الأمر لمن هم تحت 18','لازم موافقة قبل الاشتراك أو الدفع'],['send_7day_plan','إرسال خطة الأيام السبعة بالبريد','بعد ما يكتب المستخدم بريده في النتيجة'],['maintenance','وضع الصيانة','يقفل الموقع للزوار مؤقتاً']].map(s=>`<div class="sw"><div><b>${s[1]}</b><small>${s[2]}</small></div><button class="tg ${SETTINGS[s[0]]?'on':''}" data-key="${s[0]}"></button></div>`).join('')}</div>
  <div class="card"><h3>الدفع</h3><div class="hint">SkipCash</div>
   <div class="sw"><div><b>وضع التجربة (Sandbox)</b><small>نشغّل الدفع الحقيقي بعد التجربة</small></div><button class="tg on"></button></div>
   <div class="sw"><div><b>مفتاح SkipCash</b><small>يُحفظ في إعدادات Vercel فقط، ما يُكتب هنا</small></div><span class="st mute">محفوظ بأمان</span></div>
   <div class="sw"><div><b>أسعار الاشتراك</b><small>شهري 99 ر.ق · سنوي 990 ر.ق</small></div><button class="btn sm ghost" data-t="تعديل الأسعار بعد الربط">تعديل</button></div></div>
  <div class="card"><h3>البريد والتنبيهات</h3><div class="hint">وين توصل تنبيهات المنصة</div>
-  <div class="sw"><div><b>تنبيه عند كل عملية دفع</b><small>يوصل لبريد المدير</small></div><button class="tg on"></button></div>
-  <div class="sw"><div><b>ملخص أسبوعي</b><small>كل أحد الصبح</small></div><button class="tg on"></button></div>
-  <div class="sw"><div><b>تنبيه عند طلب موافقة ولي أمر</b><small>لمن هم تحت 18</small></div><button class="tg"></button></div></div></div>`;
+  <div class="sw"><div><b>تنبيه عند كل عملية دفع</b><small>يوصل لبريد المدير</small></div><button class="tg ${SETTINGS.notify_each_payment?'on':''}" data-key="notify_each_payment"></button></div>
+  <div class="sw"><div><b>ملخص أسبوعي</b><small>كل أحد الصبح</small></div><button class="tg ${SETTINGS.weekly_summary?'on':''}" data-key="weekly_summary"></button></div>
+  <div class="sw"><div><b>تنبيه عند طلب موافقة ولي أمر</b><small>لمن هم تحت 18</small></div><button class="tg ${SETTINGS.notify_consent_request?'on':''}" data-key="notify_consent_request"></button></div></div></div>`;
 
 /* ---------- shell ---------- */
 let cur='home';
@@ -376,9 +411,13 @@ function go(k){cur=k;const p=PAGES.find(x=>x.k===k);$('#pt').textContent=p.t;$('
  history.replaceState(null,'','#'+k);}
 $('#nav').onclick=e=>{const a=e.target.closest('a');if(a)go(a.dataset.k);};
 $('#view').onclick=e=>{const tr=e.target.closest('tr[data-u]');if(tr)return userDrawer(tr.dataset.u);
- const ed=e.target.closest('[data-e]');if(ed)return mcForm(+ed.dataset.e);
- const pb=e.target.closest('[data-p]');if(pb){const m=MC.find(x=>x.id==pb.dataset.p);m.st=m.st==='pub'?'draft':'pub';go('mc');return toast(m.st==='pub'?'تم النشر':'تم الإخفاء');}
- const tg=e.target.closest('.tg');if(tg){tg.classList.toggle('on');return toast('تم التغيير (معاينة)');}
+ const ed=e.target.closest('[data-e]');if(ed)return mcForm(ed.dataset.e);
+ const pb=e.target.closest('[data-p]');if(pb){const m=MC.find(x=>String(x.id)===pb.dataset.p),ns=m.st==='pub'?'draft':'pub';
+  if(DEMO){m.st=ns;go('mc');return toast(ns==='pub'?'تم النشر':'تم الإخفاء');}
+  return SB.from('masterclasses').update({status:ns==='pub'?'published':'draft'}).eq('id',m.id).then(({error})=>{if(error)return toast('تعذّر الحفظ: '+error.message);m.st=ns;go('mc');toast(ns==='pub'?'تم النشر':'تم الإخفاء');});}
+ const tg=e.target.closest('.tg');if(tg){const k=tg.dataset.key,on=!tg.classList.contains('on');tg.classList.toggle('on',on);
+  if(!k||DEMO)return toast(k?'تم التغيير (بيانات تجريبية)':'يتفعّل لاحقاً');
+  return SB.from('settings').update({value:on,updated_at:new Date().toISOString()}).eq('key',k).then(({error})=>{if(error){tg.classList.toggle('on',!on);return toast('تعذّر الحفظ: '+error.message);}SETTINGS[k]=on;toast('تم الحفظ');});}
  const t=e.target.closest('[data-t]');if(t)toast(t.dataset.t);};
 function openDr(h){$('#drb').innerHTML=h;$('#dr').classList.add('on');$('#ov').classList.add('on');}
 function openMd(h){$('#mdb').innerHTML=h;$('#md').classList.add('on');$('#ov').classList.add('on');}
@@ -388,17 +427,41 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
 $('#burger').onclick=()=>$('#side').classList.toggle('on');
 $('#today').textContent=new Date().toLocaleDateString('ar-QA',{weekday:'long',day:'numeric',month:'long'});
 
-/* login (preview: any email/password; real: Supabase auth, admin role only) */
-const enter=mail=>{$('#meMail').textContent=mail;$('#login').classList.add('hide');$('#app').classList.remove('hide');const h=location.hash.slice(1);go(PAGES.some(p=>p.k===h)?h:'home');};
-$('#lgf').onsubmit=e=>{e.preventDefault();const m=$('#le').value.trim();if($('#lp').value.length<4){$('#lerr').textContent='كلمة المرور قصيرة';return;}try{sessionStorage.setItem('yvAdmin',m)}catch(_){}enter(m);};
-$('#fgo').onclick=()=>{$('#lgf').classList.add('hide');$('#rsf').classList.remove('hide');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
-$('#rback').onclick=()=>{$('#rsf').classList.add('hide');$('#lgf').classList.remove('hide');};
-$('#rsf').onsubmit=e=>{e.preventDefault();const m=$('#re').value.trim();$('#rok').innerHTML='إذا كان <b>'+esc(m)+'</b> بريد حساب المدير، سيصلك رابط خلال دقائق.<br>افتحه واختر كلمة مرور جديدة.';$('#rok').classList.remove('hide');};
-document.addEventListener('click',e=>{if(e.target.id!=='pwSave')return;const f=$('#pwf');if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
+/* ---------- login: Supabase auth, admin role only ---------- */
+const show=id=>['#lgf','#rsf','#npf'].forEach(x=>$(x).classList.toggle('hide',x!==id));
+const back=location.origin+location.pathname;
+async function refresh(){if(DEMO)return;await loadReal();}
+async function enterReal(user){
+ const {data:pr,error}=await SB.from('profiles').select('role,status,email').eq('id',user.id).single();
+ if(error||!pr||pr.role!=='admin'||pr.status!=='active'){await SB.auth.signOut();show('#lgf');$('#lerr').textContent='هذا الحساب ليس حساب المدير.';return;}
+ ME=user;try{await loadReal();}catch(e){$('#lerr').textContent='تعذّر تحميل البيانات: '+e.message;return;}
+ $('#modeChip').textContent='متصل بقاعدة البيانات';$('#modeChip').classList.remove('demo');
+ $('#meMail').textContent=user.email;$('#login').classList.add('hide');$('#app').classList.remove('hide');const h=location.hash.slice(1);go(PAGES.some(p=>p.k===h)?h:'home');}
+function enterDemo(){loadSample();$('#modeChip').textContent='بيانات تجريبية';$('#modeChip').classList.add('demo');$('#meMail').textContent='demo@youverse.qa';
+ $('#login').classList.add('hide');$('#app').classList.remove('hide');go('home');}
+$('#lgf').onsubmit=async e=>{e.preventDefault();const btn=$('#lgf button[type=submit]');btn.disabled=true;$('#lerr').textContent='';
+ const {data,error}=await SB.auth.signInWithPassword({email:$('#le').value.trim(),password:$('#lp').value});btn.disabled=false;
+ if(error){$('#lerr').textContent=/Invalid login/i.test(error.message)?'البريد أو كلمة المرور غير صحيحة.':/fetch/i.test(error.message)?'تعذّر الاتصال. تأكد من الإنترنت وحاول مرة ثانية.':error.message;return;}enterReal(data.user);};
+let firstMode=false;
+$('#fgo').onclick=()=>{firstMode=false;$('#rsT').textContent='استعادة كلمة المرور';$('#rsP').textContent='اكتب بريد حساب المدير، ونرسل لك رابطاً لتعيين كلمة مرور جديدة';$('#rsB').textContent='إرسال رابط الاستعادة';show('#rsf');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
+$('#first').onclick=()=>{firstMode=true;$('#rsT').textContent='أول دخول للمدير';$('#rsP').textContent='اكتب بريد المدير، ونرسل لك رابط دخول. بعدها تختار كلمة المرور.';$('#rsB').textContent='أرسل رابط الدخول';show('#rsf');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
+$('#rback').onclick=()=>show('#lgf');
+$('#demo').onclick=enterDemo;
+$('#rsf').onsubmit=async e=>{e.preventDefault();const m=$('#re').value.trim(),btn=$('#rsB');btn.disabled=true;
+ const {error}=firstMode?await SB.auth.signInWithOtp({email:m,options:{shouldCreateUser:true,emailRedirectTo:back}}):await SB.auth.resetPasswordForEmail(m,{redirectTo:back});btn.disabled=false;
+ $('#rok').innerHTML=error?('<span style="color:#FF9BAA">'+esc(error.message)+'</span>'):(firstMode?'أرسلنا رابط الدخول إلى <b>'+esc(m)+'</b>. افتحه من نفس الجهاز، ثم اختر كلمة المرور.':'إذا كان <b>'+esc(m)+'</b> بريد حساب المدير، سيصلك رابط خلال دقائق.<br>افتحه واختر كلمة مرور جديدة.');$('#rok').classList.remove('hide');};
+$('#npf').onsubmit=async e=>{e.preventDefault();const a=$('#np1').value,b=$('#np2').value;if(a!==b){$('#nperr').textContent='كلمتا المرور غير متطابقتين';return;}
+ const {data,error}=await SB.auth.updateUser({password:a,data:{pw_set:true}});if(error){$('#nperr').textContent=error.message;return;}history.replaceState(null,'',location.pathname);enterReal(data.user);};
+document.addEventListener('click',async e=>{if(e.target.id!=='pwSave')return;const f=$('#pwf');if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
  if(d.n!==d.c){$('#pwerr').textContent='كلمتا المرور غير متطابقتين';return;}if(d.n===d.o){$('#pwerr').textContent='اختر كلمة مرور مختلفة عن الحالية';return;}
- $('#pwerr').textContent='';f.reset();toast('تم تغيير كلمة المرور (معاينة)');});
-$('#out').onclick=()=>{try{sessionStorage.removeItem('yvAdmin')}catch(_){}location.hash='';location.reload();};
-try{const m=sessionStorage.getItem('yvAdmin');if(m)enter(m);}catch(_){}
+ if(DEMO){$('#pwerr').textContent='';f.reset();return toast('تم تغيير كلمة المرور (بيانات تجريبية)');}
+ const {error:e1}=await SB.auth.signInWithPassword({email:ME.email,password:d.o});if(e1){$('#pwerr').textContent='كلمة المرور الحالية غير صحيحة';return;}
+ const {error}=await SB.auth.updateUser({password:d.n,data:{pw_set:true}});if(error){$('#pwerr').textContent=error.message;return;}$('#pwerr').textContent='';f.reset();toast('تم تغيير كلمة المرور');});
+$('#out').onclick=async()=>{if(!DEMO)await SB.auth.signOut();location.hash='';location.reload();};
+/* returning from an email link: password recovery, or the first magic-link sign-in */
+SB.auth.onAuthStateChange((ev,session)=>{if(ev==='PASSWORD_RECOVERY'){show('#npf');return;}
+ if(ev==='SIGNED_IN'&&session&&!session.user.user_metadata?.pw_set&&/access_token|code=/.test(location.href)){show('#npf');}});
+SB.auth.getSession().then(({data})=>{const u=data.session&&data.session.user;if(!u)return;if(!u.user_metadata?.pw_set){show('#npf');return;}enterReal(u);});
 </script>
 </body>
 </html>

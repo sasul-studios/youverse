@@ -137,6 +137,7 @@ h2{font-size:clamp(26px,4.4vw,36px);line-height:1.5;margin:0 0 22px;color:#fff;f
 <main id="app"></main>
 <script src="test-data.js"></script>
 <script src="yv-icons.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
 <script src="progress.js" defer></script>
 <script>
 const D=window.YV_TEST,$=s=>document.querySelector(s),app=$('#app');
@@ -207,7 +208,10 @@ function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
  if(S.screen==='email'){const e=$('#email'),err=$('#err');e.oninput=()=>{S.email=e.value;e.classList.remove('bad');err.textContent='';};
   e.onkeydown=ev=>{if(ev.key==='Enter')$('#reveal').click();};
   on('#reveal',()=>{const v=e.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){e.classList.add('bad');err.textContent=t.emailError;e.focus();return;}S.email=v;go('result');});}
- if(S.screen==='result'){try{localStorage.setItem('yvLight',S.light);}catch(x){}   /* the site header shows "Your Light: …" */
+ if(S.screen==='result'){try{localStorage.setItem('yvLight',S.light);}catch(x){}
+ if(!S.saved&&window.supabase){S.saved=true;   /* save the result (row-level security: visitors can add, only the admin reads) */
+  try{window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm',{auth:{persistSession:false}})
+   .from('test_results').insert({name:(S.name||'').trim().slice(0,80)||null,email:S.email||null,lang,answers:S.ans,light:S.light,plan_requested:!!S.email}).then(({error})=>{if(error)console.warn('result not saved',error.message);});}catch(x){}}   /* the site header shows "Your Light: …" */
  const txt=$('#stext').textContent;
   on('#enter',()=>{S.worldOpen=true;render(false);});
   on('#peek',e=>{e.preventDefault();try{sessionStorage.setItem('yvWorld',S.light);}catch(x){}location.href='app-v3.html#youfinder'+(lang==='en'?'-en':'');});
