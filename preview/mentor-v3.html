@@ -121,6 +121,7 @@ textarea:focus{border-color:var(--teal)}
 
 <script src="test-data.js"></script>
 <script src="yv-icons.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
 <script src="yv-shell.js"></script>
 <script src="progress.js" defer></script>
 <script>
@@ -155,23 +156,26 @@ const T=en?{h1:'YouMentor',sub:'A private session with someone who gets your pat
  days:['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']};
 $('#h1').textContent=T.h1;$('#sub').textContent=T.sub;$('#tYouer').textContent=T.youer;$('#tMentor').textContent=T.mentor;$('#allT').textContent=T.all;
 const cur=n=>'<span class="yv-later">'+(en?'(Price, later)':'(السعر لاحقاً)')+'</span>';   /* prices come from the client */
+const fieldOf=m=>m.ft||F[m.f]||'';
+const priceOf=(m,k)=>m.sample||m[k]==null?cur():(en?'QAR '+fmtN(m[k]):fmtN(m[k])+' ر.ق');
+const fmtN=n=>Number(n).toLocaleString('en-US');
 const later=t=>'<span class="yv-later">('+t+(en?', later)':' لاحقاً)')+'</span>';
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2400);};
 
 /* sample mentors (names and photos come from the client; fields here are examples) */
 const F=en?{biz:'Entrepreneurship',design:'Graphic design',content:'Content creation',code:'Programming',mkt:'Marketing',career:'Career path',music:'Music'}
           :{biz:'ريادة الأعمال',design:'التصميم الجرافيكي',content:'صناعة المحتوى',code:'البرمجة',mkt:'التسويق',career:'المسار المهني',music:'الموسيقى'};
-const M=[{f:'biz',l:'H',langs:['ar','en'],p30:200,p60:350,days:[0,1,3],ini:'أ'},{f:'design',l:'S',langs:['ar'],p30:120,p60:200,days:[1,2,4],ini:'ب'},
+let M=[{f:'biz',l:'H',langs:['ar','en'],p30:200,p60:350,days:[0,1,3],ini:'أ'},{f:'design',l:'S',langs:['ar'],p30:120,p60:200,days:[1,2,4],ini:'ب'},
  {f:'content',l:'O',langs:['ar','en'],p30:150,p60:260,days:[0,2,3],ini:'ج'},{f:'code',l:'F',langs:['en'],p30:180,p60:300,days:[0,1,2,3],ini:'د'},
  {f:'mkt',l:'O',langs:['ar'],p30:100,p60:180,days:[3,6],ini:'ه'},{f:'career',l:'C',langs:['ar','en'],p30:130,p60:220,days:[0,1,2],ini:'و'},
  {f:'music',l:'S',langs:['en'],p30:160,p60:280,days:[4,6],ini:'ز'},{f:'biz',l:'F',langs:['ar'],p30:250,p60:420,days:[1,3],ini:'ح'}]
- .map((m,i)=>Object.assign(m,{id:i,name:T.name,ini:en?'ABCDEFGH'[i]:m.ini,hours:[16,17.5,19,20.5]}));
+ .map((m,i)=>Object.assign(m,{id:i,name:T.name,ini:en?'ABCDEFGH'[i]:m.ini,hours:[16,17.5,19,20.5],sample:true}));
 const SLOT_TZ='Asia/Qatar';const QOFF=3;   /* availability is set in Qatar time */
 const myTZ=Intl.DateTimeFormat().resolvedOptions().timeZone||SLOT_TZ;let showTZ=myTZ;
 const dayStart=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x;};
 function slots(m,dayOffset){const now=new Date(),base=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+dayOffset));
- const qDow=new Date(base.getTime()+QOFF*36e5).getUTCDay();if(!m.days.includes(qDow))return [];
- return m.hours.map(h=>new Date(base.getTime()+(h-QOFF)*36e5)).filter(t=>t-now>3*36e5);}
+ const qDow=new Date(base.getTime()+QOFF*36e5).getUTCDay();const hrs=m.hd?m.hd[qDow]:(m.days.includes(qDow)?m.hours:null);if(!hrs)return [];
+ return hrs.map(h=>new Date(base.getTime()+(h-QOFF)*36e5)).filter(t=>t-now>3*36e5);}
 function nextSlot(m){for(let d=0;d<14;d++){const s=slots(m,d);if(s.length)return s[0];}return null;}
 const fmtT=t=>t.toLocaleTimeString(en?'en-US':'ar-u-nu-latn',{hour:'numeric',minute:'2-digit',timeZone:showTZ});
 const fmtD=t=>t.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{weekday:'short',day:'numeric',month:'short',timeZone:showTZ});
@@ -179,16 +183,18 @@ const rel=t=>{if(!t)return '—';const d=Math.round((dayStart(t)-dayStart(new Da
 
 /* directory */
 const FL={spec:'',lang:'',price:'',avail:''};
-$('#filters').innerHTML=[['spec',T.spec,Object.keys(F).map(k=>[k,F[k]])],['lang',T.lang,[['ar',T.ar],['en',T.en]]],['price',T.price,[['1',T.p1],['2',T.p2],['3',T.p3]]],['avail',T.avail,[['today',T.today],['week',T.week]]]]
- .map(([k,t,o])=>`<select data-k="${k}" aria-label="${t}"><option value="">${t}: ${T.any}</option>${o.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>`).join('');
+function buildFilters(){const specs=[...new Set(M.map(m=>m.sample?m.f:fieldOf(m)).filter(Boolean))].map(v=>[v,M.find(m=>(m.sample?m.f:fieldOf(m))===v).sample?F[v]:v]);
+ $('#filters').innerHTML=[['spec',T.spec,specs],['lang',T.lang,[['ar',T.ar],['en',T.en]]],['price',T.price,[['1',T.p1],['2',T.p2],['3',T.p3]]],['avail',T.avail,[['today',T.today],['week',T.week]]]]
+ .map(([k,t,o])=>`<select data-k="${k}" aria-label="${t}"><option value="">${t}: ${T.any}</option>${o.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select>`).join('');}
+buildFilters();
 $('#filters').onchange=e=>{FL[e.target.dataset.k]=e.target.value;renderDir();};
-const ok=m=>{if(FL.spec&&m.f!==FL.spec)return false;if(FL.lang&&!m.langs.includes(FL.lang))return false;
- if(FL.price==='1'&&m.p30>150)return false;if(FL.price==='2'&&(m.p30<150||m.p30>250))return false;if(FL.price==='3'&&m.p30<=250)return false;
+const ok=m=>{if(FL.spec&&(m.sample?m.f:fieldOf(m))!==FL.spec)return false;if(FL.lang&&!m.langs.includes(FL.lang))return false;
+ if(FL.price&&m.p30==null)return false;if(FL.price==='1'&&m.p30>150)return false;if(FL.price==='2'&&(m.p30<150||m.p30>250))return false;if(FL.price==='3'&&m.p30<=250)return false;
  const n=nextSlot(m);if(FL.avail==='today'&&!(n&&dayStart(n)-dayStart(new Date())===0))return false;if(FL.avail==='week'&&!(n&&n-new Date()<7*864e5))return false;return true;};
 const langTxt=m=>m.langs.length>1?T.both:(m.langs[0]==='ar'?T.ar:T.en);
-const card=m=>`<article class="card"><div class="mh" data-p="${m.id}"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><b>${m.name}</b><small>${F[m.f]}</small></div></div>
+const card=m=>`<article class="card"><div class="mh" data-p="${m.id}"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><b>${m.name}</b><small>${fieldOf(m)}</small></div></div>
  <div class="tags"><span>${YVI('world',14)}${langTxt(m)}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
- <div class="meta"><span>${YVI('clock',15)}30 ${T.min} · ${cur(m.p30)}</span><span>${YVI('calendar',15)}${later(en?'Next slot':'الموعد')}</span></div>
+ <div class="meta"><span>${YVI('clock',15)}30 ${T.min} · ${priceOf(m,'p30')}</span><span>${YVI('calendar',15)}${m.sample?later(en?'Next slot':'الموعد'):rel(nextSlot(m))}</span></div>
  <div style="display:flex;gap:8px"><button class="btn" style="flex:1" data-b="${m.id}">${T.book}</button><button class="btn ghost" data-p="${m.id}">${T.profile}</button></div></article>`;
 function renderDir(){setTimeout(()=>YVLater(document.querySelector('main'),en));const L=SH.light,list=M.filter(ok);
  const rec=L?list.filter(m=>m.l===L):[];
@@ -196,6 +202,15 @@ function renderDir(){setTimeout(()=>YVLater(document.querySelector('main'),en));
  const rest=list.filter(m=>!rec.includes(m));$('#allT').style.display=rest.length||!rec.length?'':'none';
  $('#grid').innerHTML=rest.length?rest.map(card).join(''):(rec.length?'':`<div class="empty">${T.none}</div>`);}
 renderDir();
+/* approved mentors from the database replace the samples as soon as there is at least one */
+(async()=>{try{if(!window.supabase)return;const sb=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm',{auth:{persistSession:false}});
+ const [mt,av]=await Promise.all([sb.from('mentors').select('id,name,field,bio,langs,light,price_30,price_60').eq('approved',true).order('created_at'),sb.from('mentor_availability').select('mentor_id,weekday,start_time,end_time')]);
+ if(mt.error||av.error||!mt.data.length)return;
+ const toH=t=>{const [h,m]=t.split(':');return +h+(+m)/60;};
+ M=mt.data.map((r,i)=>{const hd={};av.data.filter(a=>a.mentor_id===r.id).forEach(a=>{const s=toH(a.start_time),e=toH(a.end_time),list=hd[a.weekday]=hd[a.weekday]||[];for(let h=s;h+0.5<=e;h+=1.5)list.push(h);});
+  const ini=(r.name||'?').replace(/^(د\.|أ\.|م\.|Dr\.|Mr\.|Ms\.)\s*/,'').trim()[0]||'?';
+  return {id:i,dbId:r.id,name:esc(r.name),ft:r.field||'',bio:r.bio||'',l:r.light||'C',langs:r.langs&&r.langs.length?r.langs:['ar'],p30:r.price_30,p60:r.price_60,hd,days:Object.keys(hd).map(Number),hours:[],ini};});
+ buildFilters();renderDir();}catch(e){console.warn(e);}})();
 
 /* sheet: profile + booking */
 let B=null;
@@ -204,11 +219,11 @@ function close(){$('#sheet').classList.remove('on');$('#ov').classList.remove('o
 $('#ov').onclick=close;$('#sheet .x').onclick=close;addEventListener('keydown',e=>{if(e.key==='Escape')close();});
 document.addEventListener('click',e=>{const p=e.target.closest('[data-p]'),b=e.target.closest('[data-b]');
  if(b&&!e.target.closest('#sheet')){booking(+b.dataset.b);return;}if(p&&!e.target.closest('#sheet'))profile(+p.dataset.p);});
-const head=m=>`<div class="ph"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><h2>${m.name}</h2><small>${F[m.f]} · ${langTxt(m)}</small></div></div>`;
-function profile(id){const m=M[id];open(`${head(m)}<p class="bio">${T.bio}</p>
- <div class="h4">${T.fields}</div><div class="tags"><span>${F[m.f]}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
- <div class="h4">${T.session}</div><div class="opts"><div class="opt" style="cursor:default"><b>30 ${T.min}</b><small>${cur(m.p30)}</small></div><div class="opt" style="cursor:default"><b>60 ${T.min}</b><small>${cur(m.p60)}</small></div></div>
- <div class="tz">${YVI('calendar',14)}${T.next}: ${later(en?'Slot':'الموعد')}</div>
+const head=m=>`<div class="ph"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><h2>${m.name}</h2><small>${fieldOf(m)} · ${langTxt(m)}</small></div></div>`;
+function profile(id){const m=M[id];open(`${head(m)}<p class="bio">${m.sample||!m.bio?T.bio:esc(m.bio)}</p>
+ <div class="h4">${T.fields}</div><div class="tags"><span>${fieldOf(m)}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
+ <div class="h4">${T.session}</div><div class="opts"><div class="opt" style="cursor:default"><b>30 ${T.min}</b><small>${priceOf(m,'p30')}</small></div><div class="opt" style="cursor:default"><b>60 ${T.min}</b><small>${priceOf(m,'p60')}</small></div></div>
+ <div class="tz">${YVI('calendar',14)}${T.next}: ${m.sample?later(en?'Slot':'الموعد'):rel(nextSlot(m))}</div>
  <button class="btn" style="width:100%;margin-top:22px" id="goBook">${T.book}</button><p class="fine">${T.code}</p>`);$('#goBook').onclick=()=>booking(id);}
 function booking(id){const m=M[id];B={m,len:30,day:null,t:null,note:'',minor:false,agree:false,parent:''};
  for(let d=0;d<14;d++)if(slots(m,d).length){B.day=d;break;}drawB();}
@@ -216,18 +231,18 @@ function drawB(){const m=B.m,days=[...Array(14)].map((_,d)=>d),q=showTZ===SLOT_T
  const s=B.day!=null?slots(m,B.day):[];const price=B.len===30?m.p30:m.p60;
  const ready=B.t&&B.note.trim().length>2&&B.agree&&(!B.minor||/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(B.parent));
  open(`${head(m)}
- <div class="h4">${T.session}</div><div class="opts">${[30,60].map(l=>`<button class="opt" data-len="${l}" aria-pressed="${B.len===l}"><b>${l} ${T.min}</b><small>${cur(l===30?m.p30:m.p60)}</small></button>`).join('')}</div>
+ <div class="h4">${T.session}</div><div class="opts">${[30,60].map(l=>`<button class="opt" data-len="${l}" aria-pressed="${B.len===l}"><b>${l} ${T.min}</b><small>${priceOf(m,l===30?'p30':'p60')}</small></button>`).join('')}</div>
  <div class="h4"><i>1</i>${T.s1}</div>
  <div class="days">${days.map(d=>{const dt=new Date(Date.now()+d*864e5),has=slots(m,d).length;return `<button class="day" data-day="${d}" aria-pressed="${B.day===d}" ${has?'':'disabled'}><small>${dt.toLocaleDateString(en?'en-US':'ar',{weekday:'short',timeZone:showTZ})}</small><b>${dt.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{day:'numeric',timeZone:showTZ})}</b></button>`}).join('')}</div>
  <div class="slots">${s.map(t=>`<button class="slot" data-t="${t.getTime()}" aria-pressed="${B.t===t.getTime()}">${fmtT(t)}</button>`).join('')}</div>
- <div class="tz">${later(en?'Times are examples':'الأوقات أمثلة')}</div><div class="tz">${YVI('world',14)}${q?T.tzQ:T.tzMine+' ('+myTZ+')'}${myTZ!==SLOT_TZ?` · <button id="tzb">${q?T.showMine:T.showQ}</button>`:''}</div>
+ ${m.sample?`<div class="tz">${later(en?'Times are examples':'الأوقات أمثلة')}</div>`:''}<div class="tz">${YVI('world',14)}${q?T.tzQ:T.tzMine+' ('+myTZ+')'}${myTZ!==SLOT_TZ?` · <button id="tzb">${q?T.showMine:T.showQ}</button>`:''}</div>
  <div class="h4"><i>2</i>${T.s2}</div><textarea id="note" maxlength="240" placeholder="${esc(T.help)}">${esc(B.note)}</textarea><div class="count"><span id="cnt">${B.note.length}</span>/240</div>
  <div class="h4"><i>3</i>${T.s3}</div>
  <div class="policy"><b>${T.pol}</b><ul>${T.polL.map(x=>`<li>${x}</li>`).join('')}</ul></div>
  <label class="chk"><input type="checkbox" id="under" ${B.minor?'checked':''}>${T.under}</label>
  ${B.minor?`<div class="minor">${T.minor}<input id="par" type="email" placeholder="${T.parent}" value="${esc(B.parent)}" style="width:100%;height:44px;margin-top:10px;border:1.5px solid #F2DDAA;border-radius:12px;padding:0 12px;background:#fff;outline:none" dir="ltr"></div>`:''}
  <label class="chk"><input type="checkbox" id="agree" ${B.agree?'checked':''}>${T.agree}</label>
- <div class="sum"><span>${T.total}</span><b>${cur(price)}</b></div>
+ <div class="sum"><span>${T.total}</span><b>${priceOf(m,B.len===30?'p30':'p60')}</b></div>
  <button class="btn dark pay" id="pay" ${ready?'':'disabled'}>${T.pay}</button><p class="fine">${T.fine}</p>`);
  const sb=$('#sb');
  sb.querySelectorAll('[data-len]').forEach(b=>b.onclick=()=>{B.len=+b.dataset.len;keep(drawB);});

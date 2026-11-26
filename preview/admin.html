@@ -211,7 +211,8 @@ const fmt=n=>n.toLocaleString('en-US'),qar=n=>fmt(n)+' ر.ق';
 const SB=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm');   /* publishable key: safe in the page, access is enforced by row-level security */
 const LIGHTS={H:{n:'الأفق',e:YVI('H',15),w:'عالم المؤسسين',c:'#7FB2FF'},F:{n:'الصانع',e:YVI('F',15),w:'عالم الصنّاع',c:'#F2A93B'},O:{n:'المدار',e:YVI('O',15),w:'عالم التأثير',c:'#5CE1E6'},S:{n:'الشرارة',e:YVI('S',15),w:'عالم المبدعين',c:'#F08BB4'},C:{n:'البوصلة',e:YVI('C',15),w:'عالم الاكتشاف',c:'#A99BFF'}};
 const now=Date.now(),DAY=864e5;
-let DEMO=false,ME=null,USERS=[],PAYS=[],MC=[],RESULTS=[],SETTINGS={};
+let DEMO=false,ME=null,USERS=[],PAYS=[],MC=[],RESULTS=[],SETTINGS={},MENTORS=[];
+const DAYS=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 function loadSample(){DEMO=true;let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280,pick=a=>a[Math.floor(rnd()*a.length)];
  const FN=['سارة','محمد','نورة','عبدالله','مريم','خالد','ريم','فهد','لولوة','حمد','جواهر','يوسف','هيا','علي','دانة','سلطان','شيخة','راشد','العنود','ناصر','أمل','تميم','ليان','جاسم','روضة','مبارك','غلا','عمر','نوف','سعود'];
  const LN=['الكواري','المري','السليطي','العطية','النعيمي','الهاجري','المهندي','الخليفي','البوعينين','الدوسري','الكبيسي','المناعي'];
@@ -227,9 +228,14 @@ function loadSample(){DEMO=true;let seed=7;const rnd=()=>(seed=(seed*9301+49297)
   PAYS.push({id:'SC-'+(48210+PAYS.length*7),u,what:sub?'اشتراك '+u.plan:m.t,amt:sub?(u.plan==='سنوي'?990:99):m.p,when:u.joined+Math.floor(rnd()*5)*DAY,st:rnd()<.86?'paid':rnd()<.6?'pend':'ref'});}});
  PAYS.sort((a,b)=>b.when-a.when);
  RESULTS=USERS.filter(u=>u.lt).map((u,i)=>({id:'r'+u.id,n:u.n,e:u.e,lt:u.lt,plan:i%4>0,when:u.joined,uid:u.id}));
+ MENTORS=[{id:'m1',n:'د. هند الأنصاري',f:'ريادة الأعمال',bio:'',langs:['ar','en'],l:'H',p30:200,p60:350,ok:true,applied:false,av:[{d:0,from:'16:00',to:'21:00'},{d:2,from:'16:00',to:'21:00'}],sess:24,earn:4800},
+  {id:'m2',n:'أ. فيصل الملا',f:'صناعة المحتوى',bio:'',langs:['ar'],l:'S',p30:150,p60:260,ok:true,applied:false,av:[{d:1,from:'17:00',to:'21:00'}],sess:17,earn:2550},
+  {id:'m3',n:'م. عائشة الجابر',f:'البرمجة',bio:'',langs:['en'],l:'F',p30:180,p60:300,ok:false,applied:true,av:[],sess:0,earn:0}];
  SETTINGS={registration_open:true,parental_consent_required:true,send_7day_plan:true,maintenance:false,notify_each_payment:true,weekly_summary:true,notify_consent_request:false};}
 const T=t=>t?new Date(t).getTime():null;
 async function loadReal(){DEMO=false;
+ const [mt,av,bk]=await Promise.all([SB.from('mentors').select('*').order('created_at',{ascending:false}),SB.from('mentor_availability').select('*'),SB.from('bookings').select('mentor_id,status,minutes,order_id')]);
+ for(const r of [mt,av,bk])if(r.error)throw r.error;
  const [pr,rs,od,mc,en,st]=await Promise.all([SB.from('profiles').select('*').order('created_at',{ascending:false}),SB.from('test_results').select('*').order('created_at',{ascending:false}).limit(1000),
   SB.from('orders').select('*').order('created_at',{ascending:false}).limit(1000),SB.from('masterclasses').select('*').order('created_at',{ascending:false}),
   SB.from('enrollments').select('user_id,masterclass_id,progress'),SB.from('settings').select('key,value')]);
@@ -246,7 +252,11 @@ async function loadReal(){DEMO=false;
  const cnt={};en.data.forEach(x=>cnt[x.masterclass_id]=(cnt[x.masterclass_id]||0)+1);
  MC=mc.data.map(m=>({id:m.id,t:m.title_ar,m:m.mentor_name||'',w:m.world,ch:m.chapters,min:m.minutes,p:+m.price_qar,st:m.status==='published'?'pub':'draft',en:cnt[m.id]||0,d:m.description_ar||''}));
  RESULTS=rs.data.map(r=>({id:r.id,n:r.name||'—',e:r.email||'',lt:r.light,plan:r.plan_requested,when:T(r.created_at),uid:r.user_id||''}));
- SETTINGS={};st.data.forEach(x=>SETTINGS[x.key]=x.value===true||x.value==='true');}
+ SETTINGS={};st.data.forEach(x=>SETTINGS[x.key]=x.value===true||x.value==='true');
+ const paidOrder={};od.data.forEach(o=>{if(o.status==='paid')paidOrder[o.id]=+o.amount_qar;});
+ MENTORS=mt.data.map(m=>{const b=bk.data.filter(x=>x.mentor_id===m.id&&['confirmed','completed'].includes(x.status));
+  return {id:m.id,n:m.name,f:m.field||'',bio:m.bio||'',langs:m.langs||['ar'],l:m.light,p30:m.price_30!=null?+m.price_30:null,p60:m.price_60!=null?+m.price_60:null,ok:m.approved,applied:!!m.user_id&&!m.approved,
+   av:av.data.filter(a=>a.mentor_id===m.id).map(a=>({d:a.weekday,from:a.start_time.slice(0,5),to:a.end_time.slice(0,5)})),sess:b.length,earn:b.reduce((s,x)=>s+(paidOrder[x.order_id]||0),0)};});}
 const pct=(a,b)=>b?Math.round(a/b*100):0;
 const emptyMsg=t=>`<div class="empty">${t}</div>`;
 
@@ -271,6 +281,7 @@ const PAGES=[
  {k:'users',t:'المستخدمون',s:'كل الحسابات المسجلة في المنصة',i:I.users},
  {k:'test',t:'اختبار الضوء',s:'النتائج وتوزيع الأضواء والعوالم',i:I.test},
  {k:'mc',t:'الماستركلاس',s:'إضافة وتعديل الماستركلاس ونشرها',i:I.mc},
+ {k:'mentors',t:'المرشدون والمدربون',s:'إضافة المرشدين واعتمادهم وأوقاتهم وأسعارهم',i:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 5.5h15a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5h-1a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z"/><path d="M8.5 10h7M8.5 13h4.5"/></svg>'},
  {k:'pay',t:'المدفوعات',s:'عمليات الدفع عبر SkipCash',i:I.pay},
  {k:'set',t:'الإعدادات',s:'حساب المدير وإعدادات المنصة',i:I.set}];
 
@@ -366,6 +377,51 @@ const mcForm=id=>{const m=MC.find(x=>String(x.id)===String(id))||{t:'',m:'',w:'H
   $('#mcSave').disabled=true;(id?SB.from('masterclasses').update(row).eq('id',id):SB.from('masterclasses').insert(row)).then(async({error})=>{
    if(error){$('#mcSave').disabled=false;return toast('تعذّر الحفظ: '+error.message);}await refresh();closeAll();go('mc');toast('تم الحفظ');});};};
 
+let mf='all';
+V.mentors=()=>{const L=MENTORS.filter(m=>mf==='all'||(mf==='ok'?m.ok:mf==='req'?(!m.ok&&m.applied):(!m.ok&&!m.applied)));
+ const langT=a=>a.map(x=>x==='ar'?'عربي':'English').join(' · ');
+ return `<div class="grid kpis">
+ ${kpi(YVI('sparkle',17,'#127F87'),'#E8F7F8','مرشدون معتمدون',fmt(MENTORS.filter(m=>m.ok).length),'يظهرون في عالم يو مينتور',1)}
+ ${kpi(YVI('mail',17,'#C98A12'),'#FFF3DA','طلبات انضمام',fmt(MENTORS.filter(m=>!m.ok&&m.applied).length),'بانتظار اعتمادك',0)}
+ ${kpi(YVI('calendar',17,'#6B5BD6'),'#EEEBFC','جلسات مؤكدة',fmt(MENTORS.reduce((s,m)=>s+m.sess,0)),'كل المرشدين',1)}
+ ${kpi(YVI('award',17,'#B8860B'),'#FFF3DA','إيرادات الجلسات',qar(MENTORS.reduce((s,m)=>s+m.earn,0)),'مدفوعة',1)}</div>
+ <div class="card" style="margin-top:18px"><div class="tools"><button class="btn" id="mtAdd">+ مرشد جديد</button>
+  <select id="mf"><option value="all">الكل</option><option value="ok" ${mf==='ok'?'selected':''}>معتمدون</option><option value="req" ${mf==='req'?'selected':''}>طلبات انضمام</option><option value="hid" ${mf==='hid'?'selected':''}>مخفيون</option></select></div>
+ <div class="tw"><table><thead><tr><th>المرشد</th><th>التخصص</th><th>اللغات</th><th>الضوء</th><th>30 / 60 دقيقة</th><th>التوفر</th><th>جلسات</th><th>الحالة</th><th></th></tr></thead><tbody>
+ ${L.length?L.map(m=>`<tr data-m="${m.id}"><td><div class="u">${avatar(m.n,m.l)}<b>${esc(m.n)}</b></div></td><td>${esc(m.f||'—')}</td><td>${langT(m.langs)}</td><td>${m.l?lightTag(m.l):'—'}</td>
+  <td>${m.p30!=null?qar(m.p30):'—'} / ${m.p60!=null?qar(m.p60):'—'}</td><td>${m.av.length?m.av.map(a=>DAYS[a.d]).join('، '):'<span class="st warn">لم تُحدد</span>'}</td><td>${m.sess}</td>
+  <td>${m.ok?'<span class="st ok">معتمد</span>':m.applied?'<span class="st warn">طلب انضمام</span>':'<span class="st mute">مخفي</span>'}</td>
+  <td style="white-space:nowrap">${m.ok?`<button class="btn sm ghost" data-mt="hide" data-id="${m.id}">إخفاء</button>`:`<button class="btn sm" data-mt="approve" data-id="${m.id}">اعتماد</button>`}${!m.ok&&m.applied?` <button class="btn sm ghost" style="color:var(--bad)" data-mt="reject" data-id="${m.id}">رفض</button>`:''}</td></tr>`).join(''):'<tr><td colspan="9" class="empty">لا يوجد مرشدون بعد. أضف أول مرشد من الزر فوق.</td></tr>'}</tbody></table></div>
+ <div class="hint" style="margin:14px 0 0">المرشد لا يظهر في عالم يو مينتور إلا بعد اعتماده. الأوقات بتوقيت قطر.</div></div>`;};
+const mtForm=id=>{const m=MENTORS.find(x=>String(x.id)===String(id))||{n:'',f:'',bio:'',langs:['ar'],l:'',p30:'',p60:'',ok:true,av:[]};
+ const has=d=>m.av.find(a=>a.d===d),av0=m.av[0]||{from:'16:00',to:'21:00'};
+ openMd(`<h2>${id?'تعديل المرشد':'مرشد جديد'}</h2><form class="fm" id="mtf">
+ <label class="w">الاسم<input name="n" value="${esc(m.n)}" required></label>
+ <label>التخصص<input name="f" value="${esc(m.f)}" placeholder="مثل: ريادة الأعمال"></label>
+ <label>الضوء المناسب<select name="l"><option value="">—</option>${Object.keys(LIGHTS).map(k=>`<option value="${k}" ${m.l===k?'selected':''}>${LIGHTS[k].n}</option>`).join('')}</select></label>
+ <label>سعر 30 دقيقة (ر.ق)<input name="p30" type="number" min="0" value="${m.p30??''}"></label>
+ <label>سعر 60 دقيقة (ر.ق)<input name="p60" type="number" min="0" value="${m.p60??''}"></label>
+ <div class="w" style="display:flex;gap:18px;font-size:14px;font-weight:700;color:var(--ink2)">اللغات: <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" name="ar" ${m.langs.includes('ar')?'checked':''} style="height:auto">عربي</label><label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" name="en" ${m.langs.includes('en')?'checked':''} style="height:auto">English</label></div>
+ <label class="w">نبذة<textarea name="bio">${esc(m.bio)}</textarea></label>
+ <div class="w" style="font-size:13px;color:var(--mut);font-weight:700">أيام التوفر (بتوقيت قطر)</div>
+ <div class="w" style="display:flex;flex-wrap:wrap;gap:8px">${DAYS.map((d,i)=>`<label style="flex-direction:row;align-items:center;gap:6px;background:#F2F7F8;border-radius:20px;padding:6px 12px;color:var(--ink2)"><input type="checkbox" name="d${i}" ${has(i)?'checked':''} style="height:auto">${d}</label>`).join('')}</div>
+ <label>من<input name="from" type="time" value="${av0.from}"></label><label>إلى<input name="to" type="time" value="${av0.to}"></label>
+ <label class="w" style="flex-direction:row;align-items:center;gap:8px;color:var(--ink2)"><input type="checkbox" name="ok" ${m.ok?'checked':''} style="height:auto">معتمد ويظهر في عالم يو مينتور</label>
+ </form><div class="act"><button class="btn" id="mtSave">حفظ</button><button class="btn ghost" data-close>إلغاء</button></div>`);
+ $('#mtSave').onclick=async()=>{const f=$('#mtf');if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
+  const langs=['ar','en'].filter(k=>d[k]);if(!langs.length)return toast('اختر لغة واحدة على الأقل');
+  if(d.from>=d.to)return toast('وقت النهاية لازم يكون بعد البداية');
+  const days=[0,1,2,3,4,5,6].filter(i=>d['d'+i]);
+  const row={name:d.n.trim(),field:d.f.trim()||null,bio:d.bio.trim()||null,langs,light:d.l||null,price_30:d.p30===''?null:+d.p30,price_60:d.p60===''?null:+d.p60,approved:!!d.ok};
+  if(DEMO){const o={id:id||('m'+Date.now()),n:row.name,f:row.field||'',bio:row.bio||'',langs,l:row.light,p30:row.price_30,p60:row.price_60,ok:row.approved,applied:false,av:days.map(x=>({d:x,from:d.from,to:d.to})),sess:m.sess||0,earn:m.earn||0};
+   if(id)Object.assign(m,o);else MENTORS.unshift(o);closeAll();go('mentors');return toast('تم الحفظ (بيانات تجريبية)');}
+  $('#mtSave').disabled=true;
+  let mid=id,r=id?await SB.from('mentors').update(row).eq('id',id):await SB.from('mentors').insert(row).select('id').single();
+  if(r.error){$('#mtSave').disabled=false;return toast('تعذّر الحفظ: '+r.error.message);}if(!id)mid=r.data.id;
+  const del=await SB.from('mentor_availability').delete().eq('mentor_id',mid);if(del.error){$('#mtSave').disabled=false;return toast('تعذّر حفظ الأوقات: '+del.error.message);}
+  if(days.length){const ins=await SB.from('mentor_availability').insert(days.map(x=>({mentor_id:mid,weekday:x,start_time:d.from,end_time:d.to})));if(ins.error){$('#mtSave').disabled=false;return toast('تعذّر حفظ الأوقات: '+ins.error.message);}}
+  await refresh();closeAll();go('mentors');toast('تم الحفظ');};};
+
 let pf='';
 V.pay=()=>{const paid=PAYS.filter(p=>p.st==='paid'),r=PAYS.filter(p=>!pf||p.st===pf);return `<div class="grid kpis">
  ${kpi(YVI('award',17,'#B8860B'),'#FFF3DA','إجمالي المدفوع',qar(paid.reduce((s,p)=>s+p.amt,0)),paid.length+' عملية',1)}
@@ -408,9 +464,16 @@ function go(k){cur=k;const p=PAGES.find(x=>x.k===k);$('#pt').textContent=p.t;$('
  if(k==='test')$('#tcsv').onclick=()=>csv('youverse-light-results.csv',[['الاسم','البريد','الضوء','العالم'],...USERS.filter(u=>u.lt).map(u=>[u.n,u.e,LIGHTS[u.lt].n,LIGHTS[u.lt].w])]);
  if(k==='pay'){$('#pf').onchange=e=>{pf=e.target.value;go('pay');};$('#pcsv').onclick=()=>csv('youverse-payments.csv',[['رقم العملية','المستخدم','البند','المبلغ','الحالة','التاريخ'],...PAYS.map(p=>[p.id,p.u.n,p.what,p.amt,p.st,date(p.when)])]);}
  if(k==='mc'){$('#mcAdd').onclick=()=>mcForm(0);}
+ if(k==='mentors'){$('#mtAdd').onclick=()=>mtForm(0);$('#mf').onchange=e=>{mf=e.target.value;go('mentors');};}
  history.replaceState(null,'','#'+k);}
 $('#nav').onclick=e=>{const a=e.target.closest('a');if(a)go(a.dataset.k);};
-$('#view').onclick=e=>{const tr=e.target.closest('tr[data-u]');if(tr)return userDrawer(tr.dataset.u);
+$('#view').onclick=e=>{const ma=e.target.closest('[data-mt]');if(ma){const m=MENTORS.find(x=>String(x.id)===ma.dataset.id),a=ma.dataset.mt;
+  if(a==='reject'&&!confirm('رفض طلب '+m.n+' وحذفه؟'))return;
+  if(DEMO){if(a==='reject')MENTORS.splice(MENTORS.indexOf(m),1);else{m.ok=a==='approve';m.applied=false;}go('mentors');return toast(a==='approve'?'تم الاعتماد':a==='hide'?'تم الإخفاء':'تم الرفض');}
+  const q=a==='reject'?SB.from('mentors').delete().eq('id',m.id):SB.from('mentors').update({approved:a==='approve'}).eq('id',m.id);
+  return q.then(async({error})=>{if(error)return toast('تعذّر الحفظ: '+error.message);await refresh();go('mentors');toast(a==='approve'?'تم الاعتماد، ويظهر الحين في عالم يو مينتور':a==='hide'?'تم الإخفاء':'تم الرفض');});}
+ const mr=e.target.closest('tr[data-m]');if(mr)return mtForm(mr.dataset.m);
+ const tr=e.target.closest('tr[data-u]');if(tr)return userDrawer(tr.dataset.u);
  const ed=e.target.closest('[data-e]');if(ed)return mcForm(ed.dataset.e);
  const pb=e.target.closest('[data-p]');if(pb){const m=MC.find(x=>String(x.id)===pb.dataset.p),ns=m.st==='pub'?'draft':'pub';
   if(DEMO){m.st=ns;go('mc');return toast(ns==='pub'?'تم النشر':'تم الإخفاء');}
