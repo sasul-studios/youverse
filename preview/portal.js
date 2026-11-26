@@ -19,14 +19,14 @@ const PAIR={'Main.dc.html':'Main-EN.dc.html','YouFinder.dc.html':'YouFinder-EN.d
 function header(k){
  const en=/-EN\.dc\.html$/.test(k),base=en?k.replace('-EN',''):k,other=en?base:(PAIR[k]||'Main-EN.dc.html');
  const E=en?'-EN':'',on=f=>base===f?' style="color: #032E36"':'';
- const L=en?{home:'Home',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',langFont:"'Almarai', sans-serif"}
-           :{home:'الرئيسية',mentor:'يو مينتور',login:'تسجيل الدخول',test:'ابدأ الاختبار',your:'ضوؤك: ',lang:'EN',langFont:"'Lora', serif"};
+ const L=en?{home:'Home',you:'My space',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',langFont:"'Almarai', sans-serif"}
+           :{home:'الرئيسية',you:'مساحتي',mentor:'يو مينتور',login:'تسجيل الدخول',test:'ابدأ الاختبار',your:'ضوؤك: ',lang:'EN',langFont:"'Lora', serif"};
  const t=light&&LN.ar[light]?L.your+LN[en?'en':'ar'][light]:L.test;
  const tHref=light?(en?'YouFinder-EN.dc.html':'YouFinder.dc.html'):(en?TEST+'?lang=en':TEST);
  return `<header style="background: #FFFFFF; border-bottom: 1px solid #E6EEF0">
 <div style="max-width: 1240px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
 <a href="Main${E}.dc.html" aria-label="${en?'Youverse home':'Youverse الرئيسية'}"><img src="/_blob/1e4dffc431313b7bc68eadda79d3417c" alt="Youverse" style="height: 44px; display: block"></a>
-<nav style="display: flex; flex-wrap: wrap; gap: 28px; font-size: 16px; font-weight: 700"><a href="Main${E}.dc.html"${on('Main.dc.html')}>${L.home}</a><a href="YouFinder${E}.dc.html"${on('YouFinder.dc.html')}>YouFinder</a><a href="Main${E}.dc.html#worlds">YouPartner</a><a href="mentor.html${en?'?lang=en':''}">${L.mentor}</a><a href="You${E}.dc.html"${on('You.dc.html')}>You</a></nav>
+<nav style="display: flex; flex-wrap: wrap; gap: 28px; font-size: 16px; font-weight: 700"><a href="Main${E}.dc.html"${on('Main.dc.html')}>${L.home}</a><a href="YouFinder${E}.dc.html"${on('YouFinder.dc.html')}>YouFinder</a><a href="Main${E}.dc.html#worlds">YouPartner</a><a href="mentor.html${en?'?lang=en':''}">${L.mentor}</a><a href="You${E}.dc.html"${on('You.dc.html')}>${L.you}</a></nav>
 <div style="display: flex; gap: 12px; align-items: center">
 <a href="Register${E}.dc.html" style="font-weight: 700; padding: 12px 18px">${L.login}</a>
 <a href="${other}" style="font-family: ${L.langFont}; font-weight: 700; border: 1px solid #CFE3E6; padding: 10px 14px; border-radius: 12px">${L.lang}</a>
@@ -51,7 +51,8 @@ const arName=t=>t.replace(/YouFinder(?!s)/g,'يو فايندر').replace(/YouPar
 window.yvHeader=function(box,phone){yh(box,phone);
  if(document.documentElement.lang!=='en'){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const v=n.nodeValue,r=arName(v);if(r!==v)n.nodeValue=r.replace('ادخل عالمك في عالم يو فايندر','ادخل عالمك في يو فايندر');}}
  if(window.YVLater)window.YVLater(box,document.documentElement.lang==='en');
- box.querySelectorAll('header nav a').forEach(a=>{const t=a.textContent.trim();if((t==='يو مينتور'||t==='عالم يو مينتور'||t==='YouMentor')&&!a.querySelector('svg'))a.innerHTML=ico('mentor',16,'currentColor')+'<span>'+t+'</span>';});};
+ box.querySelectorAll('header nav a').forEach(a=>{const t=a.textContent.trim();if((t==='يو مينتور'||t==='عالم يو مينتور'||t==='YouMentor')&&!a.querySelector('svg'))a.innerHTML=ico('mentor',16,'currentColor')+'<span>'+t+'</span>';
+  if((t==='مساحتي'||t==='My space')&&!a.querySelector('svg'))a.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>'+t+'</span>';});};
 
 /* ---------- home: a portal with three doors ---------- */
 function portal(en){
