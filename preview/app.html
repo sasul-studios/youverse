@@ -91,6 +91,16 @@ html[data-header=light] .yvd .yv-burger{background:#032E36;border:0}
 @keyframes yvBreathe{0%,100%{transform:scale(1);opacity:.88;box-shadow:0 0 40px #5CE1E6,0 0 90px rgba(92,225,230,.18)}50%{transform:scale(1.12);opacity:1;box-shadow:0 0 70px #5CE1E6,0 0 150px rgba(92,225,230,.4)}}
 @media (hover:hover) and (pointer:fine){#root a.yv-lightcard:hover{transform:translateY(-4px) scale(1.015)!important;box-shadow:0 40px 70px -30px rgba(3,20,40,.7)!important}}
 </style>
+<style id="yv-journey-phone">
+@media (max-width:640px){
+ div:has(> div > .yv-wtag){gap:12px!important;margin-top:28px!important}
+ div:has(> .yv-wtag){display:grid!important;grid-template-columns:auto 1fr;column-gap:14px!important;row-gap:6px!important;align-items:start;padding:18px 18px!important;border-radius:22px!important;min-height:0!important}
+ div:has(> .yv-wtag) > span:first-child{grid-row:1 / span 3;width:44px!important;height:44px!important;border-radius:14px!important;font-size:20px!important}
+ div:has(> .yv-wtag) > .yv-wtag{justify-self:start;font-size:12px!important;padding:3px 10px!important}
+ div:has(> .yv-wtag) > h3{font-size:22px!important;line-height:1.35}
+ div:has(> .yv-wtag) > p{font-size:15px!important;line-height:1.7!important;grid-column:2}
+}
+</style>
 </head>
 <body>
 <div id="root"></div>
