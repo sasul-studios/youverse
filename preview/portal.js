@@ -2,6 +2,7 @@
    and the home page as a portal with three doors. Loaded after enhance.js and before app.js. */
 (function(){
 const P=window.DC_PAGES;
+const TEST=/-v3\.html$/.test(location.pathname)?'test-v3.html':'test.html';   /* test pages link to the test-page copy of the Light test */
 let light=null;try{light=localStorage.getItem('yvLight');}catch(e){}
 const LN={ar:{H:'الأفق',F:'الصانع',O:'المدار',S:'الشرارة',C:'البوصلة'},en:{H:'Horizon',F:'Forge',O:'Orbit',S:'Spark',C:'Compass'}};
 
@@ -21,7 +22,7 @@ function header(k){
  const L=en?{home:'Home',mentor:'YouMentor',login:'Log in',test:'Take the test',your:'Your Light: ',lang:'عربي',langFont:"'Almarai', sans-serif"}
            :{home:'الرئيسية',mentor:'يو مينتور',login:'تسجيل الدخول',test:'ابدأ الاختبار',your:'ضوؤك: ',lang:'EN',langFont:"'Lora', serif"};
  const t=light&&LN.ar[light]?L.your+LN[en?'en':'ar'][light]:L.test;
- const tHref=light?(en?'YouFinder-EN.dc.html':'YouFinder.dc.html'):(en?'test.html?lang=en':'test.html');
+ const tHref=light?(en?'YouFinder-EN.dc.html':'YouFinder.dc.html'):(en?TEST+'?lang=en':TEST);
  return `<header style="background: #FFFFFF; border-bottom: 1px solid #E6EEF0">
 <div style="max-width: 1240px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
 <a href="Main${E}.dc.html" aria-label="${en?'Youverse home':'Youverse الرئيسية'}"><img src="/_blob/1e4dffc431313b7bc68eadda79d3417c" alt="Youverse" style="height: 44px; display: block"></a>
@@ -75,11 +76,20 @@ function portal(en){
 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px">
 ${doors}
 </div>
-<a class="yv-lightcard" href="${en?'test.html?lang=en':'test.html'}" style="position: relative; overflow: hidden; border-radius: 28px; padding: 44px 48px; display: flex; flex-wrap: wrap; align-items: center; gap: 30px; color: #FFFFFF; background: #04070f url(v5d/cosmos-2x.webp) center/cover; box-shadow: 0 30px 60px -28px rgba(3,20,40,0.6)"><span style="position: absolute; inset: 0; background: radial-gradient(ellipse 80% 90% at 50% 50%, rgba(3,6,14,0.35), rgba(3,6,14,0.85))"></span><span class="yv-orb" style="position: relative; width: 84px; height: 84px; flex-shrink: 0; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #FFFFFF 0%, #9EEFF2 25%, #3FB9C0 60%, #0E5A61 100%); box-shadow: 0 0 50px #5CE1E6"></span><span style="position: relative; display: flex; flex-direction: column; gap: 6px; flex: 1 1 320px"><span style="font-family: 'Amiri', serif; font-weight: 700; font-size: 36px; line-height: 1.3">${T.dark} <span style="color: #9EEFF2">${T.find}</span></span><span style="font-size: 16px; color: rgba(234,244,246,0.8); line-height: 1.8">${T.orb}</span></span><span style="position: relative; background: #5CE1E6; color: #032E36; font-weight: 800; font-size: 16px; padding: 14px 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(92,225,230,0.35)">${T.cta}</span></a>
+<a class="yv-lightcard" href="${en?TEST+'?lang=en':TEST}" style="position: relative; overflow: hidden; border-radius: 28px; padding: 44px 48px; display: flex; flex-wrap: wrap; align-items: center; gap: 30px; color: #FFFFFF; background: #04070f url(v5d/cosmos-2x.webp) center/cover; box-shadow: 0 30px 60px -28px rgba(3,20,40,0.6)"><span style="position: absolute; inset: 0; background: radial-gradient(ellipse 80% 90% at 50% 50%, rgba(3,6,14,0.35), rgba(3,6,14,0.85))"></span><span class="yv-orb" style="position: relative; width: 84px; height: 84px; flex-shrink: 0; border-radius: 50%; background: radial-gradient(circle at 42% 38%, #FFFFFF 0%, #9EEFF2 25%, #3FB9C0 60%, #0E5A61 100%); box-shadow: 0 0 50px #5CE1E6"></span><span style="position: relative; display: flex; flex-direction: column; gap: 6px; flex: 1 1 320px"><span style="font-family: 'Amiri', serif; font-weight: 700; font-size: 36px; line-height: 1.3">${T.dark} <span style="color: #9EEFF2">${T.find}</span></span><span style="font-size: 16px; color: rgba(234,244,246,0.8); line-height: 1.8">${T.orb}</span></span><span style="position: relative; background: #5CE1E6; color: #032E36; font-weight: 800; font-size: 16px; padding: 14px 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(92,225,230,0.35)">${T.cta}</span></a>
 </div>
 </section>`;}
 for(const [k,en] of [['Main.dc.html',false],['Main-EN.dc.html',true]]){const s=P[k],a=s.indexOf('<section',s.indexOf('</header>')),b=s.indexOf('</section>',a);
  if(a>0&&b>0)P[k]=s.slice(0,a)+portal(en)+s.slice(b+10);}
+
+/* emoji -> line icons (yv-icons.js) */
+if(window.YVI){const Y=window.YVI,M={'📖':'book','⏱️':'clock','⏱':'clock','🎧':'media','🏅':'award'};
+ for(const k in P){let s=P[k];
+  s=s.replace(/<span style="font-size: 20px">(📖|⏱️|⏱|🎧|🏅)<\/span>/g,(m,e)=>'<span style="display: flex; color: #127F87">'+Y(M[e],20)+'</span>');
+  s=s.replace(/ 🔥<\/span>/g,' '+Y('flame',15,'#E07A2F')+'</span>').replace(/ 📚<\/span>/g,' '+Y('stack',15,'#127F87')+'</span>').replace(/ 🏅<\/span>/g,' '+Y('award',15,'#B8860B')+'</span>');
+  s=s.replace(/aria-hidden="true">✦<\/div>/g,'aria-hidden="true">'+Y('sparkle',28,'#4A3F75')+'</div>');
+  s=s.split('href="test.html?lang=en"').join('href="'+TEST+'?lang=en"').split('href="test.html"').join('href="'+TEST+'"');
+  P[k]=s;}}
 
 /* styles for this round */
 const st=document.createElement('style');st.textContent=`
