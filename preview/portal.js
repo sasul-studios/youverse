@@ -100,7 +100,7 @@ if(window.YVI){const Y=window.YVI,M={'📖':'book','⏱️':'clock','⏱':'clock
   s=s.replace(/<span style="font-size: 20px">(📖|⏱️|⏱|🎧|🏅)<\/span>/g,(m,e)=>'<span style="display: flex; color: #127F87">'+Y(M[e],20)+'</span>');
   s=s.replace(/ 🔥<\/span>/g,' '+Y('flame',15,'#E07A2F')+'</span>').replace(/ 📚<\/span>/g,' '+Y('stack',15,'#127F87')+'</span>').replace(/ 🏅<\/span>/g,' '+Y('award',15,'#B8860B')+'</span>');
   s=s.replace(/aria-hidden="true">✦<\/div>/g,'aria-hidden="true">'+Y('sparkle',28,'#4A3F75')+'</div>');
-  if(TEST!=='test.html')s=s.split('href="YouFinder-EN.dc.html"').join('href="finder-v3.html?lang=en"').split('href="YouFinder.dc.html"').join('href="finder-v3.html"').split('href="mentor.html').join('href="mentor-v3.html');
+  {const X=TEST==='test.html'?'':'-v3';s=s.split('href="YouFinder-EN.dc.html"').join('href="finder'+X+'.html?lang=en"').split('href="YouFinder.dc.html"').join('href="finder'+X+'.html"');if(X)s=s.split('href="mentor.html').join('href="mentor-v3.html');}
   s=s.split('href="test.html?lang=en"').join('href="'+TEST+'?lang=en"').split('href="test.html"').join('href="'+TEST+'"');
   P[k]=s;}}
 

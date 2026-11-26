@@ -136,6 +136,8 @@ h2{font-size:clamp(26px,4.4vw,36px);line-height:1.5;margin:0 0 22px;color:#fff;f
 </header>
 <main id="app"></main>
 <script src="test-data.js"></script>
+<script src="yv-icons.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
 <script>
 const D=window.YV_TEST,$=s=>document.querySelector(s),app=$('#app');
 const KEYS={ar:['أ','ب','ج','د'],en:['A','B','C','D']};
@@ -169,23 +171,23 @@ function render(anim){const t=T();let h='';document.body.className=S.screen==='r
   <p class="quote serif">${esc(t.notes[S.q])}</p><button class="btn" id="next" type="button" style="margin-top:34px">${esc(t.cont)}</button></section>`;}
  else if(S.screen==='loading'){h=`<section class="screen c">${HALO('fast')}<h2 class="serif" style="margin:0">${esc(t.loadingTitle)}</h2><div class="msgs" id="msgs"></div></section>`;}
  else if(S.screen==='email'){const L=t.lights[S.light],c=D.COLORS[S.light];
-  h=`<section class="screen c" style="--c:${c}"><div class="orb" style="--c:${c}">${L.emoji}</div><h1 class="serif">${esc(t.lightTitle(L.name))}</h1>
+  h=`<section class="screen c" style="--c:${c}"><div class="orb" style="--c:${c}">${YVI(S.light,40,"#032E36",1.6)}</div><h1 class="serif">${esc(t.lightTitle(L.name))}</h1>
   <p class="tag serif" style="color:${c}">${esc(L.tagline)}</p><p class="lead">${esc(t.emailText)}</p>
   <input class="field" id="email" type="email" inputmode="email" autocomplete="email" dir="ltr" placeholder="${esc(t.emailField)}" value="${esc(S.email)}">
   <p class="err" id="err"></p><button class="btn" id="reveal" type="button" style="margin-top:4px">${esc(t.emailBtn)}</button><p class="note">${esc(t.emailNote)}</p></section>`;}
  else if(S.screen==='result'){const L=t.lights[S.light],c=D.COLORS[S.light],name=S.name.trim()||t.you,share=t.shareText(L.name,L.tagline);
-  h=`<section class="screen" style="--c:${c}"><div class="c"><div class="orb" style="--c:${c}">${L.emoji}</div>
+  h=`<section class="screen" style="--c:${c}"><div class="c"><div class="orb" style="--c:${c}">${YVI(S.light,40,"#032E36",1.6)}</div>
   <p class="hello">${esc(t.greeting(name))}</p><h1 class="title serif">${esc(t.lightTitle(L.name))}</h1>
   <p class="tag serif">${esc(L.tagline)}</p><p class="desc">${esc(L.desc)}</p></div>
-  <div class="grid2"><div class="card"><h3>⚡ ${esc(t.sections.superpower)}</h3><p>${esc(L.superpower)}</p></div>
-  <div class="card"><h3>🌑 ${esc(t.sections.shadow)}</h3><p>${esc(L.shadow)}</p></div></div>
-  <div class="card world sec"><h3>🌍 ${esc(t.sections.world)}</h3><div class="wn serif">${esc(L.world)}</div><p style="color:rgba(234,244,246,.85)">${esc(L.worldDesc)}</p>
-   <button class="btn" id="enter" type="button">${esc(t.enterWorld(L.world))}</button>${S.worldOpen?`<div class="soon">${esc(t.worldSoon)}<br><a href="#" id="peek" style="color:var(--c);font-weight:800">${lang==='ar'?'معاينة: شاهد عالمك في YouFinder ←':'Preview: see your World in YouFinder →'}</a></div>`:''}</div>
-  <div class="card sec"><h3>🎓 ${esc(t.sections.matches)}</h3><div class="mlist">${L.matches.map(m=>`<div class="mi"><i>▶</i><span>${esc(m)}</span></div>`).join('')}</div></div>
-  <div class="card sec"><h3 style="justify-content:space-between"><span>🗓️ ${esc(t.sections.days)}</span><span class="draft">${lang==='ar'?'مسودة':'Draft'}</span></h3>
+  <div class="grid2"><div class="card"><h3>${YVI("bolt",19)} ${esc(t.sections.superpower)}</h3><p>${esc(L.superpower)}</p></div>
+  <div class="card"><h3>${YVI("moon",19)} ${esc(t.sections.shadow)}</h3><p>${esc(L.shadow)}</p></div></div>
+  <div class="card world sec"><h3>${YVI("world",19)} ${esc(t.sections.world)}</h3><div class="wn serif">${esc(L.world)}</div><p style="color:rgba(234,244,246,.85)">${esc(L.worldDesc)}</p>
+   <button class="btn" id="enter" type="button">${esc(t.enterWorld(L.world))}</button>${S.worldOpen?`<div class="soon">${esc(t.worldSoon)}<br><a href="#" id="peek" style="color:var(--c);font-weight:800">${lang==='ar'?'معاينة: شاهد عالمك في عالم يو فايندر ←':'Preview: see your World in YouFinder →'}</a></div>`:''}</div>
+  <div class="card sec"><h3>${YVI("cap",19)} ${esc(t.sections.matches)}</h3><div class="mlist">${L.matches.map(m=>`<div class="mi"><i>${YVI("play",12,"currentColor",2)}</i><span>${esc(m)}</span></div>`).join('')}</div></div>
+  <div class="card sec"><h3 style="justify-content:space-between"><span>${YVI("calendar",19)} ${esc(t.sections.days)}</span><span class="draft">${lang==='ar'?'مسودة':'Draft'}</span></h3>
    <div class="days">${L.days.map((d,k)=>`<div class="day"><small>${esc(t.dayLabel(k+1))}</small><span>${esc(d)}</span></div>`).join('')}</div></div>
-  <div class="card sec sent"><span style="font-size:22px">✉️</span><span>${esc(t.planSent(S.email))}</span></div>
-  <div class="card sec"><h3>✨ ${esc(t.shareTitle)}</h3><div class="sharebox" id="stext">${esc(share)}</div>
+  <div class="card sec sent"><span style="display:flex">${YVI("mail",24)}</span><span>${esc(t.planSent(S.email))}</span></div>
+  <div class="card sec"><h3>${YVI("sparkle",19)} ${esc(t.shareTitle)}</h3><div class="sharebox" id="stext">${esc(share)}</div>
    <div class="row"><button class="btn2 main" id="copy" type="button">${esc(t.copy)}</button><button class="btn2" id="share" type="button">${esc(t.share)}</button></div></div>
   <div class="c"><button class="link" id="retake" type="button" style="margin-top:18px">↻ ${esc(t.retake)}</button></div></section>`;}
  app.innerHTML=h;app.classList.toggle('still',!anim);if(!anim)app.querySelectorAll('.screen').forEach(e=>e.style.animation='none');
@@ -205,7 +207,10 @@ function bind(){const t=T(),on=(id,f)=>{const e=$(id);if(e)e.onclick=f;};
  if(S.screen==='email'){const e=$('#email'),err=$('#err');e.oninput=()=>{S.email=e.value;e.classList.remove('bad');err.textContent='';};
   e.onkeydown=ev=>{if(ev.key==='Enter')$('#reveal').click();};
   on('#reveal',()=>{const v=e.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){e.classList.add('bad');err.textContent=t.emailError;e.focus();return;}S.email=v;go('result');});}
- if(S.screen==='result'){try{localStorage.setItem('yvLight',S.light);}catch(x){}   /* the site header shows "Your Light: …" */
+ if(S.screen==='result'){try{localStorage.setItem('yvLight',S.light);}catch(x){}
+ if(!S.saved&&window.supabase){S.saved=true;   /* save the result (row-level security: visitors can add, only the admin reads) */
+  try{window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm',{auth:{persistSession:false}})
+   .from('test_results').insert({name:(S.name||'').trim().slice(0,80)||null,email:S.email||null,lang,answers:S.ans,light:S.light,plan_requested:!!S.email}).then(({error})=>{if(error)console.warn('result not saved',error.message);});}catch(x){}}   /* the site header shows "Your Light: …" */
  const txt=$('#stext').textContent;
   on('#enter',()=>{S.worldOpen=true;render(false);});
   on('#peek',e=>{e.preventDefault();try{sessionStorage.setItem('yvWorld',S.light);}catch(x){}location.href='app.html#youfinder'+(lang==='en'?'-en':'');});
