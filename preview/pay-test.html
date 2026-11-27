@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Youverse · تجربة الدفع SkipCash</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B2A33;--mut:#5B7480;--line:#DCEBEE;--teal:#127F87;--bg:#F4FAFB}
+*{box-sizing:border-box}body{margin:0;font-family:Almarai,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:860px;margin:0 auto;padding:28px 18px 60px}
+h1{font-family:Amiri,serif;font-size:34px;margin:0 0 4px}p{color:var(--mut);line-height:1.8;margin:0 0 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:16px}
+.card h2{font-size:17px;margin:0 0 12px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut);font-weight:700}
+input,select{height:44px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;color:var(--ink);background:#fff}
+button{height:44px;border:0;border-radius:22px;padding:0 20px;background:var(--teal);color:#fff;font:inherit;cursor:pointer}
+button[disabled]{opacity:.5;cursor:default}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;background:#E8F7F8;color:var(--teal)}
+.warn{background:#FFF3DA;color:#8A5A00}.bad{background:#FDE7EA;color:#A3243A}.ok{background:#E3F6EA;color:#17713A}
+table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:start}
+#msg{margin-top:10px;font-size:14px;min-height:20px}
+.tw{overflow-x:auto}
+</style>
+</head>
+<body>
+<main>
+<h1>تجربة الدفع · SkipCash</h1>
+<p>صفحة داخلية للمدير فقط، لتجربة الدفع في بيئة التجربة (Sandbox) قبل الإطلاق. ما تظهر في قوائم الموقع.</p>
+<div id="who" class="card">جارٍ التحقق من الدخول…</div>
+
+<div id="tool" hidden>
+<div class="card">
+<h2>بيانات الدافع</h2>
+<div class="row">
+<label>الاسم الأول<input id="fn" value="Test"></label>
+<label>اسم العائلة<input id="ln" value="Youverse"></label>
+<label>الجوال<input id="ph" dir="ltr" placeholder="+974 5555 5555"></label>
+</div>
+</div>
+
+<div class="card">
+<h2>اختر ما تجربه</h2>
+<div class="row" style="align-items:end">
+<button data-t="test">دفعة تجربة 1 ر.ق</button>
+<button data-t="subscription" data-plan="monthly">اشتراك شهري</button>
+<button data-t="subscription" data-plan="yearly">اشتراك سنوي</button>
+</div>
+<div class="row" style="margin-top:14px;align-items:end">
+<label>ماستركلاس منشور<select id="mc"><option value="">— لا يوجد بعد —</option></select></label>
+<button data-t="masterclass">ادفع الماستركلاس</button>
+</div>
+<div class="row" style="margin-top:14px;align-items:end">
+<label>مرشد معتمد<select id="mt"><option value="">— لا يوجد بعد —</option></select></label>
+<label>المدة<select id="mm"><option value="30">30 دقيقة</option><option value="60">60 دقيقة</option></select></label>
+<label>الموعد<input id="md" type="datetime-local"></label>
+<button data-t="session">احجز وادفع الجلسة</button>
+</div>
+<div id="msg"></div>
+</div>
+
+<div class="card">
+<h2>آخر الطلبات</h2>
+<div class="tw"><table><thead><tr><th>البند</th><th>المبلغ</th><th>الحالة</th><th>SkipCash</th><th>البيئة</th><th>التاريخ</th></tr></thead><tbody id="orders"></tbody></table></div>
+</div>
+</div>
+</main>
+<script src="vendor/supabase-2.45.4.js"></script>
+<script>
+const SB=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm');
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SC={0:'جديد',1:'معلّق',2:'مدفوع',3:'ملغى',4:'فشل',5:'مرفوض',6:'مسترد',12:'قيد التنفيذ'};
+const ST={pending:['معلّق','warn'],paid:['مدفوع','ok'],failed:['فشل','bad'],cancelled:['ملغى','bad'],refunded:['مسترد','warn']};
+let session=null;
+(async()=>{
+ const {data}=await SB.auth.getSession();session=data.session;
+ if(!session){$('#who').innerHTML='لازم تسجّل دخول كمدير أول. <a href="admin.html">افتح لوحة التحكم وسجّل الدخول</a> ثم ارجع لهذي الصفحة.';return;}
+ const {data:p}=await SB.from('profiles').select('role,full_name').eq('id',session.user.id).single();
+ if(!p||p.role!=='admin'){$('#who').textContent='هذي الصفحة للمدير فقط.';return;}
+ $('#who').innerHTML=`مسجّل كمدير: <b dir="ltr">${esc(session.user.email)}</b> <span class="pill" id="envp">…</span>`;
+ $('#tool').hidden=false;
+ const d=new Date(Date.now()+2*864e5);d.setMinutes(0,0,0);$('#md').value=new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16);
+ const [mc,mt]=await Promise.all([SB.from('masterclasses').select('id,title_ar,price_qar').eq('status','published'),SB.from('mentors').select('id,name,price_30,price_60').eq('approved',true)]);
+ if(mc.data&&mc.data.length)$('#mc').innerHTML=mc.data.map(m=>`<option value="${m.id}">${esc(m.title_ar)} · ${m.price_qar} ر.ق</option>`).join('');
+ if(mt.data&&mt.data.length)$('#mt').innerHTML=mt.data.map(m=>`<option value="${m.id}">${esc(m.name)} · ${m.price_30??'—'}/${m.price_60??'—'} ر.ق</option>`).join('');
+ loadOrders();
+})();
+async function loadOrders(){
+ const {data}=await SB.from('orders').select('item_type,item_label,amount_qar,status,skipcash_status_id,env,created_at').order('created_at',{ascending:false}).limit(15);
+ $('#orders').innerHTML=(data&&data.length?data:[]).map(o=>{const s=ST[o.status]||[o.status,''];return `<tr><td>${esc(o.item_label||o.item_type)}</td><td>${o.amount_qar} ر.ق</td><td><span class="pill ${s[1]}">${s[0]}</span></td><td>${o.skipcash_status_id==null?'—':(SC[o.skipcash_status_id]||o.skipcash_status_id)}</td><td>${o.env==='production'?'حقيقي':'تجربة'}</td><td>${new Date(o.created_at).toLocaleString('ar-QA')}</td></tr>`}).join('')||'<tr><td colspan="6" style="color:var(--mut)">لا توجد طلبات بعد</td></tr>';
+}
+document.querySelectorAll('button[data-t]').forEach(b=>b.onclick=async()=>{
+ const t=b.dataset.t,body={item_type:t,first_name:$('#fn').value,last_name:$('#ln').value,phone:$('#ph').value};
+ if(t==='subscription')body.plan=b.dataset.plan;
+ if(t==='masterclass'){if(!$('#mc').value)return msg('ما فيه ماستركلاس منشور بعد.',1);body.item_id=$('#mc').value;}
+ if(t==='session'){if(!$('#mt').value)return msg('ما فيه مرشد معتمد بعد.',1);body.mentor_id=$('#mt').value;body.minutes=+$('#mm').value;body.starts_at=new Date($('#md').value).toISOString();}
+ document.querySelectorAll('button[data-t]').forEach(x=>x.disabled=true);msg('جارٍ إنشاء الدفع…');
+ try{
+  const {data}=await SB.auth.getSession();
+  const r=await fetch('/api/skipcash/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({error:'رد غير متوقع من السيرفر ('+r.status+')'}));
+  if(!r.ok||!j.payUrl)throw new Error(j.error||('HTTP '+r.status));
+  msg('ننقلك لصفحة SkipCash…');location.href=j.payUrl;
+ }catch(e){msg(e.message,1);document.querySelectorAll('button[data-t]').forEach(x=>x.disabled=false);loadOrders();}
+});
+function msg(t,bad){$('#msg').innerHTML=`<span class="pill ${bad?'bad':''}">${esc(t)}</span>`;}
+</script>
+</body>
+</html>
