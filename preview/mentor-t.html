@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouMentor - Youverse</title>
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#032E36;--ink2:#2E4A50;--mut:#5E7A7F;--line:#E3EEF0;--teal:#127F87;--cyan:#5CE1E6;--cream:#FBF1DE;--gold:#9A6A12}
+*{box-sizing:border-box}html,body{margin:0;overflow-x:clip}
+body{font-family:Almarai,sans-serif;color:var(--ink);background:linear-gradient(160deg,#E6F6F7 0%,#F1EFFB 45%,#FBF3EA 100%) fixed;min-height:100vh}
+h1,h2,h3,.serif{font-family:Amiri,serif;margin:0;line-height:1.3}html[lang=en] h1,html[lang=en] h2,html[lang=en] h3,html[lang=en] .serif{font-family:Lora,serif}
+button,input,select,textarea{font:inherit;color:inherit}a{color:inherit}
+.hide{display:none!important}
+main{max-width:1240px;margin:0 auto;padding:44px 32px 90px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+.top h1{font-size:clamp(42px,5vw,64px)}.top p{margin:8px 0 0;color:var(--ink2);font-size:17px;line-height:1.8}
+.tabs{display:flex;padding:4px;border-radius:30px;background:rgba(255,255,255,.7);border:1px solid var(--line)}
+.tabs button{border:0;background:none;height:38px;padding:0 18px;border-radius:30px;font-weight:700;font-size:14px;cursor:pointer;color:var(--mut)}
+.tabs button[aria-pressed=true]{background:var(--ink);color:#fff}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 6px}
+.filters select{height:44px;border-radius:30px;border:1px solid var(--line);background:#fff;padding:0 16px;font-weight:700;font-size:14px;color:var(--ink2);cursor:pointer;outline:none}
+.filters select:focus{border-color:var(--teal)}
+.rec{display:flex;align-items:center;gap:8px;margin:22px 0 12px;font-weight:800;color:var(--teal);font-size:15px}
+.sec-t{margin:34px 0 12px;font-size:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 18px 40px -30px rgba(3,46,54,.4);display:flex;flex-direction:column;gap:14px;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 26px 50px -30px rgba(3,46,54,.5)}
+.mh{display:flex;gap:14px;align-items:center;cursor:pointer}
+.av{width:62px;height:62px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:Amiri,serif;font-weight:700;font-size:24px;color:var(--ink);background:linear-gradient(135deg,#D7F3F4,#E9E5FA);border:2px solid #fff;box-shadow:0 0 0 1.5px var(--c,#5CE1E6)}
+.mh b{display:block;font-size:17px}.mh small{display:block;color:var(--mut);font-size:13.5px;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}.tags span{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:var(--ink2);background:#F2F7F8;border-radius:20px;padding:5px 10px}
+.meta{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;color:var(--ink2);border-top:1px solid #F0F5F6;padding-top:12px}
+.meta span{display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 22px;border-radius:30px;border:0;background:var(--teal);color:#fff;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;transition:filter .15s,transform .15s}
+.btn:hover{filter:brightness(1.08)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.dark{background:var(--ink)}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.sm{height:36px;padding:0 14px;font-size:13px}
+.empty{color:var(--mut);padding:30px;text-align:center}
+
+/* sheet (profile + booking) */
+.ov{position:fixed;inset:0;background:rgba(3,20,26,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}.ov.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(520px,100%);background:#fff;z-index:90;transform:translateX(-105%);visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s .3s;overflow-y:auto;padding:26px 26px 40px;box-shadow:0 0 60px rgba(0,0,0,.2)}
+html[dir=ltr] .sheet{transform:translateX(105%)}
+.sheet.on{transform:none!important;visibility:visible;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.sheet .x{position:absolute;top:16px;inset-inline-start:16px;width:36px;height:36px;border-radius:50%;border:0;background:#F0F5F6;cursor:pointer;font-size:18px}
+.ph{display:flex;gap:16px;align-items:center;margin:30px 0 14px}.ph .av{width:76px;height:76px;font-size:30px}
+.ph h2{font-size:30px}.ph small{color:var(--mut);font-size:14px}
+.bio{color:var(--ink2);line-height:1.9;font-size:15px;margin:0 0 14px}
+.h4{font-weight:800;font-size:15px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}.h4 i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-size:12.5px;display:flex;align-items:center;justify-content:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{border:1.5px solid var(--line);border-radius:18px;padding:14px;cursor:pointer;text-align:start;background:#fff}
+.opt b{display:block;font-size:16px}.opt small{color:var(--mut)}
+.opt[aria-pressed=true]{border-color:var(--teal);background:#EDF9FA;box-shadow:0 0 0 1px var(--teal)}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.days::-webkit-scrollbar{display:none}
+.day{flex-shrink:0;width:64px;border:1.5px solid var(--line);border-radius:16px;padding:9px 0;text-align:center;cursor:pointer;background:#fff}
+.day small{display:block;color:var(--mut);font-size:11.5px}.day b{font-size:18px}
+.day[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.day[aria-pressed=true] small{color:rgba(255,255,255,.7)}
+.day:disabled{opacity:.35;cursor:not-allowed}
+.slots{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.slot{height:42px;padding:0 16px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-weight:800;cursor:pointer;direction:ltr}
+.slot[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tz{font-size:12.5px;color:var(--mut);margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tz button{border:0;background:none;color:var(--teal);font-weight:800;cursor:pointer;padding:0;font-size:12.5px;text-decoration:underline}
+textarea{width:100%;min-height:86px;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;resize:vertical;outline:none;line-height:1.7}
+textarea:focus{border-color:var(--teal)}
+.count{font-size:12px;color:var(--mut);text-align:end;margin-top:4px}
+.policy{background:#F6FAFB;border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:13.5px;line-height:1.85;color:var(--ink2)}
+.policy ul{margin:6px 0 0;padding-inline-start:18px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.7;margin-top:12px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--teal);flex-shrink:0;margin-top:3px}
+.minor{background:#FFF6E3;border:1px solid #F2DDAA;border-radius:16px;padding:12px 14px;font-size:13.5px;line-height:1.8;color:#7A5300;margin-top:12px}
+.sum{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px;font-size:15px}.sum b{font-size:22px}
+.pay{width:100%;height:54px;font-size:16px}
+.fine{font-size:12px;color:var(--mut);text-align:center;margin-top:10px;line-height:1.7}
+.done{text-align:center;padding-top:40px}.done .ok{width:74px;height:74px;border-radius:50%;background:#E3F6EE;color:#1E9E6A;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.done h2{font-size:32px}.done p{color:var(--ink2);line-height:1.9}
+.steps{text-align:start;background:#F6FAFB;border-radius:18px;padding:16px 18px;margin:18px 0;display:flex;flex-direction:column;gap:12px;font-size:14px}
+.steps div{display:flex;gap:10px;align-items:flex-start;line-height:1.7}.steps svg{color:var(--teal);margin-top:3px}
+.report{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:#B04A5E;font-weight:800;font-size:13px;cursor:pointer;padding:0}
+
+/* mentor side */
+.panel{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin-top:26px}
+.box{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 18px 40px -30px rgba(3,46,54,.35)}
+.box h3{font-size:24px;margin-bottom:4px}.box .hint{color:var(--mut);font-size:13px;margin-bottom:14px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}.kp .box{padding:18px}.kp small{color:var(--mut);font-size:13px;font-weight:700}.kp b{display:block;font-size:28px;margin-top:6px}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wk button{height:40px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:800;font-size:12.5px;cursor:pointer}
+.wk button[aria-pressed=true]{background:#EDF9FA;border-color:var(--teal);color:var(--teal)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0F5F6}.row:last-child{border:0}
+.row .av{width:44px;height:44px;font-size:17px}.row small{display:block;color:var(--mut);font-size:12.5px;line-height:1.6}
+.row .acts{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.st{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11.5px;font-weight:800}.st.ok{background:#E3F6EE;color:#1E9E6A}.st.wait{background:#FFF3DA;color:#C98A12}.st.no{background:#FDE7EA;color:#D0465A}
+.price{display:flex;gap:10px}.price label{flex:1;font-size:13px;color:var(--mut);font-weight:700;display:flex;flex-direction:column;gap:6px}
+.price input{height:44px;border:1.5px solid var(--line);border-radius:12px;padding:0 12px;outline:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:14px;font-weight:700;opacity:0;transition:.25s;z-index:120;pointer-events:none}.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:760px){main{padding:26px 16px 70px}.top p{font-size:15.5px}.filters{flex-wrap:nowrap;overflow-x:auto;margin-inline:-16px;padding:0 16px 4px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.filters select{flex-shrink:0}
+ .grid{grid-template-columns:1fr}.sheet{padding:22px 18px 40px}.panel,.kp{grid-template-columns:1fr}.kp{grid-template-columns:repeat(3,1fr)}.kp b{font-size:22px}}
+</style>
+<link rel="preload" as="image" href="img/logo-h128.webp">
+<script>window.YV_LOGO='img/logo-h128.webp';</script>
+<style>html,body{overscroll-behavior-y:none}html{background:inherit}</style>
+</head>
+<body>
+<div id="yv-shell" data-page="mentor"></div>
+<main>
+ <div class="top"><div><h1 id="h1"></h1><p id="sub"></p></div><div class="tabs" role="group"><button id="tYouer" aria-pressed="true"></button><button id="tMentor" aria-pressed="false"></button></div></div>
+
+ <section id="dir">
+  <div class="filters" id="filters"></div>
+  <div id="recWrap"></div>
+  <h2 class="sec-t" id="allT"></h2>
+  <div class="grid" id="grid"></div>
+ </section>
+
+ <section id="side" class="hide"></section>
+</main>
+<div class="ov" id="ov"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true"><button class="x" aria-label="close">×</button><div id="sb"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script src="test-data.js"></script>
+<script src="yv-icons.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
+<script src="yv-shell.js"></script>
+<script>
+const SH=window.YV_SHELL,en=SH.en,lang=en?'en':'ar',D=window.YV_TEST,LT=D[lang].lights,COL=D.COLORS;
+document.documentElement.lang=lang;document.documentElement.dir=en?'ltr':'rtl';
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const T=en?{h1:'YouMentor',sub:'A private session with someone who gets your path.',youer:'Find a mentor',mentor:"I'm a mentor",
+ spec:'Field',lang:'Language',price:'Price',avail:'Availability',any:'All',ar:'Arabic',en:'English',both:'Arabic & English',p1:'Up to QAR 150',p2:'QAR 150 - 250',p3:'Over QAR 250',today:'Available today',week:'This week',
+ rec:'Recommended for your Light',all:'All mentors',min:'min',next:'Next slot',book:'Book a session',profile:'View profile',none:'No mentors match these filters.',
+ about:'About',fields:'Fields',langs:'Languages',session:'Session',s1:'Choose a time',s2:'What do you want help with?',s3:'Payment',help:'One or two lines, e.g. "I want feedback on my portfolio".',
+ tzMine:'Times are shown in your time zone',tzQ:'Times are shown in Qatar time',showQ:'Show Qatar time',showMine:'Show my time',
+ pol:'Cancellation and refunds',polL:['Cancel up to 24 hours before: full refund.','Cancel less than 24 hours before: 50% refund.','Mentor cancels or does not show up: full refund, or rebook for free.','You do not show up within 10 minutes: no refund.'],
+ agree:'I have read the cancellation policy and the code of conduct.',under:'I am under 18',minor:'You are under 18: we will email your parent or guardian for consent before the session is confirmed. Sessions and messages stay inside Youverse.',
+ parent:"Parent's email",total:'Total',pay:'Pay with SkipCash and book',fine:'Preview: payment is not live yet. After paying you get a confirmation email, a calendar invite and the session link (Google Meet or Zoom), then reminders 24 hours and 1 hour before.',
+ done:'Your session is booked',doneP:'Preview: in the live site this happens after SkipCash confirms the payment.',d1:'Confirmation email with the session details',d2:'Calendar invite with the session link (Google Meet or Zoom)',d3:'Reminders 24 hours and 1 hour before',d4w:'Waiting for your parent or guardian to approve',close:'Done',report:'Report a problem',reportT:'Your report reaches the Youverse team right away.',
+ code:'Code of conduct: respect, no personal contact details, no meetings outside Youverse.',
+ kp1:'Upcoming sessions',kp2:'This month',kp3:'Rating',avT:'Weekly availability',avH:'Tap the days you take sessions; Qatar time.',hours:'Hours',prT:'Session prices',p30:'30 minutes (QAR)',p60:'60 minutes (QAR)',save:'Save',upT:'Upcoming sessions',upH:"With each youer's note",accept:'Accept',move:'Reschedule',cancel:'Cancel',accepted:'Accepted',pending:'New request',apply:'Want to become a mentor?',applyP:'Mentors are approved by the Youverse team first.',applyB:'Apply',
+ saved:'Saved (preview)',name:'[Mentor name]',field:'[Field]',bio:'[A short bio about the mentor: experience, what they help with, and who they like to work with.]',youer:'Find a mentor',sample:'Sample prices',
+ days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat']}
+:{h1:'عالم يو مينتور',sub:'جلسة خاصة، مع من يفهم طريقك.',youer:'ابحث عن مرشد',mentor:'أنا مرشد',
+ spec:'التخصص',lang:'اللغة',price:'السعر',avail:'التوفر',any:'الكل',ar:'عربي',en:'English',both:'عربي و English',p1:'حتى 150 ر.ق',p2:'150 - 250 ر.ق',p3:'أكثر من 250 ر.ق',today:'متاح اليوم',week:'هذا الأسبوع',
+ rec:'موصى به لضوئك',all:'كل المرشدين',min:'دقيقة',next:'أقرب موعد',book:'احجز جلسة',profile:'الملف',none:'لا يوجد مرشد بهذه الفلاتر.',
+ about:'نبذة',fields:'التخصصات',langs:'اللغات',session:'الجلسة',s1:'اختر الوقت',s2:'بماذا تريد المساعدة؟',s3:'الدفع',help:'سطر أو سطران، مثل: «أريد رأياً في ملف أعمالي».',
+ tzMine:'الأوقات بتوقيتك',tzQ:'الأوقات بتوقيت قطر',showQ:'اعرض بتوقيت قطر',showMine:'اعرض بتوقيتي',
+ pol:'سياسة الإلغاء والاسترداد',polL:['الإلغاء قبل 24 ساعة أو أكثر: استرداد كامل.','الإلغاء خلال أقل من 24 ساعة: استرداد 50%.','إذا ألغى المرشد أو لم يحضر: استرداد كامل أو إعادة الحجز مجاناً.','إذا لم تحضر خلال 10 دقائق: لا يوجد استرداد.'],
+ agree:'قرأت سياسة الإلغاء ومدونة السلوك.',under:'عمري أقل من 18 سنة',minor:'عمرك أقل من 18: نرسل لولي أمرك بريداً للموافقة قبل تأكيد الجلسة. كل الرسائل والجلسات تبقى داخل Youverse.',
+ parent:'بريد ولي الأمر',total:'الإجمالي',pay:'ادفع عبر SkipCash واحجز',fine:'معاينة: الدفع غير مفعّل بعد. بعد الدفع يصلك بريد تأكيد مع دعوة تقويم ورابط الجلسة (Google Meet أو Zoom)، ثم تذكيران قبل 24 ساعة وقبل ساعة.',
+ done:'تم حجز جلستك',doneP:'معاينة: في الموقع الحقيقي يحدث هذا بعد تأكيد SkipCash للدفع.',d1:'بريد تأكيد بتفاصيل الجلسة',d2:'دعوة تقويم مع رابط الجلسة (Google Meet أو Zoom)',d3:'تذكيران قبل 24 ساعة وقبل ساعة',d4w:'بانتظار موافقة ولي الأمر',close:'تم',report:'إبلاغ عن مشكلة',reportT:'يصل بلاغك لفريق Youverse مباشرة.',
+ code:'مدونة السلوك: الاحترام، لا تبادل لأرقام أو حسابات شخصية، لا لقاءات خارج Youverse.',
+ kp1:'الجلسات القادمة',kp2:'أرباح هذا الشهر',kp3:'التقييم',avT:'التوفر الأسبوعي',avH:'اختر الأيام التي تستقبل فيها جلسات، بتوقيت قطر.',hours:'الساعات',prT:'أسعار الجلسات',p30:'30 دقيقة (ر.ق)',p60:'60 دقيقة (ر.ق)',save:'حفظ',upT:'الجلسات القادمة',upH:'مع ملاحظة كل يوير',accept:'قبول',move:'إعادة جدولة',cancel:'إلغاء',accepted:'مقبولة',pending:'طلب جديد',apply:'تريد أن تصبح مرشداً؟',applyP:'نعتمد المرشدين من فريق Youverse أولاً.',applyB:'قدّم طلبك',
+ saved:'تم الحفظ (معاينة)',name:'[اسم المرشد]',field:'[التخصص]',bio:'[نبذة قصيرة عن المرشد: خبرته، وبماذا يساعد، ومع من يحب أن يعمل.]',sample:'أسعار تجريبية',
+ days:['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']};
+$('#h1').textContent=T.h1;$('#sub').textContent=T.sub;$('#tYouer').textContent=T.youer;$('#tMentor').textContent=T.mentor;$('#allT').textContent=T.all;
+const cur=n=>'<span class="yv-later">'+(en?'(Price, later)':'(السعر لاحقاً)')+'</span>';   /* prices come from the client */
+const fieldOf=m=>m.ft||F[m.f]||'';
+const priceOf=(m,k)=>m.sample||m[k]==null?cur():(en?'QAR '+fmtN(m[k]):fmtN(m[k])+' ر.ق');
+const fmtN=n=>Number(n).toLocaleString('en-US');
+const later=t=>'<span class="yv-later">('+t+(en?', later)':' لاحقاً)')+'</span>';
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2400);};
+
+/* sample mentors (names and photos come from the client; fields here are examples) */
+const F=en?{biz:'Entrepreneurship',design:'Graphic design',content:'Content creation',code:'Programming',mkt:'Marketing',career:'Career path',music:'Music'}
+          :{biz:'ريادة الأعمال',design:'التصميم الجرافيكي',content:'صناعة المحتوى',code:'البرمجة',mkt:'التسويق',career:'المسار المهني',music:'الموسيقى'};
+let M=[{f:'biz',l:'H',langs:['ar','en'],p30:200,p60:350,days:[0,1,3],ini:'أ'},{f:'design',l:'S',langs:['ar'],p30:120,p60:200,days:[1,2,4],ini:'ب'},
+ {f:'content',l:'O',langs:['ar','en'],p30:150,p60:260,days:[0,2,3],ini:'ج'},{f:'code',l:'F',langs:['en'],p30:180,p60:300,days:[0,1,2,3],ini:'د'},
+ {f:'mkt',l:'O',langs:['ar'],p30:100,p60:180,days:[3,6],ini:'ه'},{f:'career',l:'C',langs:['ar','en'],p30:130,p60:220,days:[0,1,2],ini:'و'},
+ {f:'music',l:'S',langs:['en'],p30:160,p60:280,days:[4,6],ini:'ز'},{f:'biz',l:'F',langs:['ar'],p30:250,p60:420,days:[1,3],ini:'ح'}]
+ .map((m,i)=>Object.assign(m,{id:i,name:T.name,ini:en?'ABCDEFGH'[i]:m.ini,hours:[16,17.5,19,20.5],sample:true}));
+const SLOT_TZ='Asia/Qatar';const QOFF=3;   /* availability is set in Qatar time */
+const myTZ=Intl.DateTimeFormat().resolvedOptions().timeZone||SLOT_TZ;let showTZ=myTZ;
+const dayStart=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x;};
+function slots(m,dayOffset){const now=new Date(),base=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+dayOffset));
+ const qDow=new Date(base.getTime()+QOFF*36e5).getUTCDay();const hrs=m.hd?m.hd[qDow]:(m.days.includes(qDow)?m.hours:null);if(!hrs)return [];
+ return hrs.map(h=>new Date(base.getTime()+(h-QOFF)*36e5)).filter(t=>t-now>3*36e5);}
+function nextSlot(m){for(let d=0;d<14;d++){const s=slots(m,d);if(s.length)return s[0];}return null;}
+const fmtT=t=>t.toLocaleTimeString(en?'en-US':'ar-u-nu-latn',{hour:'numeric',minute:'2-digit',timeZone:showTZ});
+const fmtD=t=>t.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{weekday:'short',day:'numeric',month:'short',timeZone:showTZ});
+const rel=t=>{if(!t)return '—';const d=Math.round((dayStart(t)-dayStart(new Date()))/864e5);return (d===0?(en?'Today':'اليوم'):d===1?(en?'Tomorrow':'غداً'):fmtD(t))+' · '+fmtT(t);};
+
+/* directory */
+const FL={spec:'',lang:'',price:'',avail:''};
+function buildFilters(){const specs=[...new Set(M.map(m=>m.sample?m.f:fieldOf(m)).filter(Boolean))].map(v=>[v,M.find(m=>(m.sample?m.f:fieldOf(m))===v).sample?F[v]:v]);
+ $('#filters').innerHTML=[['spec',T.spec,specs],['lang',T.lang,[['ar',T.ar],['en',T.en]]],['price',T.price,[['1',T.p1],['2',T.p2],['3',T.p3]]],['avail',T.avail,[['today',T.today],['week',T.week]]]]
+ .map(([k,t,o])=>`<select data-k="${k}" aria-label="${t}"><option value="">${t}: ${T.any}</option>${o.map(([v,l])=>`<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select>`).join('');}
+buildFilters();
+$('#filters').onchange=e=>{FL[e.target.dataset.k]=e.target.value;renderDir();};
+const ok=m=>{if(FL.spec&&(m.sample?m.f:fieldOf(m))!==FL.spec)return false;if(FL.lang&&!m.langs.includes(FL.lang))return false;
+ if(FL.price&&m.p30==null)return false;if(FL.price==='1'&&m.p30>150)return false;if(FL.price==='2'&&(m.p30<150||m.p30>250))return false;if(FL.price==='3'&&m.p30<=250)return false;
+ const n=nextSlot(m);if(FL.avail==='today'&&!(n&&dayStart(n)-dayStart(new Date())===0))return false;if(FL.avail==='week'&&!(n&&n-new Date()<7*864e5))return false;return true;};
+const langTxt=m=>m.langs.length>1?T.both:(m.langs[0]==='ar'?T.ar:T.en);
+const card=m=>`<article class="card"><div class="mh" data-p="${m.id}"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><b>${m.name}</b><small>${fieldOf(m)}</small></div></div>
+ <div class="tags"><span>${YVI('world',14)}${langTxt(m)}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
+ <div class="meta"><span>${YVI('clock',15)}30 ${T.min} · ${priceOf(m,'p30')}</span><span>${YVI('calendar',15)}${m.sample?later(en?'Next slot':'الموعد'):rel(nextSlot(m))}</span></div>
+ <div style="display:flex;gap:8px"><button class="btn" style="flex:1" data-b="${m.id}">${T.book}</button><button class="btn ghost" data-p="${m.id}">${T.profile}</button></div></article>`;
+function renderDir(){setTimeout(()=>YVLater(document.querySelector('main'),en));const L=SH.light,list=M.filter(ok);
+ const rec=L?list.filter(m=>m.l===L):[];
+ $('#recWrap').innerHTML=rec.length?`<div class="rec">${YVI(L,18)}${T.rec}: ${LT[L].name}</div><div class="grid">${rec.map(card).join('')}</div>`:'';
+ const rest=list.filter(m=>!rec.includes(m));$('#allT').style.display=rest.length||!rec.length?'':'none';
+ $('#grid').innerHTML=rest.length?rest.map(card).join(''):(rec.length?'':`<div class="empty">${T.none}</div>`);}
+renderDir();
+/* approved mentors from the database replace the samples as soon as there is at least one */
+(async()=>{try{if(!window.supabase)return;const sb=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm',{auth:{persistSession:false}});
+ const [mt,av]=await Promise.all([sb.from('mentors').select('id,name,field,bio,langs,light,price_30,price_60').eq('approved',true).eq('kind','mentor').order('created_at'),sb.from('mentor_availability').select('mentor_id,weekday,start_time,end_time')]);
+ if(mt.error||av.error||!mt.data.length)return;
+ const toH=t=>{const [h,m]=t.split(':');return +h+(+m)/60;};
+ M=mt.data.map((r,i)=>{const hd={};av.data.filter(a=>a.mentor_id===r.id).forEach(a=>{const s=toH(a.start_time),e=toH(a.end_time),list=hd[a.weekday]=hd[a.weekday]||[];for(let h=s;h+0.5<=e;h+=1.5)list.push(h);});
+  const ini=(r.name||'?').replace(/^(د\.|أ\.|م\.|Dr\.|Mr\.|Ms\.)\s*/,'').trim()[0]||'?';
+  return {id:i,dbId:r.id,name:esc(r.name),ft:r.field||'',bio:r.bio||'',l:r.light||'C',langs:r.langs&&r.langs.length?r.langs:['ar'],p30:r.price_30,p60:r.price_60,hd,days:Object.keys(hd).map(Number),hours:[],ini};});
+ buildFilters();renderDir();}catch(e){console.warn(e);}})();
+
+/* sheet: profile + booking */
+let B=null;
+function open(h){$('#sb').innerHTML=h;YVLater($('#sb'),en);$('#sheet').classList.add('on');$('#ov').classList.add('on');$('#sheet').scrollTop=0;}
+function close(){$('#sheet').classList.remove('on');$('#ov').classList.remove('on');}
+$('#ov').onclick=close;$('#sheet .x').onclick=close;addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+document.addEventListener('click',e=>{const p=e.target.closest('[data-p]'),b=e.target.closest('[data-b]');
+ if(b&&!e.target.closest('#sheet')){booking(+b.dataset.b);return;}if(p&&!e.target.closest('#sheet'))profile(+p.dataset.p);});
+const head=m=>`<div class="ph"><span class="av" style="--c:${COL[m.l]}">${m.ini}</span><div><h2>${m.name}</h2><small>${fieldOf(m)} · ${langTxt(m)}</small></div></div>`;
+function profile(id){const m=M[id];open(`${head(m)}<p class="bio">${m.sample||!m.bio?T.bio:esc(m.bio)}</p>
+ <div class="h4">${T.fields}</div><div class="tags"><span>${fieldOf(m)}</span><span style="color:${COL[m.l]}">${YVI(m.l,14)}${LT[m.l].name}</span></div>
+ <div class="h4">${T.session}</div><div class="opts"><div class="opt" style="cursor:default"><b>30 ${T.min}</b><small>${priceOf(m,'p30')}</small></div><div class="opt" style="cursor:default"><b>60 ${T.min}</b><small>${priceOf(m,'p60')}</small></div></div>
+ <div class="tz">${YVI('calendar',14)}${T.next}: ${m.sample?later(en?'Slot':'الموعد'):rel(nextSlot(m))}</div>
+ <button class="btn" style="width:100%;margin-top:22px" id="goBook">${T.book}</button><p class="fine">${T.code}</p>`);$('#goBook').onclick=()=>booking(id);}
+function booking(id){const m=M[id];B={m,len:30,day:null,t:null,note:'',minor:false,agree:false,parent:''};
+ for(let d=0;d<14;d++)if(slots(m,d).length){B.day=d;break;}drawB();}
+function drawB(){const m=B.m,days=[...Array(14)].map((_,d)=>d),q=showTZ===SLOT_TZ;
+ const s=B.day!=null?slots(m,B.day):[];const price=B.len===30?m.p30:m.p60;
+ const ready=B.t&&B.note.trim().length>2&&B.agree&&(!B.minor||/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(B.parent));
+ open(`${head(m)}
+ <div class="h4">${T.session}</div><div class="opts">${[30,60].map(l=>`<button class="opt" data-len="${l}" aria-pressed="${B.len===l}"><b>${l} ${T.min}</b><small>${priceOf(m,l===30?'p30':'p60')}</small></button>`).join('')}</div>
+ <div class="h4"><i>1</i>${T.s1}</div>
+ <div class="days">${days.map(d=>{const dt=new Date(Date.now()+d*864e5),has=slots(m,d).length;return `<button class="day" data-day="${d}" aria-pressed="${B.day===d}" ${has?'':'disabled'}><small>${dt.toLocaleDateString(en?'en-US':'ar',{weekday:'short',timeZone:showTZ})}</small><b>${dt.toLocaleDateString(en?'en-US':'ar-u-nu-latn',{day:'numeric',timeZone:showTZ})}</b></button>`}).join('')}</div>
+ <div class="slots">${s.map(t=>`<button class="slot" data-t="${t.getTime()}" aria-pressed="${B.t===t.getTime()}">${fmtT(t)}</button>`).join('')}</div>
+ ${m.sample?`<div class="tz">${later(en?'Times are examples':'الأوقات أمثلة')}</div>`:''}<div class="tz">${YVI('world',14)}${q?T.tzQ:T.tzMine+' ('+myTZ+')'}${myTZ!==SLOT_TZ?` · <button id="tzb">${q?T.showMine:T.showQ}</button>`:''}</div>
+ <div class="h4"><i>2</i>${T.s2}</div><textarea id="note" maxlength="240" placeholder="${esc(T.help)}">${esc(B.note)}</textarea><div class="count"><span id="cnt">${B.note.length}</span>/240</div>
+ <div class="h4"><i>3</i>${T.s3}</div>
+ <div class="policy"><b>${T.pol}</b><ul>${T.polL.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+ <label class="chk"><input type="checkbox" id="under" ${B.minor?'checked':''}>${T.under}</label>
+ ${B.minor?`<div class="minor">${T.minor}<input id="par" type="email" placeholder="${T.parent}" value="${esc(B.parent)}" style="width:100%;height:44px;margin-top:10px;border:1.5px solid #F2DDAA;border-radius:12px;padding:0 12px;background:#fff;outline:none" dir="ltr"></div>`:''}
+ <label class="chk"><input type="checkbox" id="agree" ${B.agree?'checked':''}>${T.agree}</label>
+ <div class="sum"><span>${T.total}</span><b>${priceOf(m,B.len===30?'p30':'p60')}</b></div>
+ <button class="btn dark pay" id="pay" ${ready?'':'disabled'}>${T.pay}</button><p class="fine">${T.fine}</p>`);
+ const sb=$('#sb');
+ sb.querySelectorAll('[data-len]').forEach(b=>b.onclick=()=>{B.len=+b.dataset.len;keep(drawB);});
+ sb.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{B.day=+b.dataset.day;B.t=null;keep(drawB);});
+ sb.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{B.t=+b.dataset.t;keep(drawB);});
+ const tzb=$('#tzb');if(tzb)tzb.onclick=()=>{showTZ=showTZ===SLOT_TZ?myTZ:SLOT_TZ;keep(drawB);};
+ $('#note').oninput=e=>{B.note=e.target.value;$('#cnt').textContent=B.note.length;refreshPay();};
+ $('#under').onchange=e=>{B.minor=e.target.checked;keep(drawB);};$('#agree').onchange=e=>{B.agree=e.target.checked;refreshPay();};
+ const par=$('#par');if(par)par.oninput=e=>{B.parent=e.target.value.trim();refreshPay();};
+ $('#pay').onclick=confirmB;}
+function refreshPay(){const ok=B.t&&B.note.trim().length>2&&B.agree&&(!B.minor||/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(B.parent));$('#pay').disabled=!ok;}
+function keep(f){const y=$('#sheet').scrollTop;f();$('#sheet').scrollTop=y;}
+function confirmB(){const t=new Date(B.t),ic=n=>YVI(n,18);
+ open(`<div class="done"><div class="ok">${YVI('sparkle',36,'#1E9E6A')}</div><h2>${T.done}</h2><p>${B.m.name} · ${B.len} ${T.min}<br><b>${fmtD(t)} · ${fmtT(t)}</b></p>
+ <div class="steps"><div>${ic('mail')}${T.d1}</div><div>${ic('calendar')}${T.d2}</div><div>${ic('clock')}${T.d3}</div>${B.minor?`<div style="color:#9A6A12">${YVI('award',18,'#9A6A12')}${T.d4w}</div>`:''}</div>
+ <p class="fine">${T.doneP}</p><button class="btn" style="width:100%" id="fin">${T.close}</button>
+ <p style="text-align:center;margin-top:16px"><button class="report" id="rep">${YVI('bolt',14)}${T.report}</button></p></div>`);
+ $('#fin').onclick=close;$('#rep').onclick=()=>toast(T.reportT);}
+
+/* mentor side */
+const W={days:[0,1,3],from:'16:00',to:'21:00',p30:150,p60:260};
+function renderSide(){setTimeout(()=>YVLater($('#side'),en));const ups=[{n:'[اسم اليوير]',ini:'س',note:en?'I want feedback on my first design portfolio.':'أريد رأياً في أول ملف أعمال صممته.',d:1,h:'5:30',st:'pending'},
+ {n:'[اسم اليوير]',ini:'م',note:en?'How do I price my first freelance project?':'كيف أسعّر أول مشروع حر لي؟',d:2,h:'7:00',st:'ok'},
+ {n:'[اسم اليوير]',ini:'ر',note:en?'Choosing between two university majors.':'أحتار بين تخصصين في الجامعة.',d:4,h:'4:00',st:'ok'}];
+ $('#side').innerHTML=`<div class="kp"><div class="box"><small>${T.kp1}</small><b>3</b></div><div class="box"><small>${T.kp2}</small><b>${cur(1240)}</b></div><div class="box"><small>${T.kp3}</small><b>4.9</b></div></div>
+ <div class="panel"><div class="box"><h3>${T.upT}</h3><div class="hint">${T.upH}</div>
+  ${ups.map((u,i)=>`<div class="row"><span class="av">${u.ini}</span><div><b>${u.n}</b> <span class="st ${u.st==='ok'?'ok':'wait'}">${u.st==='ok'?T.accepted:T.pending}</span><small>${rel((()=>{const x=new Date(Date.now()+u.d*864e5);const [hh,mm]=u.h.split(':');x.setHours(12+ +hh,+mm,0,0);return x;})())}</small><small>«${u.note}»</small></div>
+   <div class="acts">${u.st==='ok'?'':`<button class="btn sm" data-a="${T.accepted}">${T.accept}</button>`}<button class="btn sm ghost" data-a="${T.move}">${T.move}</button><button class="btn sm ghost" style="color:#D0465A" data-a="${T.cancel}">${T.cancel}</button></div></div>`).join('')}</div>
+ <div style="display:flex;flex-direction:column;gap:18px"><div class="box"><h3>${T.avT}</h3><div class="hint">${T.avH}</div>
+  <div class="wk">${T.days.map((d,i)=>`<button data-wd="${i}" aria-pressed="${W.days.includes(i)}">${d.slice(0,en?3:7)}</button>`).join('')}</div>
+  <div class="price" style="margin-top:14px"><label>${T.hours}<input type="time" value="${W.from}"></label><label>&nbsp;<input type="time" value="${W.to}"></label></div></div>
+  <div class="box"><h3>${T.prT}</h3><div class="price" style="margin-top:10px"><label>${T.p30}<input type="number" value="${W.p30}"></label><label>${T.p60}<input type="number" value="${W.p60}"></label></div>
+  <button class="btn" style="margin-top:14px;width:100%" data-a="${T.saved}">${T.save}</button></div>
+  <div class="box" style="background:var(--cream)"><h3>${T.apply}</h3><div class="hint" style="color:#5B5446">${T.applyP}</div><p class="fine" style="text-align:start;margin:0 0 12px">${T.code}</p><button class="btn dark" data-a="${T.saved}">${T.applyB}</button></div></div></div>`;}
+$('#side').onclick=e=>{const w=e.target.closest('[data-wd]');if(w){const i=+w.dataset.wd;W.days=W.days.includes(i)?W.days.filter(x=>x!==i):[...W.days,i];w.setAttribute('aria-pressed',W.days.includes(i));return;}
+ const a=e.target.closest('[data-a]');if(a)toast(a.dataset.a===T.saved?T.saved:a.dataset.a+(en?' (preview)':' (معاينة)'));};
+function tab(mentor){$('#dir').classList.toggle('hide',mentor);$('#side').classList.toggle('hide',!mentor);$('#tYouer').setAttribute('aria-pressed',!mentor);$('#tMentor').setAttribute('aria-pressed',mentor);if(mentor)renderSide();history.replaceState(null,'',location.pathname+location.search+(mentor?'#mentor':''));}
+$('#tYouer').onclick=()=>tab(false);$('#tMentor').onclick=()=>tab(true);if(location.hash==='#mentor')tab(true);
+</script>
+</body>
+</html>
