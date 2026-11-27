@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Youverse · مساحتي</title>
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="preload" as="image" href="img/logo-h128.webp">
+<script>window.YV_LOGO='img/logo-h128.webp';</script>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Almarai:wght@400;700;800&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B2A33;--ink2:#244850;--mut:#5B7480;--line:#DCEBEE;--teal:#127F87;--cy:#5CE1E6}
+*{box-sizing:border-box}html,body{margin:0;overscroll-behavior-y:none}
+body{font-family:Almarai,sans-serif;color:var(--ink);background:linear-gradient(135deg,#E6F8F9 0%,#EFECFB 50%,#FAEDF3 100%);min-height:100vh}
+html[lang=en] .serif{font-family:Lora,serif}
+.serif{font-family:Amiri,serif}
+main{max-width:1120px;margin:0 auto;padding:34px 22px 80px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.top small{color:var(--mut);font-size:14px}
+h1{font-size:48px;margin:4px 0 0;line-height:1.25}
+.light{display:inline-flex;align-items:center;gap:10px;margin-top:12px;background:#0B2A33;color:#fff;border-radius:30px;padding:8px 18px 8px 8px;font-size:15px}
+html[dir=rtl] .light{padding:8px 8px 8px 18px}
+.light i{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.b{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:24px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;font:inherit;font-size:15px;cursor:pointer}
+.b.p{background:var(--teal);border-color:var(--teal);color:#fff}
+.note{margin-top:20px;background:#FFF3DA;color:#7A5300;border-radius:18px;padding:14px 18px;line-height:1.8;font-size:14.5px}
+.grid{display:grid;gap:18px;margin-top:22px}
+.kp{grid-template-columns:repeat(3,1fr)}
+.two{grid-template-columns:1.3fr 1fr}
+.c{background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);border-radius:24px;padding:22px;box-shadow:0 10px 40px rgba(11,42,51,.05);min-width:0}
+.c h2{font-size:18px;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.k b{display:block;font-size:30px;margin-top:6px}.k span{color:var(--mut);font-size:14px}
+.row{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}.row:first-of-type{border-top:0}
+.row .t{flex:1;min-width:0}.row .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .t small{color:var(--mut);font-size:13px}
+.bar{height:6px;border-radius:4px;background:#E5F0F2;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--teal);border-radius:4px}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;background:#E8F7F8;color:var(--teal);white-space:nowrap}
+.pill.w{background:#FFF3DA;color:#8A5A00}.pill.r{background:#FDE7EA;color:#A3243A}.pill.g{background:#E3F6EA;color:#17713A}
+.empty{color:var(--mut);font-size:14.5px;line-height:1.8;padding:6px 0}.empty a{color:var(--teal);font-weight:700;text-decoration:none}
+.dot{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:#F0F7F8}
+form{display:grid;gap:12px}label{display:grid;gap:6px;font-size:13.5px;font-weight:700;color:var(--ink2)}
+input{height:46px;border:1px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.msg{font-size:13.5px;min-height:18px;color:var(--teal)}.msg.bad{color:#B3263E}
+#load{padding:80px 0;text-align:center;color:var(--mut)}
+@media (max-width:860px){
+ main{padding:22px 16px 70px}h1{font-size:36px}
+ .kp{grid-template-columns:repeat(3,1fr);gap:10px}.k{padding:14px}.k b{font-size:24px}.k span{font-size:12.5px}
+ .two{grid-template-columns:1fr}.c{padding:18px;border-radius:20px}
+ .acts{width:100%}.acts .b{flex:1;justify-content:center;padding:0 12px}
+}
+</style>
+</head>
+<body>
+<div id="yv-shell" data-page="you"></div>
+<main><div id="load">…</div><div id="app" hidden></div></main>
+<script src="yv-icons.js"></script>
+<script src="vendor/supabase-2.45.4.js"></script>
+<script src="yv-shell.js"></script>
+<script src="yv-auth.js"></script>
+<script>
+const SB=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm');   /* publishable key: safe in the page; access is enforced by row-level security */
+const EN=new URLSearchParams(location.search).get('lang')==='en',LQ=EN?'?lang=en':'';
+if(EN){document.documentElement.lang='en';document.documentElement.dir='ltr';}
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ic=(n,s=18,c)=>window.YVI?YVI(n,s,c):'';
+const LT={H:{ar:'ضوء الأفق',en:'Horizon Light',w:['عالم المؤسسين','Founders world'],c:'#7FB2FF'},F:{ar:'ضوء الصانع',en:'Forge Light',w:['عالم الصنّاع','Makers world'],c:'#F2A93B'},O:{ar:'ضوء المدار',en:'Orbit Light',w:['عالم التأثير','Influence world'],c:'#5CE1E6'},S:{ar:'ضوء الشرارة',en:'Spark Light',w:['عالم المبدعين','Creators world'],c:'#F08BB4'},C:{ar:'ضوء البوصلة',en:'Compass Light',w:['عالم الاكتشاف','Explorers world'],c:'#A99BFF'}};
+const T=EN?{hi:'Hello',space:'My Space',nolight:'You have not taken the test yet',retake:'Take the test again',take:'Take the test',explore:'Explore your world',
+ pend:'Your parent or guardian has not approved your account yet. You can browse and learn, and booking sessions opens after their approval.',
+ mc:'Masterclasses',ss:'Sessions',sub:'Subscription',none:'None',until:'until',
+ learn:'Continue learning',noLearn:'No masterclasses yet.',browse:'Browse masterclasses',open:'Continue',
+ sessions:'My sessions',noSess:'No sessions booked yet.',bookOne:'Book a session',join:'Join the session',
+ results:'My test results',noRes:'No saved results yet.',pays:'My payments',noPay:'No payments yet.',
+ acc:'Account',name:'Full name',save:'Save',newpw:'New password',chpw:'Change password',out:'Sign out',saved:'Saved.',pwShort:'At least 8 characters.',pwOk:'Password changed.',
+ st:{pending_payment:['Awaiting payment','w'],pending_consent:['Awaiting parent approval','w'],confirmed:['Confirmed','g'],cancelled:['Cancelled','r'],completed:['Completed',''],no_show:['Missed','r']},
+ os:{pending:['Pending','w'],paid:['Paid','g'],failed:['Failed','r'],cancelled:['Cancelled','r'],refunded:['Refunded','w']},min:'min',q:'QAR',monthly:'Monthly',yearly:'Yearly'}
+:{hi:'أهلاً',space:'مساحتي',nolight:'ما سويت الاختبار بعد',retake:'إعادة الاختبار',take:'ابدأ الاختبار',explore:'استكشف عالمك',
+ pend:'ولي أمرك ما وافق على حسابك بعد. تقدر تتصفّح وتتعلّم، وحجز الجلسات يتفعّل بعد موافقته.',
+ mc:'ماستركلاس',ss:'جلسات',sub:'الاشتراك',none:'لا يوجد',until:'حتى',
+ learn:'أكمل التعلّم',noLearn:'ما عندك ماستركلاس بعد.',browse:'تصفّح الماستركلاس',open:'متابعة',
+ sessions:'جلساتي',noSess:'ما حجزت جلسات بعد.',bookOne:'احجز جلسة',join:'ادخل الجلسة',
+ results:'سجل نتائجي',noRes:'ما فيه نتائج محفوظة بعد.',pays:'مدفوعاتي',noPay:'ما فيه مدفوعات بعد.',
+ acc:'حسابي',name:'الاسم الكامل',save:'حفظ',newpw:'كلمة مرور جديدة',chpw:'تغيير كلمة المرور',out:'تسجيل الخروج',saved:'تم الحفظ.',pwShort:'8 أحرف على الأقل.',pwOk:'تم تغيير كلمة المرور.',
+ st:{pending_payment:['بانتظار الدفع','w'],pending_consent:['بانتظار موافقة ولي الأمر','w'],confirmed:['مؤكدة','g'],cancelled:['ملغاة','r'],completed:['تمت',''],no_show:['فاتت','r']},
+ os:{pending:['معلّق','w'],paid:['مدفوع','g'],failed:['فشل','r'],cancelled:['ملغى','r'],refunded:['مسترد','w']},min:'دقيقة',q:'ر.ق',monthly:'شهري',yearly:'سنوي'};
+const loc=EN?'en-GB':'ar-QA';
+const dt=d=>new Date(d).toLocaleDateString(loc,{day:'numeric',month:'long',year:'numeric'});
+const dtt=d=>new Date(d).toLocaleString(loc,{weekday:'long',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'});
+const pill=(m,k)=>{const v=m[k]||[k,''];return `<span class="pill ${v[1]}">${esc(v[0])}</span>`;};
+const LBL=EN?{}:{'monthly subscription':'اشتراك شهري','yearly subscription':'اشتراك سنوي','sandbox test':'دفعة تجربة'};
+const olabel=l=>LBL[l]||(EN?l:String(l||'').replace(/^session (\d+) min with /,'جلسة $1 دقيقة مع '));
+const lname=k=>LT[k]?(EN?LT[k].en:LT[k].ar):'';
+
+(async()=>{
+ const {data:{session}}=await SB.auth.getSession();
+ if(!session)return location.replace('account.html?mode=login&next='+encodeURIComponent('space.html'+LQ)+(EN?'&lang=en':''));
+ try{const id=localStorage.getItem('yvResultId');if(id){const {error}=await SB.rpc('claim_test_result',{result_id:id});if(!error)localStorage.removeItem('yvResultId');}}catch(x){}
+ const uid=session.user.id;
+ const [pr,en,bk,rs,od]=await Promise.all([
+  SB.from('profiles').select('full_name,light,is_minor,parent_consent,plan,plan_until').eq('id',uid).single(),
+  SB.from('enrollments').select('progress,created_at,masterclasses(id,title_ar,title_en,minutes)').eq('user_id',uid).order('created_at',{ascending:false}),
+  SB.from('bookings').select('id,starts_at,minutes,status,meeting_url,mentors(name)').eq('user_id',uid).order('starts_at',{ascending:false}).limit(20),
+  SB.from('test_results').select('light,created_at').eq('user_id',uid).order('created_at',{ascending:false}).limit(10),
+  SB.from('orders').select('item_label,amount_qar,status,created_at').eq('user_id',uid).order('created_at',{ascending:false}).limit(10)]);
+ const p=pr.data||{},E=en.data||[],B=bk.data||[],R=rs.data||[],O=od.data||[];
+ const light=p.light||(()=>{try{return localStorage.getItem('yvLight')}catch(x){return null}})();
+ if(p.light)try{localStorage.setItem('yvLight',p.light);}catch(x){}
+ const first=(p.full_name||'').trim().split(/\s+/)[0]||session.user.email.split('@')[0];
+ const plan=p.plan&&p.plan_until&&new Date(p.plan_until)>new Date()?`${T[p.plan]||p.plan}`:'';
+ const sessN=B.filter(b=>['confirmed','completed'].includes(b.status)).length;
+ const L=LT[light];
+ $('#app').innerHTML=`
+ <div class="top"><div><small>${new Date().toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</small>
+  <h1 class="serif">${T.hi} ${esc(first)}</h1>
+  ${L?`<div class="light"><i>${ic(light,18,L.c)}</i>${lname(light)} · ${esc(L.w[EN?1:0])}</div>`:`<div class="light"><i>${ic('sparkle',18,'#5CE1E6')}</i>${T.nolight}</div>`}</div>
+  <div class="acts">${L?`<a class="b p" href="finder.html${LQ}">${ic('world',17,'#fff')}${T.explore}</a>`:''}<a class="b ${L?'':'p'}" href="test.html${LQ}">${T[L?'retake':'take']}</a></div></div>
+ ${p.is_minor&&p.parent_consent!=='granted'?`<div class="note">${T.pend}</div>`:''}
+ <div class="grid kp">
+  <div class="c k"><span>${T.mc}</span><b>${E.length}</b></div>
+  <div class="c k"><span>${T.ss}</span><b>${sessN}</b></div>
+  <div class="c k"><span>${T.sub}</span><b style="font-size:${plan?'22px':'20px'}">${plan||T.none}</b>${plan?`<span>${T.until} ${dt(p.plan_until)}</span>`:''}</div></div>
+ <div class="grid two">
+  <div class="c"><h2>${ic('play',18,'#127F87')}${T.learn}</h2>
+   ${E.length?E.map(x=>{const m=x.masterclasses||{};return `<div class="row"><div class="dot">${ic('book',17,'#127F87')}</div><div class="t"><b>${esc(EN?(m.title_en||m.title_ar):(m.title_ar||m.title_en))}</b><div class="bar"><i style="width:${x.progress||0}%"></i></div></div><span class="pill">${x.progress||0}%</span></div>`;}).join('')
+   :`<div class="empty">${T.noLearn} <a href="app.html#${EN?'masterclass-en':'masterclass'}">${T.browse}</a></div>`}</div>
+  <div class="c"><h2>${ic('calendar',18,'#127F87')}${T.sessions}</h2>
+   ${B.length?B.map(b=>`<div class="row"><div class="t"><b>${esc(b.mentors&&b.mentors.name||'')}</b><small>${dtt(b.starts_at)} · ${b.minutes} ${T.min}</small></div>${b.status==='confirmed'&&b.meeting_url&&new Date(b.starts_at)>new Date(Date.now()-b.minutes*6e4)?`<a class="b p" style="height:36px;font-size:13.5px" href="${esc(b.meeting_url)}" target="_blank" rel="noopener">${T.join}</a>`:pill(T.st,b.status)}</div>`).join('')
+   :`<div class="empty">${T.noSess} <a href="mentor.html${LQ}">${T.bookOne}</a></div>`}</div>
+ </div>
+ <div class="grid two">
+  <div class="c"><h2>${ic('sparkle',18,'#127F87')}${T.results}</h2>
+   ${R.length?R.map(r=>`<div class="row"><div class="dot">${ic(r.light,17,(LT[r.light]||{}).c)}</div><div class="t"><b>${lname(r.light)}</b><small>${dt(r.created_at)}</small></div></div>`).join(''):`<div class="empty">${T.noRes}</div>`}</div>
+  <div class="c"><h2>${ic('award',18,'#127F87')}${T.pays}</h2>
+   ${O.length?O.map(o=>`<div class="row"><div class="t"><b>${esc(olabel(o.item_label))}</b><small>${dt(o.created_at)}</small></div><span style="font-weight:700">${o.amount_qar} ${T.q}</span>${pill(T.os,o.status)}</div>`).join(''):`<div class="empty">${T.noPay}</div>`}</div>
+ </div>
+ <div class="grid two">
+  <div class="c"><h2>${ic('you',18,'#127F87')}${T.acc}</h2>
+   <form id="fn"><label>${T.name}<input id="nm" value="${esc(p.full_name||'')}" maxlength="80"></label><div style="display:flex;gap:10px;align-items:center"><button class="b p" type="submit">${T.save}</button><span class="msg" id="m1"></span></div></form>
+   <p style="color:var(--mut);font-size:13.5px;margin:14px 0 0" dir="ltr">${esc(session.user.email)}</p></div>
+  <div class="c"><h2>${ic('bolt',18,'#127F87')}${T.chpw}</h2>
+   <form id="fp"><label>${T.newpw}<input id="pw" type="password" autocomplete="new-password" dir="ltr"></label><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="b p" type="submit">${T.save}</button><a class="b" href="account.html?mode=logout${EN?'&lang=en':''}">${T.out}</a><span class="msg" id="m2"></span></div></form></div>
+ </div>`;
+ $('#load').hidden=true;$('#app').hidden=false;
+ $('#fn').onsubmit=async e=>{e.preventDefault();const n=$('#nm').value.trim().slice(0,80);if(!n)return;const [a,b2]=await Promise.all([SB.from('profiles').update({full_name:n}).eq('id',uid),SB.auth.updateUser({data:{full_name:n}})]);const m=$('#m1');m.className='msg'+(a.error||b2.error?' bad':'');m.textContent=a.error||b2.error?(a.error||b2.error).message:T.saved;};
+ $('#fp').onsubmit=async e=>{e.preventDefault();const v=$('#pw').value,m=$('#m2');if(v.length<8){m.className='msg bad';m.textContent=T.pwShort;return;}const {error}=await SB.auth.updateUser({password:v});m.className='msg'+(error?' bad':'');m.textContent=error?error.message:T.pwOk;if(!error)$('#pw').value='';};
+})();
+</script>
+</body>
+</html>

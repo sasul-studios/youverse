@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Youverse · حسابي</title>
+<link rel="preload" as="image" href="img/logo-h128.webp">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Lora:wght@600&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B2A33;--ink2:#244850;--mut:#5B7480;--line:#D7E7EA;--teal:#127F87;--cy:#5CE1E6;--pink:#FBE9EF}
+*{box-sizing:border-box}html,body{margin:0;overscroll-behavior-y:none}
+body{font-family:Almarai,sans-serif;color:var(--ink);background:#F7FAFB;min-height:100vh}
+html[lang=en] body{font-family:Almarai,Lora,sans-serif}
+.wrap{display:grid;grid-template-columns:1fr 1.1fr;min-height:100vh}
+.side{background:linear-gradient(160deg,#DDF6F8 0%,#E9E6FA 55%,#F8E6EE 100%);padding:48px 56px;display:flex;flex-direction:column}
+.side .logo img{height:34px;display:block}
+.side .in{margin:auto 0;max-width:440px}
+.side h2{font-family:Amiri,serif;font-size:52px;line-height:1.3;margin:0 0 18px}
+html[lang=en] .side h2{font-family:Lora,serif;font-size:44px}
+.side p{color:var(--ink2);line-height:1.9;font-size:17px;margin:0 0 22px}
+.side ul{list-style:none;margin:0;padding:0;display:grid;gap:12px;color:var(--ink2);font-size:15.5px}
+.side li{display:flex;gap:10px;align-items:center}.side li svg{flex:none}
+.main{display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.box{width:100%;max-width:480px}
+h1{font-family:Amiri,serif;font-size:40px;margin:0 0 8px}html[lang=en] h1{font-family:Lora,serif;font-size:34px}
+.sub{color:var(--mut);margin:0 0 22px;font-size:15px;line-height:1.8}
+.sub a,.link{color:var(--teal);font-weight:700;text-decoration:none;cursor:pointer;background:none;border:0;font:inherit;padding:0}
+form{display:grid;gap:14px}
+label{display:grid;gap:7px;font-size:14px;font-weight:700;color:var(--ink2)}
+input[type=text],input[type=email],input[type=password]{width:100%;height:52px;border:1px solid var(--line);border-radius:14px;padding:0 16px;font:inherit;font-size:16px;color:var(--ink);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(18,127,135,.12)}
+input.bad{border-color:#D0465A}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg button{height:50px;border:1px solid var(--line);border-radius:14px;background:#fff;font:inherit;font-weight:700;color:var(--ink2);cursor:pointer}
+.seg button.on{border-color:var(--teal);background:#E6F8F9;color:var(--ink)}
+.minor{background:var(--pink);border-radius:18px;padding:18px;display:grid;gap:12px}
+.minor b{color:#7A2E49;font-size:15px}.minor small{color:#7A4A5C;line-height:1.7;font-size:13.5px}
+.minor input{border-color:#F1CFDB}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;color:var(--ink2);font-size:14px;line-height:1.7}
+.chk input{width:20px;height:20px;margin-top:2px;accent-color:var(--teal);flex:none}
+.btn{height:54px;border:0;border-radius:16px;background:var(--teal);color:#fff;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;transition:filter .15s}
+.btn:hover{filter:brightness(1.07)}.btn[disabled]{opacity:.55;cursor:default}
+.err{min-height:20px;color:#B3263E;font-size:14px;line-height:1.6}
+.ok{background:#E3F6EA;color:#17713A;border-radius:14px;padding:14px 16px;line-height:1.8;font-size:15px}
+.pw{position:relative}.pw button{position:absolute;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--mut);cursor:pointer;font:inherit;font-size:13px;right:12px}html[dir=rtl] .pw button{right:auto;left:12px}.pw input{padding-right:72px}html[dir=rtl] .pw input{padding-right:16px;padding-left:72px}
+.foot{margin-top:18px;text-align:center;color:var(--mut);font-size:14px}
+.lang{position:fixed;top:16px;inset-inline-end:18px;font-family:Lora,serif;font-weight:600;text-decoration:none;color:var(--ink2);border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;font-size:14px}
+@media (max-width:860px){
+ .wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+ .side{padding:22px 22px 26px}.side .in{margin:22px 0 0}
+ .side h2{font-size:34px;margin-bottom:8px}html[lang=en] .side h2{font-size:30px}
+ .side p{font-size:15px;margin-bottom:12px}.side ul{display:none}
+ .main{padding:26px 18px 50px;align-items:flex-start}
+ h1{font-size:32px}
+}
+</style>
+</head>
+<body>
+<a class="lang" id="lang" href="#">EN</a>
+<div class="wrap">
+ <aside class="side"><a class="logo" id="logo" href="app.html"><img src="img/logo-h128.webp" alt="Youverse" width="92" height="34"></a>
+  <div class="in"><h2 id="sh"></h2><p id="sp"></p><ul id="sl"></ul></div></aside>
+ <main class="main"><div class="box" id="box"></div></main>
+</div>
+<script src="vendor/supabase-2.45.4.js"></script>
+<script>
+const SB=window.supabase.createClient('https://bhcvhdyutwanorlpesnu.supabase.co','sb_publishable_mKEqP1C7P-lnGcWQwaQM3w_cm1A1NXm');   /* publishable key: safe in the page; access is enforced by row-level security */
+const Q=new URLSearchParams(location.search),EN=Q.get('lang')==='en';
+if(EN){document.documentElement.lang='en';document.documentElement.dir='ltr';}
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const L=EN?{
+ sh2:'Welcome back',sp2:'Sign in to reach My Space: your Light, your masterclasses and your sessions.',
+ sh:'Your result is ready. Keep it.',sp:'Create your account to keep your full result and start your journey with the masterclasses picked for you.',
+ li:['Your detailed result by email','Your results history in My Space','Masterclasses picked for your personality'],
+ su:'Create an account',haveAcc:'Already have an account?',signin:'Sign in',name:'Full name',namePh:'e.g. Sara Ahmed',email:'Email',pass:'Password',passPh:'At least 8 characters',show:'Show',hide:'Hide',
+ age:'Age',adult:'18 or older',minor:'Under 18',minT:'Parent or guardian consent is required',minP:'We will ask your parent or guardian to approve your account. Until then you can browse, but booking sessions needs their approval.',pname:"Parent's name",pmail:"Parent's email",
+ terms:'I agree to the <a class="link" href="#" onclick="return false">Terms</a> and <a class="link" href="#" onclick="return false">Privacy Policy</a>',create:'Create my account',
+ li2:'Sign in',noAcc:"Don't have an account?",reg:'Create one',forgot:'Forgot your password?',go:'Sign in',
+ fg:'Reset your password',fgP:'Enter your email and we will send you a link to choose a new password.',send:'Send the link',back:'Back to sign in',
+ rs:'Choose a new password',rsP:'Enter your new password twice.',pass2:'Confirm password',save:'Save the new password',
+ sent:'Check your inbox. We sent a link to',sentS:'Open it to confirm your email, then you will be signed in. Check your spam folder too.',sentF:'If an account exists for this email, a reset link is on its way to',
+ eName:'Please enter your name.',eMail:'Please enter a valid email.',ePass:'The password must be at least 8 characters.',eAge:'Please choose your age group.',ePar:"Please enter your parent's name and a valid email.",eTerms:'Please agree to the terms.',eSame:'The two passwords do not match.',
+ eLogin:'Wrong email or password.',eConfirm:'Please confirm your email first. We sent you a link.',eExists:'This email already has an account. Sign in instead.',eRate:'Too many attempts. Please wait a minute and try again.',eNet:'Could not reach the server. Check your connection.',
+ done:'Password changed. Taking you to My Space…',welcome:'Signed in. Taking you to My Space…',out:'You are signed out.'}:{
+ sh2:'أهلاً بعودتك',sp2:'ادخل لمساحتك: ضوؤك، والماستركلاس، وجلساتك.',
+ sh:'نتيجتك جاهزة، احفظها الآن',sp:'أنشئ حسابك لتصلك نتيجتك الكاملة على بريدك، وتبدأ رحلتك مع الماستركلاس المقترحة لك.',
+ li:['النتيجة المفصّلة على بريدك','سجل نتائجك في مساحتي','ماستركلاس مقترحة لشخصيتك'],
+ su:'إنشاء حساب',haveAcc:'لديك حساب؟',signin:'تسجيل الدخول',name:'الاسم الكامل',namePh:'مثال: سارة أحمد',email:'البريد الإلكتروني',pass:'كلمة المرور',passPh:'8 أحرف على الأقل',show:'إظهار',hide:'إخفاء',
+ age:'العمر',adult:'18 سنة أو أكثر',minor:'أقل من 18 سنة',minT:'موافقة ولي الأمر مطلوبة',minP:'نطلب من ولي أمرك الموافقة على حسابك. إلى أن يوافق تقدر تتصفّح المنصة، لكن حجز الجلسات يحتاج موافقته.',pname:'اسم ولي الأمر',pmail:'بريد ولي الأمر',
+ terms:'أوافق على <a class="link" href="#" onclick="return false">الشروط والأحكام</a> و<a class="link" href="#" onclick="return false">سياسة الخصوصية</a>',create:'إنشاء حسابي',
+ li2:'تسجيل الدخول',noAcc:'ما عندك حساب؟',reg:'أنشئ حساباً',forgot:'نسيت كلمة المرور؟',go:'دخول',
+ fg:'استعادة كلمة المرور',fgP:'اكتب بريدك ونرسل لك رابطاً لاختيار كلمة مرور جديدة.',send:'أرسل الرابط',back:'رجوع لتسجيل الدخول',
+ rs:'كلمة مرور جديدة',rsP:'اكتب كلمة المرور الجديدة مرتين.',pass2:'تأكيد كلمة المرور',save:'حفظ كلمة المرور',
+ sent:'افتح بريدك، أرسلنا رابطاً إلى',sentS:'افتحه لتأكيد بريدك وبعدها يدخلك مباشرة. شيّك على مجلد السبام بعد.',sentF:'إذا كان للبريد حساب، يوصله رابط الاستعادة على',
+ eName:'اكتب اسمك.',eMail:'اكتب بريداً صحيحاً.',ePass:'كلمة المرور لازم تكون 8 أحرف على الأقل.',eAge:'اختر فئتك العمرية.',ePar:'اكتب اسم ولي الأمر وبريداً صحيحاً له.',eTerms:'لازم توافق على الشروط.',eSame:'كلمتا المرور غير متطابقتين.',
+ eLogin:'البريد أو كلمة المرور غير صحيحة.',eConfirm:'أكّد بريدك أولاً، أرسلنا لك رابطاً.',eExists:'هذا البريد له حساب. سجّل الدخول بدلاً من ذلك.',eRate:'محاولات كثيرة. انتظر دقيقة وحاول مرة ثانية.',eNet:'ما قدرنا نوصل للسيرفر. تأكد من الاتصال.',
+ done:'تم تغيير كلمة المرور. ننقلك لمساحتك…',welcome:'تم الدخول. ننقلك لمساحتك…',out:'تم تسجيل الخروج.'};
+const LQ=EN?'?lang=en':'',NEXT=(()=>{const n=Q.get('next')||'';return /^[a-z\-]+\.html(\?[\w=&%\-]*)?$/i.test(n)?n:'space.html'+LQ;})();
+$('#lang').textContent=EN?'ع':'EN';$('#lang').href='account.html'+(EN?'':'?lang=en')+(Q.get('mode')?(EN?'?':'&')+'mode='+Q.get('mode'):'');
+$('#logo').href='app.html'+(EN?'#en':'');
+$('#sh').textContent=L.sh;$('#sp').textContent=L.sp;
+const tick='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#127F87" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+$('#sl').innerHTML=L.li.map(x=>`<li>${tick}${esc(x)}</li>`).join('');
+const okEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+const pwField=(id,ph,ac)=>`<div class="pw"><input type="password" id="${id}" placeholder="${ph||''}" autocomplete="${ac}" dir="ltr"><button type="button" data-eye="${id}">${L.show}</button></div>`;
+let age='';
+function err(t){const e=$('#err');if(e)e.textContent=t||'';}
+function busy(on){const b=$('form .btn');if(b)b.disabled=on;}
+function mapErr(e){const m=String(e&&e.message||e||'');if(/invalid login/i.test(m))return L.eLogin;if(/not confirmed/i.test(m))return L.eConfirm;if(/already registered|already exists/i.test(m))return L.eExists;if(/rate|too many|seconds/i.test(m))return L.eRate;if(/fetch|network/i.test(m))return L.eNet;return m;}
+
+async function afterSignIn(){
+ try{const id=localStorage.getItem('yvResultId');if(id){const {error}=await SB.rpc('claim_test_result',{result_id:id});if(!error)localStorage.removeItem('yvResultId');}}catch(x){}
+ try{const l=localStorage.getItem('yvLight');const {data:{user}}=await SB.auth.getUser();if(l&&user){const {data:p}=await SB.from('profiles').select('light').eq('id',user.id).single();if(p&&!p.light)await SB.from('profiles').update({light:l}).eq('id',user.id);}}catch(x){}
+ location.replace(NEXT);
+}
+
+const V={
+ signup(){return `<h1>${L.su}</h1><p class="sub">${L.haveAcc} <a href="#" data-m="login">${L.signin}</a></p>
+ <form id="f" novalidate>
+ <label>${L.name}<input type="text" id="n" placeholder="${L.namePh}" autocomplete="name" maxlength="80"></label>
+ <label>${L.email}<input type="email" id="e" placeholder="name@email.com" autocomplete="email" dir="ltr"></label>
+ <label>${L.pass}${pwField('p',L.passPh,'new-password')}</label>
+ <div><div style="font-size:14px;font-weight:700;color:var(--ink2);margin-bottom:7px">${L.age}</div><div class="seg"><button type="button" data-age="adult" class="${age==='adult'?'on':''}">${L.adult}</button><button type="button" data-age="minor" class="${age==='minor'?'on':''}">${L.minor}</button></div></div>
+ <div class="minor" id="mn" ${age==='minor'?'':'hidden'}><b>${L.minT}</b><small>${L.minP}</small>
+  <label>${L.pname}<input type="text" id="pn" maxlength="80"></label><label>${L.pmail}<input type="email" id="pe" placeholder="parent@email.com" dir="ltr"></label></div>
+ <label class="chk"><input type="checkbox" id="t"><span>${L.terms}</span></label>
+ <div class="err" id="err" role="alert"></div>
+ <button class="btn" type="submit">${L.create}</button></form>`;},
+ login(){return `<h1>${L.li2}</h1><p class="sub">${L.noAcc} <a href="#" data-m="signup">${L.reg}</a></p>
+ <form id="f" novalidate>
+ <label>${L.email}<input type="email" id="e" placeholder="name@email.com" autocomplete="email" dir="ltr"></label>
+ <label>${L.pass}${pwField('p','','current-password')}</label>
+ <div style="text-align:end"><a href="#" class="link" data-m="forgot">${L.forgot}</a></div>
+ <div class="err" id="err" role="alert"></div>
+ <button class="btn" type="submit">${L.go}</button></form>`;},
+ forgot(){return `<h1>${L.fg}</h1><p class="sub">${L.fgP}</p>
+ <form id="f" novalidate><label>${L.email}<input type="email" id="e" placeholder="name@email.com" autocomplete="email" dir="ltr"></label>
+ <div class="err" id="err" role="alert"></div><button class="btn" type="submit">${L.send}</button></form>
+ <p class="foot"><a href="#" class="link" data-m="login">${L.back}</a></p>`;},
+ reset(){return `<h1>${L.rs}</h1><p class="sub">${L.rsP}</p>
+ <form id="f" novalidate><label>${L.pass}${pwField('p',L.passPh,'new-password')}</label><label>${L.pass2}${pwField('p2','','new-password')}</label>
+ <div class="err" id="err" role="alert"></div><button class="btn" type="submit">${L.save}</button></form>`;},
+ sent(x){return `<h1>${x.reset?L.fg:L.su}</h1><div class="ok">${x.reset?L.sentF:L.sent} <b dir="ltr">${esc(x.email)}</b>.<br>${x.reset?'':L.sentS}</div><p class="foot"><a href="#" class="link" data-m="login">${L.back}</a></p>`;},
+ msg(t){return `<div class="ok">${esc(t)}</div>`;}
+};
+let mode='signup';
+function show(m,x){mode=m;const reg=m==='signup';$('#sh').textContent=reg?L.sh:L.sh2;$('#sp').textContent=reg?L.sp:L.sp2;$('#sl').hidden=!reg;$('#box').innerHTML=V[m](x||{});bind();const f=$('#box input');if(f&&matchMedia('(min-width:861px)').matches)f.focus();}
+function bind(){
+ document.querySelectorAll('[data-m]').forEach(a=>a.onclick=e=>{e.preventDefault();show(a.dataset.m);});
+ document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=$('#'+b.dataset.eye);const s=i.type==='password';i.type=s?'text':'password';b.textContent=s?L.hide:L.show;});
+ document.querySelectorAll('[data-age]').forEach(b=>b.onclick=()=>{age=b.dataset.age;document.querySelectorAll('[data-age]').forEach(x=>x.classList.toggle('on',x===b));$('#mn').hidden=age!=='minor';});
+ document.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{i.classList.remove('bad');err('');}));
+ const f=$('#f');if(f)f.onsubmit=e=>{e.preventDefault();SUBMIT[mode]();};
+}
+function bad(id,t){const i=$('#'+id);if(i){i.classList.add('bad');i.focus();}err(t);return false;}
+const SUBMIT={
+ async signup(){
+  const n=$('#n').value.trim(),e=$('#e').value.trim().toLowerCase(),p=$('#p').value;
+  if(!n)return bad('n',L.eName);if(!okEmail(e))return bad('e',L.eMail);if(p.length<8)return bad('p',L.ePass);if(!age)return err(L.eAge);
+  let pn='',pe='';if(age==='minor'){pn=$('#pn').value.trim();pe=$('#pe').value.trim().toLowerCase();if(!pn||!okEmail(pe)||pe===e)return bad(!pn?'pn':'pe',L.ePar);}
+  if(!$('#t').checked)return err(L.eTerms);
+  busy(true);
+  let light='';try{light=localStorage.getItem('yvLight')||'';}catch(x){}
+  const {data,error}=await SB.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+'/account.html?mode=confirmed'+(EN?'&lang=en':''),data:{full_name:n,is_minor:age==='minor',parent_name:pn,parent_email:pe,light,lang:EN?'en':'ar'}}});
+  busy(false);
+  if(error)return err(mapErr(error));
+  if(data.user&&Array.isArray(data.user.identities)&&!data.user.identities.length)return err(L.eExists);
+  if(data.session){show('msg',L.welcome);$('#box').innerHTML=V.msg(L.welcome);return afterSignIn();}
+  $('#box').innerHTML=V.sent({email:e});bind();
+ },
+ async login(){
+  const e=$('#e').value.trim().toLowerCase(),p=$('#p').value;
+  if(!okEmail(e))return bad('e',L.eMail);if(!p)return bad('p',L.ePass);
+  busy(true);const {error}=await SB.auth.signInWithPassword({email:e,password:p});busy(false);
+  if(error)return err(mapErr(error));
+  $('#box').innerHTML=V.msg(L.welcome);afterSignIn();
+ },
+ async forgot(){
+  const e=$('#e').value.trim().toLowerCase();if(!okEmail(e))return bad('e',L.eMail);
+  busy(true);const {error}=await SB.auth.resetPasswordForEmail(e,{redirectTo:location.origin+'/account.html?mode=reset'+(EN?'&lang=en':'')});busy(false);
+  if(error&&/rate|seconds/i.test(error.message))return err(L.eRate);
+  $('#box').innerHTML=V.sent({email:e,reset:1});bind();
+ },
+ async reset(){
+  const p=$('#p').value,p2=$('#p2').value;if(p.length<8)return bad('p',L.ePass);if(p!==p2)return bad('p2',L.eSame);
+  busy(true);const {error}=await SB.auth.updateUser({password:p});busy(false);
+  if(error)return err(mapErr(error));
+  $('#box').innerHTML=V.msg(L.done);setTimeout(()=>location.replace('space.html'+LQ),1200);
+ }
+};
+
+(async()=>{
+ const m=Q.get('mode');
+ if(m==='logout'){await SB.auth.signOut();try{localStorage.removeItem('yvLight');}catch(x){}show('login');err('');$('#box').insertAdjacentHTML('afterbegin',`<div class="ok" style="margin-bottom:16px">${L.out}</div>`);return;}
+ let recovery=m==='reset'||/type=recovery/.test(location.hash);
+ SB.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY'){recovery=true;show('reset');}});
+ const {data:{session}}=await SB.auth.getSession();
+ if(recovery&&session)return show('reset');
+ if(session&&m!=='login'){$('#box').innerHTML=V.msg(L.welcome);return afterSignIn();}
+ show(['login','forgot','signup'].includes(m)?m:'signup');
+})();
+</script>
+</body>
+</html>
