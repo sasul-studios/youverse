@@ -72,6 +72,7 @@ const L=EN?{
  sh2:'Welcome back',sp2:'Sign in to reach My Space: your Light, your masterclasses and your sessions.',
  sh:'Your result is ready. Keep it.',sp:'Create your account to keep your full result and start your journey with the masterclasses picked for you.',
  li:['Your detailed result by email','Your results history in My Space','Masterclasses picked for your personality'],
+ guest:'Browse the platform without an account',
  su:'Create an account',haveAcc:'Already have an account?',signin:'Sign in',name:'Full name',namePh:'e.g. Sara Ahmed',email:'Email',pass:'Password',passPh:'At least 8 characters',show:'Show',hide:'Hide',
  age:'Age',adult:'18 or older',minor:'Under 18',minT:'Parent or guardian consent is required',minP:'We will ask your parent or guardian to approve your account. Until then you can browse, but booking sessions needs their approval.',pname:"Parent's name",pmail:"Parent's email",
  terms:'I agree to the <a class="link" href="#" onclick="return false">Terms</a> and <a class="link" href="#" onclick="return false">Privacy Policy</a>',create:'Create my account',
@@ -85,6 +86,7 @@ const L=EN?{
  sh2:'أهلاً بعودتك',sp2:'سجّل دخولك للوصول إلى مساحتك: ضوؤك، والماستركلاس، وجلساتك.',
  sh:'نتيجتك جاهزة، احفظها الآن',sp:'أنشئ حسابك لتصلك نتيجتك الكاملة على بريدك، وتبدأ رحلتك مع الماستركلاس المقترحة لك.',
  li:['النتيجة المفصّلة على بريدك','سجل نتائجك في مساحتي','ماستركلاس مقترحة لشخصيتك'],
+ guest:'تصفّح المنصة دون تسجيل',
  su:'إنشاء حساب',haveAcc:'لديك حساب؟',signin:'تسجيل الدخول',name:'الاسم الكامل',namePh:'مثال: سارة أحمد',email:'البريد الإلكتروني',pass:'كلمة المرور',passPh:'8 أحرف على الأقل',show:'إظهار',hide:'إخفاء',
  age:'العمر',adult:'18 سنة أو أكثر',minor:'أقل من 18 سنة',minT:'موافقة ولي الأمر مطلوبة',minP:'سنطلب من ولي أمرك الموافقة على حسابك. ويمكنك تصفّح المنصة إلى حين موافقته، أما حجز الجلسات فيتطلّب موافقته.',pname:'اسم ولي الأمر',pmail:'بريد ولي الأمر',
  terms:'أوافق على <a class="link" href="#" onclick="return false">الشروط والأحكام</a> و<a class="link" href="#" onclick="return false">سياسة الخصوصية</a>',create:'إنشاء حسابي',
@@ -144,7 +146,8 @@ const V={
  msg(t){return `<div class="ok">${esc(t)}</div>`;}
 };
 let mode='signup';
-function show(m,x){mode=m;const reg=m==='signup';$('#sh').textContent=reg?L.sh:L.sh2;$('#sp').textContent=reg?L.sp:L.sp2;$('#sl').hidden=!reg;$('#box').innerHTML=V[m](x||{});bind();const f=$('#box input');if(f&&matchMedia('(min-width:861px)').matches)f.focus();}
+const GUEST=()=>['signup','login'].includes(mode)?`<p class="foot"><a class="link" href="app.html${EN?'#en':''}">${L.guest} ${EN?'→':'←'}</a></p>`:'';
+function show(m,x){mode=m;const reg=m==='signup';$('#sh').textContent=reg?L.sh:L.sh2;$('#sp').textContent=reg?L.sp:L.sp2;$('#sl').hidden=!reg;$('#box').innerHTML=V[m](x||{})+GUEST();bind();const f=$('#box input');if(f&&matchMedia('(min-width:861px)').matches)f.focus();}
 function bind(){
  document.querySelectorAll('[data-m]').forEach(a=>a.onclick=e=>{e.preventDefault();show(a.dataset.m);});
  document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=$('#'+b.dataset.eye);const s=i.type==='password';i.type=s?'text':'password';b.textContent=s?L.hide:L.show;});
