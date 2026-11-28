@@ -167,6 +167,8 @@ body.listing #listMain{display:block}body.listing #journey,body.listing #outro{d
  .tc p{font-size:14.5px;line-height:1.8;margin-top:8px}
  .tc .lt{margin-top:12px;font-size:13px}.tc .cnt{margin-top:10px;font-size:12.5px}
  .tc .num{font-size:12px}.tc .num i{width:44px}
+ .plab b{font-size:17px}.plab small{font-size:11.5px}
+ #stage.short .tc.ov p,#stage.short .tc p{display:none}#stage.short .tc h1{font-size:38px}#stage.short .tc h2{font-size:32px}
  .vt{top:14px;inset-inline-end:14px}.view button{height:30px;padding:0 12px;font-size:12px}
  #rail{inset-inline-end:auto;left:50%;top:auto;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);flex-direction:row;gap:8px;padding:6px 10px;border-radius:30px;background:rgba(6,11,22,.7);border:1px solid rgba(234,244,246,.1)}
  #rail:before{display:none}#rail .tt{display:none}
@@ -274,15 +276,40 @@ setTimeout(()=>YVLater(stage,en));
 let W,Hh,mob,R,hx,hy,f,Dz,E,A,ringR,seg,tail,hh,S=[],P=[];
 function layout(){
  const hdr=document.querySelector('.ys');hh=hdr?hdr.offsetHeight:64;document.documentElement.style.setProperty('--hh',hh+'px');
- W=stage.clientWidth;Hh=stage.clientHeight;mob=W<760;
+ W=stage.clientWidth;Hh=stage.clientHeight;mob=W<760;stage.classList.toggle('short',mob&&Hh<600);
  R=mob?Math.min(W*.25,Hh*.16):Math.min(W*.155,Hh*.255);
  hx=mob?W*.5:W*(RTL?.33:.67);hy=mob?Hh*.62:Hh*.53;
- f=Math.max(W,Hh)*1.15;Dz=f*1.05;E=R/.3;A=mob?54:76;ringR=R*(mob?1.45:1.62);
- // overview: where each world sits on the map (fractions of half the stage; mirrored for English)
- const OVd=[[-.40,.32],[.06,.40],[.36,.20],[-.04,-.06],[-.34,-.32]],OVm=[[-.42,.46],[.44,.30],[-.40,.08],[.40,-.08],[.0,-.22]];
- const ov=mob?OVm:OVd,s1=mob?.44:.40,cz0=Dz-f/s1;
- S=[{x:0,y:0,z:cz0}];P=[];
- for(let j=1;j<=N;j++){const Z=j*Dz,sj=f/(Z-cz0),u=ov[j-1][0]*(RTL?1:-1)*W/2,v=ov[j-1][1]*Hh/2;
+ f=Math.max(W,Hh)*1.15;Dz=f*1.05;A=mob?54:76;
+ if(mob){
+  // phones: fit the planet, its ring and the names between the title and the star chart, whatever the screen height
+  const railTop=Math.min($('#rail').offsetTop,$('#hint').offsetTop+8);
+  const tcs=$$('.tc:not(.ov)'),tb=Math.max(...tcs.map(t=>t.offsetTop+t.offsetHeight));
+  for(let k=0;k<12;k++){const rr=R*1.45,lo=tb+8+Math.max(R,.3*rr+A*.6),hi=railTop-8-(.3*rr+A*.62+28);
+   if(lo<=hi||R<W*.16){hy=lo<=hi?Math.min(Math.max(Hh*.6,lo),hi):(lo+hi)/2;break;}R*=.92;}
+ }
+ E=R/.3;ringR=R*(mob?1.45:1.62);
+ S=[];P=[];
+ let s1,targets;
+ if(mob){
+  // the map on phones: two staggered columns from the bottom up, sized to the free space so names never touch
+  const tc=$('.tc.ov'),top=tc.offsetTop+tc.offsetHeight+10,bottom=Math.min($('#rail').offsetTop,$('#hint').offsetTop)-6,labH=(LB[1]&&LB[1].offsetHeight)||46,gap=8;
+  const below=di=>di*.56+10+labH;   // a planet's name sits under it
+  s1=.58;let cy=[],d=[],minTop=0;
+  for(let it=0;it<24;it++){
+   const s=[...Array(N)].map((_,i)=>1/(1/s1+(Dz/f)*i));d=s.map(v=>2*R*v);cy=[];
+   let b=bottom;[0,2,4].forEach(i=>{if(i<N){cy[i]=b-below(d[i]);b=cy[i]-d[i]/2-gap;}});
+   if(N>1)cy[1]=Math.min(bottom-below(d[1]),(cy[0]+(N>2?cy[2]:cy[0]-d[0]))/2);
+   if(N>3)cy[3]=Math.min(cy[1]-d[1]/2-gap-below(d[3]),(cy[2]+(N>4?cy[4]:top+d[3]/2))/2);
+   minTop=Math.min(...cy.map((y,i)=>y-d[i]/2));
+   if(minTop>=top||s1<.2)break;s1*=.95;}
+  if(minTop>top){const up=(minTop-top)*.5;cy=cy.map(y=>y-up);}   // centre the map in the free space
+  targets=cy.map((y,i)=>[(i%2?.46:-.46)*W/2,y-Hh/2]);
+ }else{
+  const OVd=[[-.40,.32],[.06,.40],[.36,.20],[-.04,-.06],[-.34,-.32]];s1=.40;
+  targets=OVd.map(v=>[v[0]*W/2,v[1]*Hh/2]);
+ }
+ const cz0=Dz-f/s1;S=[{x:0,y:0,z:cz0}];
+ for(let j=1;j<=N;j++){const Z=j*Dz,sj=f/(Z-cz0),u=targets[j-1][0]*(RTL?1:-1),v=targets[j-1][1];
   P[j]={x:u/sj,y:v/sj,z:Z};S[j]={x:P[j].x-(hx-W/2),y:P[j].y-(hy-Hh/2),z:Z-f};}
  for(let j=1;j<=N;j++){PL[j].style.width=PL[j].style.height=E+'px';PL[j].querySelector('img').sizes=Math.round(E)+'px';
   RB[j].style.width=RF[j].style.width=2*ringR+'px';RB[j].style.height=RF[j].style.height=2*ringR*.3+'px';
@@ -418,6 +445,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(b)
 
 /* ---------- start: a short cold open, once per visit ---------- */
 layout();kick();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(!document.body.classList.contains('listing')){layout();kick();}});
 let rz=null;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(!document.body.classList.contains('listing')){layout();kick();}},150);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick();});
 (function(){let seen=false;try{seen=sessionStorage.getItem('yvFinderOpen')==='1';sessionStorage.setItem('yvFinderOpen','1');}catch(e){}
