@@ -68,6 +68,16 @@ main{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:48px 32p
 .peek a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--c);color:#03060E;font-weight:800;font-size:13.5px;padding:9px 16px;border-radius:20px}
 .peek .x{position:absolute;top:8px;inset-inline-end:8px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.08);cursor:pointer;font-size:15px}
 
+/* list view: all characters as large faces (client, Nov 2026) */
+.faces{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:28px 18px}
+.faces a{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;text-decoration:none;color:#EAF4F6;padding:6px;border-radius:20px;outline:none}
+.faces .fc{width:132px;height:132px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 35%,#16263A,#0B1626);border:2px solid var(--c);box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 12%,transparent),0 0 30px -8px var(--c);font-family:Amiri,serif;font-weight:700;font-size:44px;color:#fff;transition:transform .25s,box-shadow .25s}
+.faces .fc img{width:100%;height:100%;object-fit:cover}
+.faces a:hover .fc,.faces a:focus-visible .fc{transform:scale(1.05);box-shadow:0 0 0 8px color-mix(in srgb,var(--c) 22%,transparent),0 0 36px -4px var(--c)}
+.faces b{font-size:16px;margin-top:6px}.faces small{color:rgba(234,244,246,.62);font-size:13px;line-height:1.6}
+.list .none{color:rgba(234,244,246,.5);font-size:14px}
+@media (max-width:640px){.faces{grid-template-columns:repeat(2,1fr);gap:22px 12px}.faces .fc{width:112px;height:112px;font-size:38px}}
+body.listing .chips{display:none}
 /* list view */
 .list{display:none;margin-top:30px}
 body.listing .list{display:block}body.listing .space{display:none}
@@ -140,8 +150,8 @@ function build(){setTimeout(()=>YVLater(document.querySelector('main'),en));
   <div class="rh"><div><h2 id="r${k}"><span class="ic">${YVI(k,24)}</span>${L[k].world}</h2><div class="lt">${T.light} ${L[k].name}</div></div>${k===mine?`<span class="mine-tag">${T.yours}</span>`:''}<p>${L[k].worldDesc}</p></div>
   ${ps.length?`<div class="stars">${ps.map((p,i)=>`<button class="star" style="--c:${C[k]};--x:${en?P[i][0]:100-P[i][0]}%;--y:${P[i][1]}%;--s:${i%2?74:84}px;--f:${6+i%3}s;--d:${-i*1.3}s" data-r="${k}" data-i="${i}" aria-label="${p.name}"><i>${face(p)}</i><span>${p.name}</span></button>`).join('')}</div>`
    :`<div class="soon" style="--c:${C[k]}"><i></i><i></i><span>${T.soon}</span><i></i></div>`}</section>`;}).join('');
- $('#list').innerHTML=order.filter(k=>filter==='all'||filter===k).map(k=>`<div class="lg" style="--c:${C[k]}"><h2>${YVI(k,22)}${L[k].world}</h2><div class="lt" style="color:${C[k]};font-size:13px;font-weight:800">${T.light} ${L[k].name}</div>
-  ${PEOPLE[k].length?`<ul>${PEOPLE[k].map(p=>`<li><a href="${p.href}"><span class="av">${face(p)}</span><span><b>${p.name}</b><small>${p.line}</small></span></a></li>`).join('')}</ul>`:`<div class="none">${T.none}</div>`}</div>`).join('');}
+ {const ppl=order.filter(k=>filter==='all'||filter===k).flatMap(k=>PEOPLE[k].map(p=>({...p,k})));
+ $('#list').innerHTML=ppl.length?`<ul class="faces">${ppl.map(p=>`<li><a href="${p.href}" style="--c:${C[p.k]}"><span class="fc">${face(p)}</span><b>${p.name}</b><small>${p.line}</small></a></li>`).join('')}</ul>`:`<div class="none">${T.none}</div>`;}}
 build();YVLater(document.querySelector('main'),en);
 document.addEventListener('click',e=>{
  const c=e.target.closest('.chip');if(c){filter=c.dataset.f;build();closePeek();
@@ -150,7 +160,7 @@ document.addEventListener('click',e=>{
  if(e.target.closest('.peek .x')||!e.target.closest('.peek'))closePeek();});
 addEventListener('keydown',e=>{if(e.key==='Escape')closePeek();});
 $('#vSpace').onclick=()=>setView(false);$('#vList').onclick=()=>setView(true);
-function setView(l){document.body.classList.toggle('listing',l);$('#vSpace').setAttribute('aria-pressed',!l);$('#vList').setAttribute('aria-pressed',l);closePeek();}
+function setView(l){if(l&&filter!=='all'){filter='all';build();}document.body.classList.toggle('listing',l);$('#vSpace').setAttribute('aria-pressed',!l);$('#vList').setAttribute('aria-pressed',l);closePeek();}
 let lastStar=null;
 function openPeek(s){const k=s.dataset.r,p=PEOPLE[k][+s.dataset.i],pk=$('#peek');
  document.querySelectorAll('.star.on').forEach(x=>x.classList.remove('on'));s.classList.add('on');lastStar=s;

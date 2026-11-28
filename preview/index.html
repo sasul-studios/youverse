@@ -35,7 +35,8 @@
 .hero .sub{font-family:Amiri,serif;font-size:clamp(26px,3vw,40px);color:#DDF7F8;margin:0 0 34px;text-shadow:0 2px 20px rgba(0,0,0,.55)}
 .hero p{font-size:clamp(15px,1.4vw,19px);color:rgba(236,243,250,.82);max-width:560px;line-height:1.9;margin:30px 0 0;text-shadow:0 2px 16px rgba(0,0,0,.55)}
 .cta{display:inline-block;background:#5CE1E6;color:#032E36;text-decoration:none;font-weight:800;padding:17px 44px;border-radius:40px;font-size:18px;box-shadow:0 14px 40px rgba(92,225,230,.35)}
-.cta2{display:inline-block;margin-top:16px;color:#BFF3F5;text-decoration:none;font-size:15px}
+.cta3{display:inline-block;margin:14px 8px 0;color:#EAFBFC;text-decoration:none;font-weight:700;padding:14px 38px;border-radius:40px;font-size:16px;border:1.5px solid rgba(92,225,230,.7);background:rgba(92,225,230,.08);transition:background .3s,transform .3s}.cta3:hover{background:rgba(92,225,230,.18);transform:translateY(-2px)}.cta3[hidden]{display:none}
+.cta2{display:block;margin-top:16px;color:#BFF3F5;text-decoration:none;font-size:15px}
 /* laptop hover: the main button lifts, glows and a light sweeps across it; the second link lights up with an underline */
 .cta{position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,background .35s}
 .cta:before{content:"";position:absolute;top:0;bottom:0;width:45%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);pointer-events:none}
@@ -123,8 +124,9 @@
   <div class="hero" id="hero">
     <h1>اكتشف عالمك!</h1>
     <div class="sub">وابدأ رحلتك ..</div>
-    <a class="cta" href="test.html">ابدأ الاختبار</a>
-    <a class="cta2" href="app.html#home">تصفّح المنصة</a>
+    <a class="cta" href="account.html?mode=login&amp;next=app.html">ادخل إلى Youverse</a>
+    <a class="cta3" id="ctaTest" href="test.html" hidden>ابدأ الاختبار</a>
+    <a class="cta2" href="account.html?mode=signup&amp;next=app.html">إنشاء حساب جديد</a>
     <p>منصة تساعدك على فهم نفسك، واكتشاف شغفك، ورسم طريقك بثقة، خطوة بخطوة.</p>
   </div>
   <div class="hint" id="hint">اسحب للأسفل<i></i></div>
@@ -323,5 +325,8 @@ $('skip').addEventListener('click',()=>lock(false));
 $('skip').addEventListener('click',e=>{e.preventDefault();scrollTo({top:scene.offsetHeight-innerHeight,behavior:'smooth'});});
 f();setTimeout(()=>lines.forEach(l=>l.classList.add('on')),350);
 </script>
+<script>/* "Start the test" shows only to visitors who have not taken it yet (this device, or the signed-in account) */
+(function(){var done=false;try{done=!!localStorage.getItem('yvLight');var s=JSON.parse(localStorage.getItem('sb-bhcvhdyutwanorlpesnu-auth-token')||'null');if(s&&s.user&&s.user.user_metadata&&s.user.user_metadata.light)done=true;}catch(e){}
+if(!done){var b=document.getElementById('ctaTest');if(b)b.hidden=false;}})();</script>
 </body>
 </html>
