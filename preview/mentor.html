@@ -149,7 +149,7 @@ const T=en?{h1:'YouMentor',sub:'A private session with someone who gets your pat
  about:'نبذة',fields:'التخصصات',langs:'اللغات',session:'الجلسة',s1:'اختر الوقت',s2:'بماذا تريد المساعدة؟',s3:'الدفع',help:'سطر أو سطران، مثل: «أريد رأياً في ملف أعمالي».',
  tzMine:'الأوقات بتوقيتك',tzQ:'الأوقات بتوقيت قطر',showQ:'اعرض بتوقيت قطر',showMine:'اعرض بتوقيتي',
  pol:'سياسة الإلغاء والاسترداد',polL:['الإلغاء قبل 24 ساعة أو أكثر: استرداد كامل.','الإلغاء خلال أقل من 24 ساعة: استرداد 50%.','إذا ألغى المرشد أو لم يحضر: استرداد كامل أو إعادة الحجز مجاناً.','إذا لم تحضر خلال 10 دقائق: لا يوجد استرداد.'],
- agree:'قرأت سياسة الإلغاء ومدونة السلوك.',under:'عمري أقل من 18 سنة',minor:'عمرك أقل من 18: نرسل لولي أمرك بريداً للموافقة قبل تأكيد الجلسة. كل الرسائل والجلسات تبقى داخل Youverse.',
+ agree:'قرأت سياسة الإلغاء ومدونة السلوك.',under:'عمري أقل من 18 سنة',minor:'عمرك أقل من 18 سنة: سنرسل إلى ولي أمرك بريداً للموافقة قبل تأكيد الجلسة. كل الرسائل والجلسات تبقى داخل Youverse.',
  parent:'بريد ولي الأمر',total:'الإجمالي',pay:'ادفع عبر SkipCash واحجز',fine:'معاينة: الدفع غير مفعّل بعد. بعد الدفع يصلك بريد تأكيد مع دعوة تقويم ورابط الجلسة (Google Meet أو Zoom)، ثم تذكيران قبل 24 ساعة وقبل ساعة.',
  done:'تم حجز جلستك',doneP:'معاينة: في الموقع الحقيقي يحدث هذا بعد تأكيد SkipCash للدفع.',d1:'بريد تأكيد بتفاصيل الجلسة',d2:'دعوة تقويم مع رابط الجلسة (Google Meet أو Zoom)',d3:'تذكيران قبل 24 ساعة وقبل ساعة',d4w:'بانتظار موافقة ولي الأمر',close:'تم',report:'إبلاغ عن مشكلة',reportT:'يصل بلاغك لفريق Youverse مباشرة.',
  code:'مدونة السلوك: الاحترام، لا تبادل لأرقام أو حسابات شخصية، لا لقاءات خارج Youverse.',
@@ -284,5 +284,6 @@ $('#side').onclick=e=>{const w=e.target.closest('[data-wd]');if(w){const i=+w.da
 function tab(mentor){$('#dir').classList.toggle('hide',mentor);$('#side').classList.toggle('hide',!mentor);$('#tYouer').setAttribute('aria-pressed',!mentor);$('#tMentor').setAttribute('aria-pressed',mentor);if(mentor)renderSide();history.replaceState(null,'',location.pathname+location.search+(mentor?'#mentor':''));}
 $('#tYouer').onclick=()=>tab(false);$('#tMentor').onclick=()=>tab(true);if(location.hash==='#mentor')tab(true);
 </script>
+<script src="yv-auth.js"></script>
 </body>
 </html>

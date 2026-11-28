@@ -174,7 +174,7 @@ html[dir=rtl] .dr{transform:translateX(-105%)}.dr.on{transform:none!important}
  <form class="lg hide" id="rsf" autocomplete="off">
   <img src="img/e71bb002c61cd7d156a7ad3ffea2d570.png" alt="Youverse">
   <h1 id="rsT">استعادة كلمة المرور</h1>
-  <p id="rsP">اكتب بريد حساب المدير، ونرسل لك رابطاً لتعيين كلمة مرور جديدة</p>
+  <p id="rsP">أدخل بريد حساب المدير، وسنرسل إليك رابطاً لتعيين كلمة مرور جديدة</p>
   <label>البريد الإلكتروني</label><input id="re" type="email" placeholder="admin@youverse.qa" required>
   <button type="submit" id="rsB">إرسال رابط الاستعادة</button>
   <div class="ok hide" id="rok"></div>
@@ -281,7 +281,7 @@ const I={
  pay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>',
  set:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'};
 const PAGES=[
- {k:'home',t:'نظرة عامة',s:'ملخص المنصة خلال آخر 30 يوم',i:I.home},
+ {k:'home',t:'نظرة عامة',s:'ملخص المنصة خلال آخر 30 يوماً',i:I.home},
  {k:'users',t:'المستخدمون',s:'كل الحسابات المسجلة في المنصة',i:I.users},
  {k:'test',t:'اختبار الضوء',s:'النتائج وتوزيع الأضواء والعوالم',i:I.test},
  {k:'mc',t:'الماستركلاس',s:'إضافة وتعديل الماستركلاس ونشرها',i:I.mc},
@@ -303,7 +303,7 @@ V.home=()=>{
   ${kpi(YVI('stack',17,'#127F87'),'#E8F7F8','المستخدمون المسجلون',fmt(USERS.length),'+'+new7+' هذا الأسبوع',1)}
   ${kpi(YVI('sparkle',17,'#6B5BD6'),'#EEEBFC','نتائج اختبار الضوء',fmt(done.length),'تشمل الزوار بدون حساب',1)}
   ${kpi(YVI('cap',17,'#C2507F'),'#FCEEF3','الاشتراكات النشطة',fmt(subs.length),pct(subs.length,USERS.length)+'% من المسجلين',1)}
-  ${kpi(YVI('award',17,'#B8860B'),'#FFF3DA','إيرادات آخر 30 يوم',qar(month),PAYS.filter(p=>p.st==='paid'&&now-p.when<30*DAY).length+' عملية مدفوعة',1)}
+  ${kpi(YVI('award',17,'#B8860B'),'#FFF3DA','إيرادات آخر 30 يوماً',qar(month),PAYS.filter(p=>p.st==='paid'&&now-p.when<30*DAY).length+' عملية مدفوعة',1)}
  </div>
  <div class="grid two">
   <div class="card"><h3>التسجيلات اليومية</h3><div class="hint">عدد الحسابات الجديدة كل يوم</div>${line(days)}</div>
@@ -325,7 +325,7 @@ const line=raw=>{const a=raw.map((_,i)=>{const w=raw.slice(Math.max(0,i-2),i+1);
  ${[0,.5,1].map(f=>`<line x1="${P}" x2="${W-P}" y1="${y(mx*f)}" y2="${y(mx*f)}" stroke="#EEF4F5"/>`).join('')}
  <path d="${d} L${x(a.length-1)},${H-P} L${x(0)},${H-P}Z" fill="url(#g)"/><path d="${d}" fill="none" stroke="#127F87" stroke-width="2.5"/>
  <circle cx="${x(a.length-1)}" cy="${y(a[a.length-1])}" r="5" fill="#127F87" stroke="#fff" stroke-width="2"/>
- <text x="${P}" y="${H-6}" font-size="12" fill="#9AAEB2">قبل 30 يوم</text><text x="${W-P}" y="${H-6}" font-size="12" fill="#9AAEB2" text-anchor="end">اليوم</text></svg>`;};
+ <text x="${P}" y="${H-6}" font-size="12" fill="#9AAEB2">قبل 30 يوماً</text><text x="${W-P}" y="${H-6}" font-size="12" fill="#9AAEB2" text-anchor="end">اليوم</text></svg>`;};
 let uq='',ul='',us='';
 V.users=()=>`<div class="card"><div class="tools">
   <input id="uq" placeholder="ابحث بالاسم أو البريد…" value="${esc(uq)}">
@@ -361,7 +361,7 @@ V.test=()=>{const done=RESULTS,pl=done.filter(r=>r.plan).length,acc=done.filter(
  <div class="hint" style="margin:14px 0 0">النتيجة تُحسب بجدول العميل: نقطة لكل إجابة، والأعلى يفوز، وعند التعادل الترتيب: الأفق، الصانع، المدار، الشرارة، البوصلة.</div></div>`;};
 
 V.mc=()=>`<div class="tools"><button class="btn" id="mcAdd">+ ماستركلاس جديد</button><span class="chip">${MC.filter(m=>m.st==='pub').length} منشور · ${MC.filter(m=>m.st!=='pub').length} مسودة</span></div>
- ${MC.length?'':emptyMsg('لا توجد ماستركلاس بعد. أضف أول واحدة من الزر فوق.')}<div class="grid mcs">${MC.map(m=>`<div class="card mc"><div class="cv" style="background:linear-gradient(135deg,${LIGHTS[m.w].c},#032E36)">${m.st==='pub'?'<span class="st ok">منشور</span>':'<span class="st warn">مسودة</span>'}<h4>${esc(m.t)}</h4></div>
+ ${MC.length?'':emptyMsg('لا توجد ماستركلاس بعد. أضف أول ماستركلاس من الزر في الأعلى.')}<div class="grid mcs">${MC.map(m=>`<div class="card mc"><div class="cv" style="background:linear-gradient(135deg,${LIGHTS[m.w].c},#032E36)">${m.st==='pub'?'<span class="st ok">منشور</span>':'<span class="st warn">مسودة</span>'}<h4>${esc(m.t)}</h4></div>
  <div class="bd"><div style="font-size:14px;color:var(--ink2)">${esc(m.m)}</div><div class="meta"><span>${LIGHTS[m.w].e} ${LIGHTS[m.w].w}</span><span>${YVI('book',13)} ${m.ch} فصول</span><span>${YVI('clock',13)} ${m.min} دقيقة</span></div>
  <div class="row"><span><b>${m.p?qar(m.p):'مجاني'}</b></span><span>${fmt(m.en)} ملتحق</span></div><div style="display:flex;gap:8px"><button class="btn sm ghost" data-e="${m.id}">تعديل</button><button class="btn sm ghost" data-p="${m.id}">${m.st==='pub'?'إخفاء':'نشر'}</button></div></div></div>`).join('')}</div>`;
 const mcForm=id=>{const m=MC.find(x=>String(x.id)===String(id))||{t:'',m:'',w:'H',ch:6,min:45,p:149,st:'draft',d:''};
@@ -399,7 +399,7 @@ V.mentors=x=>{if(!x)KIND='mentor';const t=KT(),ALL=KM();const L=ALL.filter(m=>mf
  ${L.length?L.map(m=>`<tr data-m="${m.id}"><td><div class="u">${avatar(m.n,m.l)}<b>${esc(m.n)}</b></div></td><td>${esc(m.f||'—')}</td><td>${langT(m.langs)}</td><td>${m.l?lightTag(m.l):'—'}</td>
   <td>${m.p30!=null?qar(m.p30):'—'} / ${m.p60!=null?qar(m.p60):'—'}</td><td>${m.av.length?m.av.map(a=>DAYS[a.d]).join('، '):'<span class="st warn">لم تُحدد</span>'}</td><td>${m.sess}</td>
   <td>${m.ok?'<span class="st ok">معتمد</span>':m.applied?'<span class="st warn">طلب انضمام</span>':'<span class="st mute">مخفي</span>'}</td>
-  <td style="white-space:nowrap">${m.ok?`<button class="btn sm ghost" data-mt="hide" data-id="${m.id}">إخفاء</button>`:`<button class="btn sm" data-mt="approve" data-id="${m.id}">اعتماد</button>`}${!m.ok&&m.applied?` <button class="btn sm ghost" style="color:var(--bad)" data-mt="reject" data-id="${m.id}">رفض</button>`:''}</td></tr>`).join(''):'<tr><td colspan="9" class="empty">لا يوجد ${t.ones} بعد. أضف أول واحد من الزر فوق.</td></tr>'}</tbody></table></div>
+  <td style="white-space:nowrap">${m.ok?`<button class="btn sm ghost" data-mt="hide" data-id="${m.id}">إخفاء</button>`:`<button class="btn sm" data-mt="approve" data-id="${m.id}">اعتماد</button>`}${!m.ok&&m.applied?` <button class="btn sm ghost" style="color:var(--bad)" data-mt="reject" data-id="${m.id}">رفض</button>`:''}</td></tr>`).join(''):'<tr><td colspan="9" class="empty">لا يوجد ${t.ones} بعد. أضف أول واحد من الزر في الأعلى.</td></tr>'}</tbody></table></div>
  <div class="hint" style="margin:14px 0 0">${t.one} لا يظهر في ${t.w} إلا بعد اعتماده. الأوقات بتوقيت قطر.</div></div>`;};
 const mtForm=id=>{const m=MENTORS.find(x=>String(x.id)===String(id))||{n:'',f:'',bio:'',langs:['ar'],l:'',p30:'',p60:'',ok:true,av:[]};
  const has=d=>m.av.find(a=>a.d===d),av0=m.av[0]||{from:'16:00',to:'21:00'};
@@ -412,7 +412,7 @@ const mtForm=id=>{const m=MENTORS.find(x=>String(x.id)===String(id))||{n:'',f:''
  <div class="w" style="display:flex;gap:18px;font-size:14px;font-weight:700;color:var(--ink2)">اللغات: <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" name="ar" ${m.langs.includes('ar')?'checked':''} style="height:auto">عربي</label><label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" name="en" ${m.langs.includes('en')?'checked':''} style="height:auto">English</label></div>
  <label class="w">نبذة<textarea name="bio">${esc(m.bio)}</textarea></label>
  <label class="w">رابط الجلسات (Google Meet أو Zoom)<input name="url" type="url" dir="ltr" placeholder="https://meet.google.com/..." value="${esc(m.url||'')}"></label>
- <div class="w" style="font-size:12.5px;color:var(--mut);margin-top:-6px">رابط ثابت لغرفة ${KT().one}. يوصل للطالب في رسالة التأكيد بعد الدفع، وما يظهر للزوار.</div>
+ <div class="w" style="font-size:12.5px;color:var(--mut);margin-top:-6px">رابط ثابت لغرفة ${KT().one}. يصل إلى الطالب في رسالة التأكيد بعد الدفع، ولا يظهر للزوار.</div>
  <div class="w" style="font-size:13px;color:var(--mut);font-weight:700">أيام التوفر (بتوقيت قطر)</div>
  <div class="w" style="display:flex;flex-wrap:wrap;gap:8px">${DAYS.map((d,i)=>`<label style="flex-direction:row;align-items:center;gap:6px;background:#F2F7F8;border-radius:20px;padding:6px 12px;color:var(--ink2)"><input type="checkbox" name="d${i}" ${has(i)?'checked':''} style="height:auto">${d}</label>`).join('')}</div>
  <label>من<input name="from" type="time" value="${av0.from}"></label><label>إلى<input name="to" type="time" value="${av0.to}"></label>
@@ -420,8 +420,8 @@ const mtForm=id=>{const m=MENTORS.find(x=>String(x.id)===String(id))||{n:'',f:''
  </form><div class="act"><button class="btn" id="mtSave">حفظ</button><button class="btn ghost" data-close>إلغاء</button></div>`);
  $('#mtSave').onclick=async()=>{const f=$('#mtf');if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
   const langs=['ar','en'].filter(k=>d[k]);if(!langs.length)return toast('اختر لغة واحدة على الأقل');
-  if(d.from>=d.to)return toast('وقت النهاية لازم يكون بعد البداية');
-  const url=(d.url||'').trim();if(url&&!/^https:\/\//i.test(url))return toast('الرابط لازم يبدأ بـ https://');
+  if(d.from>=d.to)return toast('يجب أن يكون وقت النهاية بعد وقت البداية');
+  const url=(d.url||'').trim();if(url&&!/^https:\/\//i.test(url))return toast('يجب أن يبدأ الرابط بـ https://');
   const days=[0,1,2,3,4,5,6].filter(i=>d['d'+i]);
   const row={name:d.n.trim(),field:d.f.trim()||null,bio:d.bio.trim()||null,langs,light:d.l||null,price_30:d.p30===''?null:+d.p30,price_60:d.p60===''?null:+d.p60,approved:!!d.ok,kind:KIND};
   if(DEMO){const o={id:id||('m'+Date.now()),kind:KIND,n:row.name,f:row.field||'',bio:row.bio||'',langs,l:row.light,p30:row.price_30,p60:row.price_60,url,ok:row.approved,applied:false,av:days.map(x=>({d:x,from:d.from,to:d.to})),sess:m.sess||0,earn:m.earn||0};
@@ -454,16 +454,16 @@ V.set=()=>`<div class="grid set">
   <div class="w" style="font-size:12.5px;color:var(--mut)">8 أحرف على الأقل، ويُفضّل خلط حروف وأرقام.</div>
   <div class="w" id="pwerr" style="color:var(--bad);font-size:13px;min-height:16px"></div></form>
   <div class="act" style="margin-top:6px"><button class="btn" id="pwSave">تغيير كلمة المرور</button></div>
-  <div class="sw" style="margin-top:14px;border-top:1px solid #F0F5F6"><div><b>التحقق بخطوتين</b><small>كود من تطبيق مثل Google Authenticator عند كل دخول</small></div><button class="tg"></button></div></div>
+  <div class="sw" style="margin-top:14px;border-top:1px solid #F0F5F6"><div><b>التحقق بخطوتين</b><small>رمز من تطبيق مثل Google Authenticator عند كل دخول</small></div><button class="tg"></button></div></div>
  <div class="card"><h3>إعدادات المنصة</h3><div class="hint">تتحكم في تجربة الزوار</div>
-  ${[['registration_open','التسجيل مفتوح','الزوار يقدرون يسوون حسابات جديدة'],['parental_consent_required','موافقة ولي الأمر لمن هم تحت 18','لازم موافقة قبل الاشتراك أو الدفع'],['send_7day_plan','إرسال خطة الأيام السبعة بالبريد','بعد ما يكتب المستخدم بريده في النتيجة'],['maintenance','وضع الصيانة','يقفل الموقع للزوار مؤقتاً']].map(s=>`<div class="sw"><div><b>${s[1]}</b><small>${s[2]}</small></div><button class="tg ${SETTINGS[s[0]]?'on':''}" data-key="${s[0]}"></button></div>`).join('')}</div>
+  ${[['registration_open','التسجيل مفتوح','يمكن للزوار إنشاء حسابات جديدة'],['parental_consent_required','موافقة ولي الأمر لمن هم تحت 18','تُشترط الموافقة قبل الاشتراك أو الدفع'],['send_7day_plan','إرسال خطة الأيام السبعة بالبريد','بعد أن يُدخل المستخدم بريده في صفحة النتيجة'],['maintenance','وضع الصيانة','يُغلق الموقع أمام الزوار مؤقتاً']].map(s=>`<div class="sw"><div><b>${s[1]}</b><small>${s[2]}</small></div><button class="tg ${SETTINGS[s[0]]?'on':''}" data-key="${s[0]}"></button></div>`).join('')}</div>
  <div class="card"><h3>الدفع</h3><div class="hint">SkipCash</div>
-  <div class="sw"><div><b>وضع التجربة (Sandbox)</b><small>نشغّل الدفع الحقيقي بعد التجربة</small></div><button class="tg on"></button></div>
-  <div class="sw"><div><b>مفتاح SkipCash</b><small>يُحفظ في إعدادات Vercel فقط، ما يُكتب هنا</small></div><span class="st mute">محفوظ بأمان</span></div>
+  <div class="sw"><div><b>وضع التجربة (Sandbox)</b><small>يُفعَّل الدفع الحقيقي بعد انتهاء التجربة</small></div><button class="tg on"></button></div>
+  <div class="sw"><div><b>مفتاح SkipCash</b><small>يُحفظ في إعدادات Vercel فقط، ولا يُكتب هنا</small></div><span class="st mute">محفوظ بأمان</span></div>
   <div class="sw"><div><b>أسعار الاشتراك</b><small>شهري 99 ر.ق · سنوي 990 ر.ق</small></div><button class="btn sm ghost" data-t="تعديل الأسعار بعد الربط">تعديل</button></div></div>
- <div class="card"><h3>البريد والتنبيهات</h3><div class="hint">وين توصل تنبيهات المنصة</div>
-  <div class="sw"><div><b>تنبيه عند كل عملية دفع</b><small>يوصل لبريد المدير</small></div><button class="tg ${SETTINGS.notify_each_payment?'on':''}" data-key="notify_each_payment"></button></div>
-  <div class="sw"><div><b>ملخص أسبوعي</b><small>كل أحد الصبح</small></div><button class="tg ${SETTINGS.weekly_summary?'on':''}" data-key="weekly_summary"></button></div>
+ <div class="card"><h3>البريد والتنبيهات</h3><div class="hint">وجهة تنبيهات المنصة</div>
+  <div class="sw"><div><b>تنبيه عند كل عملية دفع</b><small>يُرسل إلى بريد المدير</small></div><button class="tg ${SETTINGS.notify_each_payment?'on':''}" data-key="notify_each_payment"></button></div>
+  <div class="sw"><div><b>ملخص أسبوعي</b><small>صباح كل أحد</small></div><button class="tg ${SETTINGS.weekly_summary?'on':''}" data-key="weekly_summary"></button></div>
   <div class="sw"><div><b>تنبيه عند طلب موافقة ولي أمر</b><small>لمن هم تحت 18</small></div><button class="tg ${SETTINGS.notify_consent_request?'on':''}" data-key="notify_consent_request"></button></div></div></div>`;
 
 /* ---------- shell ---------- */
@@ -483,7 +483,7 @@ $('#view').onclick=e=>{const ma=e.target.closest('[data-mt]');if(ma){const m=MEN
   if(a==='reject'&&!confirm('رفض طلب '+m.n+' وحذفه؟'))return;
   if(DEMO){if(a==='reject')MENTORS.splice(MENTORS.indexOf(m),1);else{m.ok=a==='approve';m.applied=false;}go(KT().pg);return toast(a==='approve'?'تم الاعتماد':a==='hide'?'تم الإخفاء':'تم الرفض');}
   const q=a==='reject'?SB.from('mentors').delete().eq('id',m.id):SB.from('mentors').update({approved:a==='approve'}).eq('id',m.id);
-  return q.then(async({error})=>{if(error)return toast('تعذّر الحفظ: '+error.message);await refresh();go(KT().pg);toast(a==='approve'?'تم الاعتماد، ويظهر الحين في '+KT().w:a==='hide'?'تم الإخفاء':'تم الرفض');});}
+  return q.then(async({error})=>{if(error)return toast('تعذّر الحفظ: '+error.message);await refresh();go(KT().pg);toast(a==='approve'?'تم الاعتماد، ويظهر الآن في '+KT().w:a==='hide'?'تم الإخفاء':'تم الرفض');});}
  const mr=e.target.closest('tr[data-m]');if(mr)return mtForm(mr.dataset.m);
  const tr=e.target.closest('tr[data-u]');if(tr)return userDrawer(tr.dataset.u);
  const ed=e.target.closest('[data-e]');if(ed)return mcForm(ed.dataset.e);
@@ -491,7 +491,7 @@ $('#view').onclick=e=>{const ma=e.target.closest('[data-mt]');if(ma){const m=MEN
   if(DEMO){m.st=ns;go('mc');return toast(ns==='pub'?'تم النشر':'تم الإخفاء');}
   return SB.from('masterclasses').update({status:ns==='pub'?'published':'draft'}).eq('id',m.id).then(({error})=>{if(error)return toast('تعذّر الحفظ: '+error.message);m.st=ns;go('mc');toast(ns==='pub'?'تم النشر':'تم الإخفاء');});}
  const tg=e.target.closest('.tg');if(tg){const k=tg.dataset.key,on=!tg.classList.contains('on');tg.classList.toggle('on',on);
-  if(!k||DEMO)return toast(k?'تم التغيير (بيانات تجريبية)':'يتفعّل لاحقاً');
+  if(!k||DEMO)return toast(k?'تم التغيير (بيانات تجريبية)':'يُفعَّل لاحقاً');
   return SB.from('settings').update({value:on,updated_at:new Date().toISOString()}).eq('key',k).then(({error})=>{if(error){tg.classList.toggle('on',!on);return toast('تعذّر الحفظ: '+error.message);}SETTINGS[k]=on;toast('تم الحفظ');});}
  const t=e.target.closest('[data-t]');if(t)toast(t.dataset.t);};
 function openDr(h){$('#drb').innerHTML=h;$('#dr').classList.add('on');$('#ov').classList.add('on');}
@@ -516,10 +516,10 @@ function enterDemo(){loadSample();$('#modeChip').textContent='بيانات تج�
  $('#login').classList.add('hide');$('#app').classList.remove('hide');go('home');}
 $('#lgf').onsubmit=async e=>{e.preventDefault();const btn=$('#lgf button[type=submit]');btn.disabled=true;$('#lerr').textContent='';
  const {data,error}=await SB.auth.signInWithPassword({email:$('#le').value.trim(),password:$('#lp').value});btn.disabled=false;
- if(error){$('#lerr').textContent=/Invalid login/i.test(error.message)?'البريد أو كلمة المرور غير صحيحة.':/fetch/i.test(error.message)?'تعذّر الاتصال. تأكد من الإنترنت وحاول مرة ثانية.':error.message;return;}enterReal(data.user);};
+ if(error){$('#lerr').textContent=/Invalid login/i.test(error.message)?'البريد أو كلمة المرور غير صحيحة.':/fetch/i.test(error.message)?'تعذّر الاتصال. تحقّق من اتصالك بالإنترنت وحاول مجدداً.':error.message;return;}enterReal(data.user);};
 let firstMode=false;
-$('#fgo').onclick=()=>{firstMode=false;$('#rsT').textContent='استعادة كلمة المرور';$('#rsP').textContent='اكتب بريد حساب المدير، ونرسل لك رابطاً لتعيين كلمة مرور جديدة';$('#rsB').textContent='إرسال رابط الاستعادة';show('#rsf');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
-$('#first').onclick=()=>{firstMode=true;$('#rsT').textContent='أول دخول للمدير';$('#rsP').textContent='اكتب بريد المدير، ونرسل لك رابط دخول. بعدها تختار كلمة المرور.';$('#rsB').textContent='أرسل رابط الدخول';show('#rsf');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
+$('#fgo').onclick=()=>{firstMode=false;$('#rsT').textContent='استعادة كلمة المرور';$('#rsP').textContent='أدخل بريد حساب المدير، وسنرسل إليك رابطاً لتعيين كلمة مرور جديدة';$('#rsB').textContent='إرسال رابط الاستعادة';show('#rsf');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
+$('#first').onclick=()=>{firstMode=true;$('#rsT').textContent='أول دخول للمدير';$('#rsP').textContent='أدخل بريد المدير، وسنرسل إليك رابط دخول، ثم تختار كلمة المرور.';$('#rsB').textContent='أرسل رابط الدخول';show('#rsf');$('#re').value=$('#le').value;$('#rok').classList.add('hide');};
 $('#rback').onclick=()=>show('#lgf');
 $('#demo').onclick=enterDemo;
 $('#rsf').onsubmit=async e=>{e.preventDefault();const m=$('#re').value.trim(),btn=$('#rsB');btn.disabled=true;

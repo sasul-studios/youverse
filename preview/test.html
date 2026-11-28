@@ -225,5 +225,6 @@ function burst(cb){const h=$('#halo');if(!h||matchMedia('(prefers-reduced-motion
 {const sp=$('#spot');let q=0;addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||q)return;q=requestAnimationFrame(()=>{q=0;sp.style.setProperty('--x',e.clientX+'px');sp.style.setProperty('--y',e.clientY+'px');});},{passive:true});}
 setLang(lang);
 </script>
+<script src="yv-auth.js"></script>
 </body>
 </html>

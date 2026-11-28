@@ -42,7 +42,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}td,th{padding:9px 6px
 </div>
 
 <div class="card">
-<h2>اختر ما تجربه</h2>
+<h2>اختر ما تريد تجربته</h2>
 <div class="row" style="align-items:end">
 <button data-t="test">دفعة تجربة 1 ر.ق</button>
 <button data-t="subscription" data-plan="monthly">اشتراك شهري</button>
@@ -76,9 +76,9 @@ const ST={pending:['معلّق','warn'],paid:['مدفوع','ok'],failed:['فشل
 let session=null;
 (async()=>{
  const {data}=await SB.auth.getSession();session=data.session;
- if(!session){$('#who').innerHTML='لازم تسجّل دخول كمدير أول. <a href="admin.html">افتح لوحة التحكم وسجّل الدخول</a> ثم ارجع لهذي الصفحة.';return;}
+ if(!session){$('#who').innerHTML='يجب تسجيل الدخول بحساب المدير أولاً. <a href="admin.html">افتح لوحة التحكم وسجّل الدخول</a> ثم عُد إلى هذه الصفحة.';return;}
  const {data:p}=await SB.from('profiles').select('role,full_name').eq('id',session.user.id).single();
- if(!p||p.role!=='admin'){$('#who').textContent='هذي الصفحة للمدير فقط.';return;}
+ if(!p||p.role!=='admin'){$('#who').textContent='هذه الصفحة للمدير فقط.';return;}
  $('#who').innerHTML=`مسجّل كمدير: <b dir="ltr">${esc(session.user.email)}</b> <span class="pill" id="envp">…</span>`;
  $('#tool').hidden=false;
  const d=new Date(Date.now()+2*864e5);d.setMinutes(0,0,0);$('#md').value=new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16);
@@ -94,15 +94,15 @@ async function loadOrders(){
 document.querySelectorAll('button[data-t]').forEach(b=>b.onclick=async()=>{
  const t=b.dataset.t,body={item_type:t,first_name:$('#fn').value,last_name:$('#ln').value,phone:$('#ph').value};
  if(t==='subscription')body.plan=b.dataset.plan;
- if(t==='masterclass'){if(!$('#mc').value)return msg('ما فيه ماستركلاس منشور بعد.',1);body.item_id=$('#mc').value;}
- if(t==='session'){if(!$('#mt').value)return msg('ما فيه مرشد معتمد بعد.',1);body.mentor_id=$('#mt').value;body.minutes=+$('#mm').value;body.starts_at=new Date($('#md').value).toISOString();}
+ if(t==='masterclass'){if(!$('#mc').value)return msg('لا توجد ماستركلاس منشورة بعد.',1);body.item_id=$('#mc').value;}
+ if(t==='session'){if(!$('#mt').value)return msg('لا يوجد مرشد معتمد بعد.',1);body.mentor_id=$('#mt').value;body.minutes=+$('#mm').value;body.starts_at=new Date($('#md').value).toISOString();}
  document.querySelectorAll('button[data-t]').forEach(x=>x.disabled=true);msg('جارٍ إنشاء الدفع…');
  try{
   const {data}=await SB.auth.getSession();
   const r=await fetch('/api/skipcash/create',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+data.session.access_token},body:JSON.stringify(body)});
   const j=await r.json().catch(()=>({error:'رد غير متوقع من السيرفر ('+r.status+')'}));
   if(!r.ok||!j.payUrl)throw new Error(j.error||('HTTP '+r.status));
-  msg('ننقلك لصفحة SkipCash…');location.href=j.payUrl;
+  msg('جارٍ نقلك إلى صفحة SkipCash…');location.href=j.payUrl;
  }catch(e){msg(e.message,1);document.querySelectorAll('button[data-t]').forEach(x=>x.disabled=false);loadOrders();}
 });
 function msg(t,bad){$('#msg').innerHTML=`<span class="pill ${bad?'bad':''}">${esc(t)}</span>`;}

@@ -17,11 +17,11 @@ a.btn{display:inline-block;background:#127F87;color:#fff;text-decoration:none;pa
 </style>
 </head>
 <body>
-<div class="box"><div class="ic" id="ic"><div class="spin"></div></div><h1 id="h">نتأكد من الدفع…</h1><p id="p">لحظات بس.</p><div class="sum" id="sum"></div><a class="btn" id="back" href="app.html">ارجع لـ Youverse</a></div>
+<div class="box"><div class="ic" id="ic"><div class="spin"></div></div><h1 id="h">جارٍ التحقق من الدفع…</h1><p id="p">لحظات من فضلك.</p><div class="sum" id="sum"></div><a class="btn" id="back" href="app.html">العودة إلى Youverse</a></div>
 <script>
 const en=(navigator.language||'').startsWith('en')&&!/[?&]lang=ar/.test(location.search);
 const T=en?{wait:'Checking your payment…',ok:'Payment received',okP:'Thank you. Your purchase is now active.',pend:'Payment is being processed',pendP:'We will update your account as soon as SkipCash confirms it.',bad:'Payment not completed',badP:'No money was taken. You can try again.',err:'We could not check the payment',errP:'If money was taken, it will be confirmed automatically. You can also contact us.',back:'Back to Youverse',q:'QAR'}
-:{wait:'نتأكد من الدفع…',ok:'تم الدفع بنجاح',okP:'شكراً لك. مشترياتك صارت مفعّلة.',pend:'الدفع قيد المعالجة',pendP:'بنحدّث حسابك أول ما تأكّده SkipCash.',bad:'ما اكتمل الدفع',badP:'ما انخصم منك شيء، وتقدر تحاول مرة ثانية.',err:'ما قدرنا نتأكد من الدفع',errP:'إذا انخصم المبلغ بيتأكد تلقائياً، وتقدر تتواصل معنا.',back:'ارجع لـ Youverse',q:'ر.ق'};
+:{wait:'جارٍ التحقق من الدفع…',ok:'تم الدفع بنجاح',okP:'شكراً لك، تم تفعيل مشترياتك.',pend:'الدفع قيد المعالجة',pendP:'سيُحدَّث حسابك فور تأكيد SkipCash للدفع.',bad:'لم تكتمل عملية الدفع',badP:'لم يُخصم أي مبلغ، ويمكنك المحاولة مجدداً.',err:'تعذّر التحقق من الدفع',errP:'إذا خُصم المبلغ فسيُؤكَّد تلقائياً، ويمكنك التواصل معنا.',back:'العودة إلى Youverse',q:'ر.ق'};
 if(en){document.documentElement.lang='en';document.documentElement.dir='ltr';}
 const $=s=>document.getElementById(s);$('h').textContent=T.wait;$('back').textContent=T.back;
 const id=new URLSearchParams(location.search).get('id');

@@ -16,8 +16,8 @@ html[lang=en] .serif{font-family:Lora,serif}
 .serif{font-family:Amiri,serif}
 main{max-width:1120px;margin:0 auto;padding:34px 22px 80px}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap}
-.top small{color:var(--mut);font-size:14px}
-h1{font-size:48px;margin:4px 0 0;line-height:1.25}
+.top small{display:block;color:var(--mut);font-size:14px;margin-bottom:14px}
+h1{font-size:48px;margin:0;line-height:1.4}
 .light{display:inline-flex;align-items:center;gap:10px;margin-top:12px;background:#0B2A33;color:#fff;border-radius:30px;padding:8px 18px 8px 8px;font-size:15px}
 html[dir=rtl] .light{padding:8px 8px 8px 18px}
 .light i{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)}
@@ -73,14 +73,14 @@ const T=EN?{hi:'Hello',space:'My Space',nolight:'You have not taken the test yet
  acc:'Account',name:'Full name',save:'Save',newpw:'New password',chpw:'Change password',out:'Sign out',saved:'Saved.',pwShort:'At least 8 characters.',pwOk:'Password changed.',
  st:{pending_payment:['Awaiting payment','w'],pending_consent:['Awaiting parent approval','w'],confirmed:['Confirmed','g'],cancelled:['Cancelled','r'],completed:['Completed',''],no_show:['Missed','r']},
  os:{pending:['Pending','w'],paid:['Paid','g'],failed:['Failed','r'],cancelled:['Cancelled','r'],refunded:['Refunded','w']},min:'min',q:'QAR',monthly:'Monthly',yearly:'Yearly'}
-:{hi:'أهلاً',space:'مساحتي',nolight:'ما سويت الاختبار بعد',retake:'إعادة الاختبار',take:'ابدأ الاختبار',explore:'استكشف عالمك',
- pend:'ولي أمرك ما وافق على حسابك بعد. تقدر تتصفّح وتتعلّم، وحجز الجلسات يتفعّل بعد موافقته.',
+:{hi:'أهلاً',space:'مساحتي',nolight:'لم تُجرِ الاختبار بعد',retake:'إعادة الاختبار',take:'ابدأ الاختبار',explore:'استكشف عالمك',
+ pend:'لم يوافق ولي أمرك على حسابك بعد. يمكنك التصفّح والتعلّم، ويُتاح حجز الجلسات بعد موافقته.',
  mc:'ماستركلاس',ss:'جلسات',sub:'الاشتراك',none:'لا يوجد',until:'حتى',
- learn:'أكمل التعلّم',noLearn:'ما عندك ماستركلاس بعد.',browse:'تصفّح الماستركلاس',open:'متابعة',
- sessions:'جلساتي',noSess:'ما حجزت جلسات بعد.',bookOne:'احجز جلسة',join:'ادخل الجلسة',
- results:'سجل نتائجي',noRes:'ما فيه نتائج محفوظة بعد.',pays:'مدفوعاتي',noPay:'ما فيه مدفوعات بعد.',
+ learn:'أكمل التعلّم',noLearn:'لا توجد لديك ماستركلاس بعد.',browse:'تصفّح الماستركلاس',open:'متابعة',
+ sessions:'جلساتي',noSess:'لم تحجز أي جلسة بعد.',bookOne:'احجز جلسة',join:'انضم إلى الجلسة',
+ results:'سجل نتائجي',noRes:'لا توجد نتائج محفوظة بعد.',pays:'مدفوعاتي',noPay:'لا توجد مدفوعات بعد.',
  acc:'حسابي',name:'الاسم الكامل',save:'حفظ',newpw:'كلمة مرور جديدة',chpw:'تغيير كلمة المرور',out:'تسجيل الخروج',saved:'تم الحفظ.',pwShort:'8 أحرف على الأقل.',pwOk:'تم تغيير كلمة المرور.',
- st:{pending_payment:['بانتظار الدفع','w'],pending_consent:['بانتظار موافقة ولي الأمر','w'],confirmed:['مؤكدة','g'],cancelled:['ملغاة','r'],completed:['تمت',''],no_show:['فاتت','r']},
+ st:{pending_payment:['بانتظار الدفع','w'],pending_consent:['بانتظار موافقة ولي الأمر','w'],confirmed:['مؤكدة','g'],cancelled:['ملغاة','r'],completed:['مكتملة',''],no_show:['لم يُحضَر','r']},
  os:{pending:['معلّق','w'],paid:['مدفوع','g'],failed:['فشل','r'],cancelled:['ملغى','r'],refunded:['مسترد','w']},min:'دقيقة',q:'ر.ق',monthly:'شهري',yearly:'سنوي'};
 const loc=EN?'en-GB':'ar-QA';
 const dt=d=>new Date(d).toLocaleDateString(loc,{day:'numeric',month:'long',year:'numeric'});
