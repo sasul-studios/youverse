@@ -55,6 +55,7 @@ html[dir=ltr] .pl img{transform:scaleX(-1)}
 .plab{position:absolute;left:0;top:0;transform-origin:50% 0;pointer-events:none;text-align:center;white-space:nowrap;will-change:transform,opacity}
 .plab b{display:block;font-family:Amiri,serif;font-size:19px;color:#fff;text-shadow:0 2px 14px #000}
 html[lang=en] .plab b{font-family:Lora,serif;font-size:16px}
+.plab[data-m=r]{text-align:left}.plab[data-m=l]{text-align:right}
 .plab small{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:var(--c)}
 .plab em{font-style:normal;font-size:10.5px;background:var(--c);color:#03060E;border-radius:20px;padding:1px 8px;margin-inline-start:4px}
 .ring{position:absolute;left:0;top:0;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--c) 60%,transparent);pointer-events:none;will-change:transform,opacity;box-shadow:0 0 22px -6px color-mix(in srgb,var(--c) 70%,transparent)}
@@ -291,24 +292,15 @@ function layout(){
  S=[];P=[];
  let s1,targets;
  if(mob){
-  // the map on phones: two staggered columns from the bottom up, sized to the free space so names never touch
-  const tc=$('.tc.ov'),top=tc.offsetTop+tc.offsetHeight+10,bottom=Math.min($('#rail').offsetTop,$('#hint').offsetTop)-6,labH=(LB[1]&&LB[1].offsetHeight)||46,gap=8;
-  const below=di=>di*.56+10+labH;   // a planet's name sits under it
-  s1=.58;let cy=[],d=[],minTop=0;
-  for(let it=0;it<24;it++){
-   const s=[...Array(N)].map((_,i)=>1/(1/s1+(Dz/f)*i));d=s.map(v=>2*R*v);cy=[];
-   let b=bottom;[0,2,4].forEach(i=>{if(i<N){cy[i]=b-below(d[i]);b=cy[i]-d[i]/2-gap;}});
-   if(N>1)cy[1]=Math.min(bottom-below(d[1]),(cy[0]+(N>2?cy[2]:cy[0]-d[0]))/2);
-   if(N>3)cy[3]=Math.min(cy[1]-d[1]/2-gap-below(d[3]),(cy[2]+(N>4?cy[4]:top+d[3]/2))/2);
-   minTop=Math.min(...cy.map((y,i)=>y-d[i]/2));
-   if(minTop>=top||s1<.2)break;s1*=.95;}
-  if(minTop>top){const up=(minTop-top)*.5;cy=cy.map(y=>y-up);}   // centre the map in the free space
-  targets=cy.map((y,i)=>[(i%2?.46:-.46)*W/2,y-Hh/2]);
+  // the map on phones: the winding path Bu Sa'ad approved (Nov 2026); names move beside their planet when they would touch something
+  const OVm=[[-.42,.46],[.44,.30],[-.40,.08],[.40,-.08],[.0,-.22]];s1=.44;
+  targets=OVm.map(v=>[v[0]*W/2,v[1]*Hh/2]);
  }else{
   const OVd=[[-.40,.32],[.06,.40],[.36,.20],[-.04,-.06],[-.34,-.32]];s1=.40;
   targets=OVd.map(v=>[v[0]*W/2,v[1]*Hh/2]);
  }
  const cz0=Dz-f/s1;S=[{x:0,y:0,z:cz0}];
+ placeNames(targets,s1,cz0);
  for(let j=1;j<=N;j++){const Z=j*Dz,sj=f/(Z-cz0),u=targets[j-1][0]*(RTL?1:-1),v=targets[j-1][1];
   P[j]={x:u/sj,y:v/sj,z:Z};S[j]={x:P[j].x-(hx-W/2),y:P[j].y-(hy-Hh/2),z:Z-f};}
  for(let j=1;j<=N;j++){PL[j].style.width=PL[j].style.height=E+'px';PL[j].querySelector('img').sizes=Math.round(E)+'px';
@@ -318,6 +310,21 @@ function layout(){
  seg=innerHeight*(mob?.85:.95);tail=innerHeight*.45;
  $('#journey').style.height=(Hh+seg*N+tail)+'px';
  drawWarp();
+}
+const LBM=[];
+function placeNames(targets,s1,cz0){
+ const rel=e=>{const r=e.getBoundingClientRect(),s=stage.getBoundingClientRect();return {x:r.left-s.left,y:r.top-s.top,r:r.right-s.left,b:r.bottom-s.top};};
+ const tc=$('.tc.ov'),obst=[{x:tc.offsetLeft,y:tc.offsetTop,r:tc.offsetLeft+tc.offsetWidth,b:tc.offsetTop+tc.offsetHeight},rel($('.vt')),rel($('#rail'))];
+ const hint=$('#hint');obst.push({x:hint.offsetLeft,y:hint.offsetTop,r:hint.offsetLeft+hint.offsetWidth,b:hint.offsetTop+hint.offsetHeight});
+ const pl=[],pob=[];for(let j=1;j<=N;j++){const sj=f/(j*Dz-cz0),rr=R*sj,x=W/2+targets[j-1][0]*(RTL?1:-1),y=Hh/2+targets[j-1][1];pl[j]={x,y,rr};pob[j]={x:x-rr,y:y-rr,r:x+rr,b:y+rr};obst.push(pob[j]);}
+ const hit=(a,b)=>a.x<b.r&&b.x<a.r&&a.y<b.b&&b.y<a.b;
+ for(let j=1;j<=N;j++){const {x,y,rr}=pl[j],w=LB[j].offsetWidth,h=LB[j].offsetHeight,g=rr*1.12+6;
+  const side=x<W/2?['r','l']:['l','r'];
+  const box={b:{x:x-w/2,y:y+g,r:x+w/2,b:y+g+h},a:{x:x-w/2,y:y-g-h,r:x+w/2,b:y-g},r:{x:x+rr*1.15+8,y:y-h/2,r:x+rr*1.15+8+w,b:y+h/2},l:{x:x-rr*1.15-8-w,y:y-h/2,r:x-rr*1.15-8,b:y+h/2}};
+  const own=pob[j];
+  const pad=8,ok2=m=>{const q=box[m];if(q.x<4||q.r>W-4||q.y<0||q.b>Hh)return false;const e={x:q.x-pad,y:q.y-2,r:q.r+pad,b:q.b+2};return !obst.some(o=>o!==own&&hit(e,o));};
+  const m=['b',...side,'a'].find(ok2)||'b';LBM[j]=m;obst.push(box[m]);
+  LB[j].dataset.m=m;}
 }
 function drawWarp(){const cv=$('#warp'),dpr=Math.min(devicePixelRatio||1,2);cv.width=W*dpr;cv.height=Hh*dpr;const x=cv.getContext('2d');x.scale(dpr,dpr);
  const cx=W/2,cy=Hh/2,dg=Math.hypot(W,Hh)/2;let s=11;const r=()=>(s=(s*9301+49297)%233280)/233280;
@@ -356,7 +363,7 @@ function frame(now){
   const zb=100-j*10;
   if(off||o<.01){pl.style.visibility='hidden';LB[j].style.visibility='hidden';}
   else{pl.style.visibility='';pl.style.opacity=o.toFixed(3);pl.style.transform=`translate3d(${(sx-E/2).toFixed(1)}px,${(sy-E/2).toFixed(1)}px,0) scale(${s.toFixed(4)})`;pl.style.zIndex=zb+1;
-   const lo=o*clamp(1-c*3)*(LIT[j]?clamp((now-LIT[j])/900):0);LB[j].style.visibility=lo>.01?'':'hidden';if(lo>.01){LB[j].style.opacity=lo.toFixed(3);LB[j].style.transform=`translate3d(calc(${sx.toFixed(1)}px - 50%),${(sy+R*s*1.12+10).toFixed(1)}px,0)`;}}
+   const lo=o*clamp(1-c*3)*(LIT[j]?clamp((now-LIT[j])/900):0);LB[j].style.visibility=lo>.01?'':'hidden';if(lo>.01){LB[j].style.opacity=lo.toFixed(3);const m=LBM[j]||'b',rr=R*s;LB[j].style.transform=m==='b'?`translate3d(calc(${sx.toFixed(1)}px - 50%),${(sy+rr*1.12+6).toFixed(1)}px,0)`:m==='a'?`translate3d(calc(${sx.toFixed(1)}px - 50%),calc(${(sy-rr*1.12-6).toFixed(1)}px - 100%),0)`:m==='r'?`translate3d(${(sx+rr*1.15+8).toFixed(1)}px,calc(${sy.toFixed(1)}px - 50%),0)`:`translate3d(calc(${(sx-rr*1.15-8).toFixed(1)}px - 100%),calc(${sy.toFixed(1)}px - 50%),0)`;}}
   const ro=o*(.22+.78*vis);
   [RB[j],RF[j]].forEach((r,b)=>{if(ro<.01||off){r.style.visibility='hidden';return;}r.style.visibility='';r.style.opacity=ro.toFixed(3);r.style.zIndex=zb+(b?2:0);r.style.transform=`translate3d(${(sx-ringR).toFixed(1)}px,${(sy-ringR*.3).toFixed(1)}px,0) scale(${s.toFixed(4)})`;});
   NB[j].style.visibility=vis>.01?'':'hidden';NB[j].style.opacity=(vis*.95).toFixed(3);
